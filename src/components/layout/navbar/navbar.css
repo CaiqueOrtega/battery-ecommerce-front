@@ -1,0 +1,9 @@
+.carret-menuDropdow-possition {
+    top: -15px;
+    left: calc(90% - 0.6em);
+
+}
+
+.dropdow-menu-size {
+    width: 270px;
+}

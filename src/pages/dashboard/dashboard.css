@@ -1,0 +1,18 @@
+  
+.list-group-item.active .color-red{
+    color: white; 
+    
+  }
+
+ .list-group-item.active {
+     background-color: #e70f00;
+     border: #f11100;
+     border-radius: 5px;
+     box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
+ }
+
+ @media (min-width: 1024px) and (max-width: 1366px) {
+  #sidebarDashboard {
+    width: 240px !important;
+  }
+}
