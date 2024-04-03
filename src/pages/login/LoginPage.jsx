@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, Form, Row, Col, Button } from 'react-bootstrap';
 import { LockIcon, EnvelopeIcon, LoginIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../../public/images/logoBgWhite.png';
 import logo from '../../../public/images/logo.png';
+import ApiAuthentication from '../../services/ApiAuthentication';
+import {decodeToken} from 'react-jwt';
 
 function LoginPage() {
   return (
@@ -29,18 +31,36 @@ function LoginPage() {
 }
 
 function LoginForm() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
     <Form>
-      <Form.Label>Endereço de E-mail</Form.Label>
-      <FormGroupWithIcon icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />} type='email' placeholder='exemplo@gmail.com' mb='3' />
-      <Form.Label>Senha</Form.Label>
-      <FormGroupWithIcon icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />} type='password' placeholder='•••••••••' />
+      <Form.Label htmlFor='emailLogin'>Endereço de E-mail</Form.Label>
+      <FormGroupWithIcon value={email} onChange={(e) => setEmail(e.target.value)} icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />} type='email' placeholder='exemplo@gmail.com' mb='3' />
+      <Form.Label htmlFor='passwordLogin'>Senha</Form.Label>
+      <FormGroupWithIcon value={password}  onChange={(e) => setPassword(e.target.value)} icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />} type='password' placeholder='•••••••••' />
       <a type='button' className='text-muted small'>Esqueceu sua Senha?</a>
       <div className='d-flex justify-content-center'>
-        <Button type='submit' variant='red' className='flex-grow-1 mt-4'>Entrar</Button>
+        <Button variant='red' className='flex-grow-1 mt-4' onClick={() => login(email, password)}>Entrar</Button>
       </div>
     </Form>
   );
+}
+
+async function login(emailLogin, passwordLogin){
+  const response = await ApiAuthentication.post('/login', {
+    email: emailLogin, 
+    password: passwordLogin
+  })
+
+  descriptedToken(response.data.token)
+
+}
+
+function descriptedToken(tokenJWT){
+    const decodedToken = decodeToken(tokenJWT);
+    console.log(decodedToken);
 }
 
 export default LoginPage;
