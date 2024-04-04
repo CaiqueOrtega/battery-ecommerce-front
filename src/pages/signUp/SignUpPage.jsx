@@ -9,7 +9,7 @@ import ApiAuthentication from '../../services/ApiAuthentication';
 
 function SignUpPage() {
     return (
-        <div className="container vh-100 d-flex align-items-center justify-content-center">
+        <div className="vh-100 d-flex align-items-center justify-content-center bg-main">
             <Card className='shadow' style={{ width: '48rem' }}>
                 <Row className='g-0'>
                     <Col md={5} className='d-none d-md-flex align-items-center bg-yellow rounded-start'>

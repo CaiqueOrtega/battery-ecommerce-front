@@ -9,7 +9,7 @@ import {decodeToken} from 'react-jwt';
 
 function LoginPage() {
   return (
-    <div className='container vh-100 d-flex align-items-center justify-content-center'>
+    <div className='vh-100 d-flex align-items-center justify-content-center bg-main'>
       <Card className='shadow' style={{ width: '45rem' }}>
         <Row className='g-0'>
           <Col md={7} className='p-md-5 px-3 py-4'>
@@ -55,7 +55,6 @@ async function login(emailLogin, passwordLogin){
   })
 
   descriptedToken(response.data.token)
-
 }
 
 function descriptedToken(tokenJWT){
