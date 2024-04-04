@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import './dashboard.css';
-import logo from '../../../public/images/logo.png';
+import logo from '../../assets/images/logo.png';
 
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
 import { SearchIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon } from '../../assets/icons/IconsSet';

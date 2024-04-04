@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 import { Card, Form, Row, Col, Button } from 'react-bootstrap';
 import { LockIcon, EnvelopeIcon, UserIcon, DocumentIcon, SingUpIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import logoBgWhite from '../../../public/images/logoBgWhite.png';
-import logo from '../../../public/images/logo.png';
+import logoBgWhite from '../../assets/images/logoBgWhite.png';
+import logo from '../../assets/images/logo.png';
 import ApiAuthentication from '../../services/ApiAuthentication';
 
 
@@ -60,7 +60,8 @@ async function signUp(emailSingUp, nameSingUp, documentSingUp, passwordSingUp){
         });
         console.log('Resposta do cadastro:', response.data.message);
     } catch (error) {
-        console.error('Erro ao se cadastrar:', error);
+        //console.error('Erro ao se cadastrar:', error);
+        console.log("JOAO")
     }
 }
 

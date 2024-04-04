@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col } from 'react-bootstrap';
 import { SearchIcon, CartIcon, UserCircleIcon, CarretUpIcon, UserCircleOutlineIcon } from '../../../assets/icons/IconsSet';
-import logo from '../../../../public/images/logo.png';
+import logo from '../../../assets/images/logo.png';
 import LoginSignupButton from '../../common/LoginSignupButton';
 import './navbar.css';
 
