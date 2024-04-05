@@ -4,12 +4,12 @@ import { LockIcon, EnvelopeIcon, UserIcon, DocumentIcon, SingUpIcon } from '../.
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
-import ApiAuthentication from '../../services/ApiAuthentication';
+import ConnectionAPI from '../../services/ConnectionAPI';
 
 
 function SignUpPage() {
     return (
-        <div className="vh-100 d-flex align-items-center justify-content-center bg-main">
+        <div className="vh-100 d-flex align-items-center justify-content-center">
             <Card className='shadow' style={{ width: '48rem' }}>
                 <Row className='g-0'>
                     <Col md={5} className='d-none d-md-flex align-items-center bg-yellow rounded-start'>
@@ -52,7 +52,7 @@ function SignUpForm() {
 
 async function signUp(emailSingUp, nameSingUp, documentSingUp, passwordSingUp){
     try {
-        const response = await ApiAuthentication.post('/register', {
+        const response = await ConnectionAPI.post('auth/register', {
             email: emailSingUp, 
             password: passwordSingUp,
             name: nameSingUp,
@@ -60,8 +60,7 @@ async function signUp(emailSingUp, nameSingUp, documentSingUp, passwordSingUp){
         });
         console.log('Resposta do cadastro:', response.data.message);
     } catch (error) {
-        //console.error('Erro ao se cadastrar:', error);
-        console.log("JOAO")
+        console.error('Erro ao se cadastrar:', error);
     }
 }
 
