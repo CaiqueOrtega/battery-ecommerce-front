@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Card, Form, Row, Col, Button } from 'react-bootstrap';
-import { LockIcon, EnvelopeIcon, LoginIcon } from '../../assets/icons/IconsSet';
+import { LockIcon, EnvelopeIcon, LoginIcon, AlertIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
@@ -9,7 +9,7 @@ import { decodeToken } from 'react-jwt';
 
 function LoginPage() {
   return (
-    <div className='vh-100 d-flex align-items-center justify-content-center bg-main'>
+    <div className='container vh-100 d-flex align-items-center justify-content-center'>
       <Card className='shadow' style={{ width: '45rem' }}>
         <Row className='g-0'>
           <Col md={7} className='p-md-5 px-3 py-4'>
@@ -32,8 +32,8 @@ function LoginPage() {
 }
 
 function LoginForm() {
-  const [email, setEmail] = useState(null);
-  const [password, setPassword] = useState(null);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
   return (
     <Form>
@@ -51,6 +51,7 @@ function LoginForm() {
 
 async function login(emailLogin, passwordLogin) {
   try {
+  
     const response = await ApiAuthentication.post('/login', {
       email: emailLogin,
       password: passwordLogin
@@ -61,12 +62,12 @@ async function login(emailLogin, passwordLogin) {
     }
   } catch (error) {
     const msgElement = document.querySelector('.msg');
-    msgElement.textContent = error.response.data.message;
-    msgElement.classList.add('alert', 'alert-danger');
+    msgElement.innerHTML = 
+    `<span>${AlertIcon()}</span>
+    <span>${error.response.data.message}</span>`; 
+  msgElement.classList.add('alert', 'alert-danger');
   }
 }
-
-
 
 function descriptedToken(tokenJWT) {
   const decodedToken = decodeToken(tokenJWT);
