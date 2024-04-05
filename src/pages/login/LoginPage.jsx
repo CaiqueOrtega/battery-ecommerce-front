@@ -4,7 +4,7 @@ import { LockIcon, EnvelopeIcon, LoginIcon, AlertIcon } from '../../assets/icons
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
-import ApiAuthentication from '../../services/ApiAuthentication';
+import ApiAuthentication from '../../services/ConnectionAPI';
 import { decodeToken } from 'react-jwt';
 
 function LoginPage() {
@@ -51,7 +51,7 @@ function LoginForm() {
 
 async function login(emailLogin, passwordLogin) {
   try {
-  
+
     const response = await ApiAuthentication.post('/login', {
       email: emailLogin,
       password: passwordLogin
@@ -62,10 +62,7 @@ async function login(emailLogin, passwordLogin) {
     }
   } catch (error) {
     const msgElement = document.querySelector('.msg');
-    msgElement.innerHTML = 
-    `<span>${AlertIcon()}</span>
-    <span>${error.response.data.message}</span>`; 
-  msgElement.classList.add('alert', 'alert-danger');
+    msgElement.classList.add('alert', 'alert-danger');
   }
 }
 
