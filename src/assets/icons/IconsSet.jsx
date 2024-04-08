@@ -44,11 +44,11 @@ export const UserCircleOutlineIcon = () => (
 );
 
 export const LockIcon = ({ className, currentColor }) => (
-    <svg className={className} fill={'#' + currentColor} height="19" width="19" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" enableBackground="new 0 0 512 512" xmlSpace="preserve"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M418.4,232.7h-23.3v-93.1C395.1,62.5,332.6,0,255.5,0S115.9,62.5,115.9,139.6v93.1H92.6c-12.8,0-23.3,10.4-23.3,23.3v232.7 c0,12.9,10.4,23.3,23.3,23.3h325.8c12.8,0,23.3-10.4,23.3-23.3V256C441.7,243.1,431.2,232.7,418.4,232.7z M348.6,232.7H162.4v-93.1 c0-51.4,41.7-93.1,93.1-93.1s93.1,41.7,93.1,93.1V232.7z"></path> </g></svg>
+    <svg className={className} fill={'#' + currentColor} height="18" width="18" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" enableBackground="new 0 0 512 512" xmlSpace="preserve"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M418.4,232.7h-23.3v-93.1C395.1,62.5,332.6,0,255.5,0S115.9,62.5,115.9,139.6v93.1H92.6c-12.8,0-23.3,10.4-23.3,23.3v232.7 c0,12.9,10.4,23.3,23.3,23.3h325.8c12.8,0,23.3-10.4,23.3-23.3V256C441.7,243.1,431.2,232.7,418.4,232.7z M348.6,232.7H162.4v-93.1 c0-51.4,41.7-93.1,93.1-93.1s93.1,41.7,93.1,93.1V232.7z"></path> </g></svg>
 );
 
 export const EnvelopeIcon = ({ className, currentColor }) => (
-    <svg className={className} height="19" width="19" viewBox="0 -3 24 24" id="meteor-icon-kit__solid-envelope" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><path fillRule="evenodd" clipRule="evenodd" d="M23.4006 1.20046L13.1469 8.9765C12.4583 9.4585 11.5417 9.4585 10.8531 8.9765L0.599433 1.20046C1.14673 0.47153 2.0183 0 3 0H21C21.9817 0 22.8533 0.47153 23.4006 1.20046zM24 3.25413V15C24 16.6569 22.6569 18 21 18H3C1.34315 18 0 16.6569 0 15V3.25413L9.70615 10.615C11.0834 11.5791 12.9166 11.5791 14.2938 10.615L24 3.25413z" fill={'#' + currentColor}></path></g></svg>
+    <svg className={className} height="18" width="18" viewBox="0 -3 24 24" id="meteor-icon-kit__solid-envelope" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><path fillRule="evenodd" clipRule="evenodd" d="M23.4006 1.20046L13.1469 8.9765C12.4583 9.4585 11.5417 9.4585 10.8531 8.9765L0.599433 1.20046C1.14673 0.47153 2.0183 0 3 0H21C21.9817 0 22.8533 0.47153 23.4006 1.20046zM24 3.25413V15C24 16.6569 22.6569 18 21 18H3C1.34315 18 0 16.6569 0 15V3.25413L9.70615 10.615C11.0834 11.5791 12.9166 11.5791 14.2938 10.615L24 3.25413z" fill={'#' + currentColor}></path></g></svg>
 );
 
 export const UserIcon = ({ className, currentColor, size }) => (
@@ -56,7 +56,7 @@ export const UserIcon = ({ className, currentColor, size }) => (
 );
 
 export const DocumentIcon = ({ className, currentColor }) => (
-    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill={'#' + currentColor} viewBox="0 0 16 16">
+    <svg className={className} xmlns="http://www.w3.org/2000/svg" width="21" height="21" fill={'#' + currentColor} viewBox="0 0 16 16">
         <path d="M5 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m4-2.5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5M9 8a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4A.5.5 0 0 1 9 8m1 2.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3a.5.5 0 0 1-.5-.5" />
         <path d="M2 2a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2zM1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H8.96q.04-.245.04-.5C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 1 1 12z" />
     </svg>

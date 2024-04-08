@@ -44,7 +44,6 @@ function LoginForm() {
         email: emailLogin,
         password: passwordLogin
       });
-
       descriptedToken(response.data.token);
 
     } catch (error) {
@@ -56,10 +55,8 @@ function LoginForm() {
     }
   };
 
-  C
   return (
     <>
-
       {errorMessage && (
         <div className='msg alert alert-danger mb-0'>
           <AlertIcon />
