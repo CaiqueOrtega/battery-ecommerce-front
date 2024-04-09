@@ -36,9 +36,18 @@ function LoginPage() {
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [errorMessages, setErrorMessages] = useState({});
+  const [prevFormDataLogin, setPrevFormDataLogin] = useState({})
+
 
   const login = async (emailLogin, passwordLogin) => {
+    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin })) {
+      setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
+      return;
+    }
+
+    setPrevFormDataLogin({ email: emailLogin, password: passwordLogin });
+
     try {
       const response = await ConnectionAPI.post('auth/login', {
         email: emailLogin,
@@ -48,20 +57,27 @@ function LoginForm() {
 
     } catch (error) {
       if (error.response) {
-        setErrorMessage(error.response.data.message);
+        if (error.response.data.field) {
+          const { field, message } = error.response.data;
+          setErrorMessages({ [field]: message });
+        }else{
+          setErrorMessages({ general: error.response.data.message})
+        }
+
+
       } else if (error.request) {
-        setErrorMessage('Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.');
+        setErrorMessages({ general: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
       }
     }
   };
 
   return (
     <>
-      {errorMessage && (
+      {errorMessages.general && (
         <div className='msg alert alert-danger mb-0'>
           <AlertIcon size={"16"} currentColor={"#74373e"} />
           <span className='ms-2'>
-            {errorMessage}
+            {errorMessages.general}
           </span>
         </div>
       )}
@@ -69,10 +85,21 @@ function LoginForm() {
         e.preventDefault();
         login(email, password);
       }}>
-        <Form.Label className='mt-3' htmlFor='emailLogin'>Endereço de E-mail</Form.Label>
-        <FormGroupWithIcon value={email} onChange={(e) => setEmail(e.target.value)} icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />} type='email' placeholder='exemplo@gmail.com' mb='3' />
-        <Form.Label htmlFor='passwordLogin'>Senha</Form.Label>
-        <FormGroupWithIcon value={password} onChange={(e) => setPassword(e.target.value)} icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />} type='password' placeholder='•••••••••' />
+        <Form.Label className='mt-3 w-100' htmlFor='emailLogin'>Endereço de E-mail</Form.Label>
+        <FormGroupWithIcon value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+          type='email' placeholder='exemplo@gmail.com' mb='3'
+          feedback={errorMessages.email}
+        />
+
+        <Form.Label htmlFor='passwordLogin' className='w-100'>Senha</Form.Label>
+        <FormGroupWithIcon value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+          type='password' placeholder='•••••••••'
+          feedback={errorMessages.password}
+        />
         <a type='button' className='text-muted small'>Esqueceu sua Senha?</a>
         <div className='d-flex justify-content-center mt-5'>
           <Button variant='red' className='flex-grow-1' type='submit'>Entrar</Button>

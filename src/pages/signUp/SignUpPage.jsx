@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, Card, Form, Row, Col, Button, InputGroup } from 'react-bootstrap';
 import { LockIcon, EnvelopeIcon, UserIcon, DocumentIcon, SingUpIcon, AlertIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
@@ -40,10 +40,16 @@ function SignUpForm() {
     const [document, setDocument] = useState('');
     const [password, setPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState({});
-
+    const [prevFormData, setPrevFormData] = useState({})
     
-
+ 
     async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp) {
+        if (JSON.stringify(prevFormData) === JSON.stringify({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp })) {
+            setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
+            return;
+        }
+
+        setPrevFormData({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp });
 
         try {
             const response = await ConnectionAPI.post('auth/register', {
@@ -55,6 +61,7 @@ function SignUpForm() {
 
 
         } catch (error) {
+            
             if (error.response) {
                 const { field, message } = error.response.data;
                 setErrorMessages({ [field]: message });
@@ -62,9 +69,10 @@ function SignUpForm() {
             } else if (error.request) {
                 setErrorMessages({ general: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
             } else {
-                setErrorMessages({ general: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.' });
+                setErrorMessages( { general: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.' });
             }
         }
+        
     }
 
     return (
