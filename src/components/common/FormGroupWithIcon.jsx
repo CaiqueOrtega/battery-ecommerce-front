@@ -1,31 +1,43 @@
-import { FormControl, Form } from "react-bootstrap";
-import { useEffect, useRef } from 'react';
+import { FormControl, Form, InputGroup } from "react-bootstrap";
+import { useEffect, useState, useRef } from 'react';
+import { AlertIcon } from "../../assets/icons/IconsSet";
 
-const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback }) => {
+const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, focusOnError }) => {
     const inputRef = useRef(null);
+    const [isFocused, setIsFocused] = useState(false);
+
 
     useEffect(() => {
-        inputRef.current.focus()
+        if (feedback && inputRef.current) {
+            inputRef.current.focus();
+        }
     }, [feedback]);
     
     return (
+        <>
+            {
+                feedback && isFocused && (
+                    <span className="text-danger small mb-1"><AlertIcon size="14" currentColor={"currentcolor"} /> {feedback} </span>
+                )
+            }
 
-        <div className={'mb-3 ' + mb + ' align-items-center d-flex position-relative flex-grow-1 flex-wrap'} >
-            <FormControl
-                value={value}
-                onChange={onChange}
-                type={type}
-                placeholder={placeholder}
-                className={`ps-5 py-2 border-0 bg-main rounded-1 ${feedback ? 'is-invalid' : ' '}`}
-                required
-                ref={inputRef}
-            />
-            {icon}
-            {feedback && (
-                <Form.Control.Feedback className="position-absolute bottom-100 flex-shrink-1" type="invalid" >{feedback}</Form.Control.Feedback>
-            )}
-        </div>
+            <div className={`${mb} align-items-center d-flex position-relative flex-grow-1`} >
+                <FormControl
+                    value={value}
+                    onChange={onChange}
+                    type={type}
+                    placeholder={placeholder}
+                    className={`ps-5 py-2 border-0 bg-main rounded-1 ${feedback && 'is-invalid'}`}
+                    ref={inputRef}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    required
+                />
+                {icon}
+            </div>
+        </>
     );
 };
+
 
 export default FormGroupWithIcon;

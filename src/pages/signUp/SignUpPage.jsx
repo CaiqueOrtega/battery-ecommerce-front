@@ -15,8 +15,8 @@ function SignUpPage() {
                     <Row className='g-0'>
                         <Col md={7} className='p-md-4  px-3 py-4'>
                             <Card.Body>
-                                <div className="d-flex align-items-center mb-5">
-                                    <h4><SingUpIcon currentColor='c00d0d' /> Registre sua conta</h4>
+                                <div className="d-flex align-items-center pb-4">
+                                    <h4 className='mb-0'><SingUpIcon currentColor='c00d0d' /> Registre sua conta</h4>
                                     <img className="d-md-none mb-3 ms-auto" src={logo} alt="Logo Baterias Jupiter" width="100px" />
                                 </div>
                                 <SignUpForm />
@@ -41,84 +41,90 @@ function SignUpForm() {
     const [password, setPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState({});
 
+    
+
     async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp) {
-            try {
-                const response = await ConnectionAPI.post('auth/register', {
-                    email: emailSignUp,
-                    password: passwordSignUp,
-                    name: nameSignUp,
-                    document: documentSignUp
-                });
 
-                
-            } catch (error) {
-                if (error.response) {
-                    const { field, message } = error.response.data;
-                    setErrorMessages({ [field]: message });
+        try {
+            const response = await ConnectionAPI.post('auth/register', {
+                email: emailSignUp,
+                password: passwordSignUp,
+                name: nameSignUp,
+                document: documentSignUp
+            });
 
 
-                    Object.keys(errorMessages).forEach(key => {
-                        if (key !== field) {
-                            setErrorMessages(prevState => ({ ...prevState, [key]: '' }));
-                        }
-                    });
-                } else if (error.request) {
-                    setErrorMessages({ general: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-                } else {
-                    setErrorMessages({ general: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.' });
-                }
+        } catch (error) {
+            if (error.response) {
+                const { field, message } = error.response.data;
+                setErrorMessages({ [field]: message });
+               
+            } else if (error.request) {
+                setErrorMessages({ general: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
+            } else {
+                setErrorMessages({ general: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.' });
             }
         }
-
-
-
-    return (
-            <>
-
-                <Form className='mt-3' onSubmit={(e) => {
-                    e.preventDefault();
-                    signUp(email, name, document, password);
-                }}>
-                    <InputGroup hasValidation>
-                        <FormGroupWithIcon value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                            type='email' placeholder='E-mail' mb={'3'}
-                            feedback={errorMessages.email}
-                        />
-                    </InputGroup>
-
-                    <InputGroup hasValidation>
-                        <FormGroupWithIcon value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'} />}
-                            type='text' placeholder='Nome Completo' mb={'3'}
-                        />
-                    </InputGroup>
-
-                    <InputGroup hasValidation>
-                        <FormGroupWithIcon value={document}
-                            onChange={(e) => setDocument(e.target.value)} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                            type='text' placeholder='CPF' mb={'3'}
-                            feedback={errorMessages.documento}
-
-                        />
-                    </InputGroup>
-
-                    <InputGroup hasValidation>
-                        <FormGroupWithIcon value={password} onChange={(e) => setPassword(e.target.value)} icon={
-                            <LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                            type='password' placeholder='Senha' mb={'3'}
-                            feedback={errorMessages.senha}
-                        />
-                    </InputGroup>
-                    <div className='d-flex justify-content-center'>
-                        <Button variant='red' className='flex-grow-1 mt-5' type='submit'>Cadastrar-se</Button>
-                    </div>
-                </Form>
-            </>
-        );
     }
 
+    return (
+        <>
+            {errorMessages.general && (
+                <div className='alert alert-danger mb-0'>
 
-    export default SignUpPage;
+                    <AlertIcon size={"16"} currentColor={"#74373e"} />
+                    <span className='ms-2'>
+                        {errorMessages.general}
+                    </span>
+                </div>
+            )}
+
+            <Form className="pt-4 " onSubmit={(e) => {
+                e.preventDefault();
+                signUp(email, name, document, password);
+            }}>
+                <InputGroup hasValidation>
+                    <FormGroupWithIcon value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                        type='email' placeholder='E-mail' mb={'mb-3'}
+                        feedback={errorMessages.email}
+                    />
+                </InputGroup>
+
+                <InputGroup hasValidation>
+                    <FormGroupWithIcon value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'} />}
+                        type='text' placeholder='Nome Completo' mb={'mb-3'}
+                        feedback={errorMessages.name}
+                    />
+                </InputGroup>
+
+                <InputGroup hasValidation>
+                    <FormGroupWithIcon value={document}
+                        onChange={(e) => setDocument(e.target.value)} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                        type='text' placeholder='CPF' mb={'mb-3'}
+                        feedback={errorMessages.document}
+                        
+                    />
+                </InputGroup>
+
+                <InputGroup hasValidation>
+                    <FormGroupWithIcon value={password} onChange={(e) => setPassword(e.target.value)} icon={
+                        <LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                        type='password' placeholder='Senha' mb={'mb-3'}
+                        feedback={errorMessages.password}
+                        
+                    />
+                </InputGroup>
+                <div className='d-flex justify-content-center mt-4 pt-3'>
+                    <Button variant='red' className='flex-grow-1' type='submit'>Cadastrar-se</Button>
+                </div>
+            </Form>
+        </>
+    );
+}
+
+
+export default SignUpPage;

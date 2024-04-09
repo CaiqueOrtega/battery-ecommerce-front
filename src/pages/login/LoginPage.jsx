@@ -59,8 +59,10 @@ function LoginForm() {
     <>
       {errorMessage && (
         <div className='msg alert alert-danger mb-0'>
-          <AlertIcon />
-          {errorMessage}
+          <AlertIcon size={"16"} currentColor={"#74373e"} />
+          <span className='ms-2'>
+            {errorMessage}
+          </span>
         </div>
       )}
       <Form onSubmit={(e) => {

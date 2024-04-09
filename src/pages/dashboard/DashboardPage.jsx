@@ -1,28 +1,27 @@
 import React, { useState } from 'react';
-import './dashboard.css';
-import logo from '../../assets/images/logo.png';
-
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
 import { SearchIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon } from '../../assets/icons/IconsSet';
-
+import BatteryIndex from '../battery/BatteryIndex';
+import logo from '../../assets/images/logo.png';
+import './dashboard.css';
 
 function DashboardPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [sidebarSelectedOption, setSidebarSelectedOption] = useState("Controle Baterias");
 
     return (
-
-        <div className="d-flex flex-column vh-100 bg-main" >
+        <div className="d-flex flex-column vh-100 bg-main">
             <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-                <Row className='g-0 flex-grow-1 overflow-hidden'>
-                    <Collapse in={sidebarOpen} className='d-lg-block'>
-                        <Col xs={12} lg={2} id='sidebarDashboard' className='bg-white shadow py-lg-5 px-2'>
-                            <SidebarContent />
-                        </Col>
-                    </Collapse>
-                    <Col className='d-flex h-100 overflow-auto p-4'>
-                        <MainContent />
+            <Row className='g-0 flex-grow-1 overflow-hidden'>
+                <Collapse in={sidebarOpen} className='d-lg-block'>
+                    <Col xs={12} lg={2} id='sidebarDashboard' className='bg-white shadow py-lg-5 px-2'>
+                        <SidebarContent onItemClick={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
                     </Col>
-                </Row>
+                </Collapse>
+                <Col className='d-flex h-100 overflow-auto p-4'>
+                    <MainContent sidebarSelectedOption={sidebarSelectedOption} />
+                </Col>
+            </Row>
         </div>
     );
 }
@@ -92,32 +91,44 @@ function UserDropdown() {
     );
 }
 
+function SidebarContent({ onItemClick, selectedOption }) {
+    const sidebarItems = [
+        { icon: <AtomIcon />, text: 'Controle Baterias' },
+        { icon: <UserIconCropped />, text: 'Usuários' },
+        { icon: <PromotionIcon />, text: 'Promoções' },
+        { icon: <StatisticsIcon />, text: 'Vendas' },
+        { icon: <DeliveryIcon />, text: 'Entregas' }
+    ];
 
-function SidebarContent() {
     return (
         <ListGroup className='list-group-flush flex-grow-1'>
-            <SidebarItem icon={<AtomIcon />} text='Controle Baterias' active={true} />
-            <SidebarItem icon={<UserIconCropped />} text='Usuários' />
-            <SidebarItem icon={<PromotionIcon />} text='Promoções' />
-            <SidebarItem icon={<StatisticsIcon />} text='Vendas' />
-            <SidebarItem icon={<DeliveryIcon />} text='Entregas' />
+            {sidebarItems.map((item, index) => (
+                <ListGroup.Item 
+                    key={index}
+                    type="button" 
+                    className={`py-2 list-group-item-action ${selectedOption === item.text ? 'active' : ''}`} 
+                    onClick={() => onItemClick(item.text)}
+                >
+                    <i className='me-2 color-red'>{item.icon}</i> {item.text}
+                </ListGroup.Item>
+            ))}
         </ListGroup>
     );
 }
 
+function MainContent({ sidebarSelectedOption }) {
+    let content = null;
+    switch (sidebarSelectedOption) {
+        case "Controle Baterias":
+            content = <BatteryIndex />;
+            break;
+        default:
+            content = null;
+    }
 
-function SidebarItem({ icon, text, active = false }) {
     return (
-        <ListGroup.Item type="button" className={`py-2 list-group-item-action ${active ? 'active' : ''}`}>
-            <i className='me-2 color-red'>{icon}</i> {text}
-        </ListGroup.Item>
-    );
-}
-
-function MainContent() {
-    return (
-        <div>Main content
-            
+        <div>
+            {content}
         </div>
     );
 }
