@@ -41,11 +41,11 @@ function LoginForm() {
 
 
   const login = async (emailLogin, passwordLogin) => {
-    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin })) {
+
+    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) &&  !errorMessages.severError)  {
       setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
       return;
     }
-
     setPrevFormDataLogin({ email: emailLogin, password: passwordLogin });
 
     try {
@@ -64,23 +64,23 @@ function LoginForm() {
           setErrorMessages({ general: error.response.data.message})
         }
 
-
       } else if (error.request) {
-        setErrorMessages({ general: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
+        setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.'  });
       }
     }
   };
 
   return (
     <>
-      {errorMessages.general && (
+      {errorMessages.general || errorMessages.severError ?(
         <div className='msg alert alert-danger mb-0'>
           <AlertIcon size={"16"} currentColor={"#74373e"} />
           <span className='ms-2'>
-            {errorMessages.general}
+            {errorMessages.general ? errorMessages.general : errorMessages.severError}
           </span>
         </div>
-      )}
+      ) : null}
+
       <Form onSubmit={(e) => {
         e.preventDefault();
         login(email, password);
@@ -89,7 +89,7 @@ function LoginForm() {
         <FormGroupWithIcon value={email}
           onChange={(e) => setEmail(e.target.value)}
           icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-          type='email' placeholder='exemplo@gmail.com' mb='3'
+          type='email' placeholder='exemplo@gmail.com' mb={'mb-3'}
           feedback={errorMessages.email}
         />
 

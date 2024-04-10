@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Card, Form, Row, Col, Button, InputGroup } from 'react-bootstrap';
-import { LockIcon, EnvelopeIcon, UserIcon, DocumentIcon, SingUpIcon, AlertIcon } from '../../assets/icons/IconsSet';
+import { LockIcon, EnvelopeIcon, UserIcon, DocumentIcon, SingUpIcon, AlertIcon, KeyIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
@@ -39,57 +39,57 @@ function SignUpForm() {
     const [name, setName] = useState('');
     const [document, setDocument] = useState('');
     const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState({});
     const [prevFormData, setPrevFormData] = useState({})
-    
- 
-    async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp) {
-        if (JSON.stringify(prevFormData) === JSON.stringify({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp })) {
+
+
+    async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp, confirmPassword) {
+        if (JSON.stringify(prevFormData) === JSON.stringify({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp, confirmPassword: confirmPassword }) && !errorMessages.severError) {
             setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
             return;
         }
 
-        setPrevFormData({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp });
+        setPrevFormData({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp, confirmPassword: confirmPassword });
+
+        console.log(confirmPassword);
 
         try {
             const response = await ConnectionAPI.post('auth/register', {
                 email: emailSignUp,
                 password: passwordSignUp,
                 name: nameSignUp,
-                document: documentSignUp
+                document: documentSignUp,
+                confirmPassword: confirmPassword
             });
 
 
         } catch (error) {
-            
+
             if (error.response) {
                 const { field, message } = error.response.data;
                 setErrorMessages({ [field]: message });
-               
+
             } else if (error.request) {
-                setErrorMessages({ general: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-            } else {
-                setErrorMessages( { general: 'Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.' });
+                setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
             }
         }
-        
     }
 
     return (
         <>
-            {errorMessages.general && (
+            {errorMessages.general || errorMessages.severError ? (
                 <div className='alert alert-danger mb-0'>
-
                     <AlertIcon size={"16"} currentColor={"#74373e"} />
                     <span className='ms-2'>
-                        {errorMessages.general}
+                        {errorMessages.general ? errorMessages.general : errorMessages.severError}
                     </span>
                 </div>
-            )}
+            ) : null}
 
             <Form className="pt-4 " onSubmit={(e) => {
                 e.preventDefault();
-                signUp(email, name, document, password);
+                signUp(email, name, document, password, confirmPassword);
             }}>
                 <InputGroup hasValidation>
                     <FormGroupWithIcon value={email}
@@ -114,7 +114,7 @@ function SignUpForm() {
                         onChange={(e) => setDocument(e.target.value)} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                         type='text' placeholder='CPF' mb={'mb-3'}
                         feedback={errorMessages.document}
-                        
+
                     />
                 </InputGroup>
 
@@ -123,8 +123,16 @@ function SignUpForm() {
                         <LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                         type='password' placeholder='Senha' mb={'mb-3'}
                         feedback={errorMessages.password}
-                        
+
                     />
+
+                    <FormGroupWithIcon value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} icon={
+                        <KeyIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                        type='password' placeholder='Confirme sua senha' mb={'mb-3'}
+                        feedback={errorMessages.confirmPassword}
+
+                    />
+
                 </InputGroup>
                 <div className='d-flex justify-content-center mt-4 pt-3'>
                     <Button variant='red' className='flex-grow-1' type='submit'>Cadastrar-se</Button>
