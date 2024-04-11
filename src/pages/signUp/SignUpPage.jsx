@@ -5,7 +5,7 @@ import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
 import ConnectionAPI from '../../services/ConnectionAPI';
-
+import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
     return (
@@ -42,9 +42,11 @@ function SignUpForm() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [errorMessages, setErrorMessages] = useState({});
     const [prevFormData, setPrevFormData] = useState({})
-
+    const navigate = useNavigate();
 
     async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp, confirmPassword) {
+
+
         if (JSON.stringify(prevFormData) === JSON.stringify({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp, confirmPassword: confirmPassword }) && !errorMessages.severError) {
             setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
             return;
@@ -63,6 +65,7 @@ function SignUpForm() {
                 confirmPassword: confirmPassword
             });
 
+            navigate("/entrar", { state: { email: emailSignUp } });
 
         } catch (error) {
 
@@ -91,49 +94,57 @@ function SignUpForm() {
                 e.preventDefault();
                 signUp(email, name, document, password, confirmPassword);
             }}>
-                <InputGroup hasValidation>
-                    <FormGroupWithIcon value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                        type='email' placeholder='E-mail' mb={'mb-3'}
-                        feedback={errorMessages.email}
-                    />
-                </InputGroup>
 
-                <InputGroup hasValidation>
-                    <FormGroupWithIcon value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'} />}
-                        type='text' placeholder='Nome Completo' mb={'mb-3'}
-                        feedback={errorMessages.name}
-                    />
-                </InputGroup>
+                <FormGroupWithIcon
+                    bgBorder={true}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                    type='email' placeholder='E-mail' mb={'mb-3'}
+                    feedback={errorMessages.email}
+                />
 
-                <InputGroup hasValidation>
-                    <FormGroupWithIcon value={document}
-                        onChange={(e) => setDocument(e.target.value)} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                        type='text' placeholder='CPF' mb={'mb-3'}
-                        feedback={errorMessages.document}
 
-                    />
-                </InputGroup>
+                <FormGroupWithIcon
+                    bgBorder={true}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'} />}
+                    type='text' placeholder='Nome Completo' mb={'mb-3'}
+                    feedback={errorMessages.name}
+                />
 
-                <InputGroup hasValidation>
-                    <FormGroupWithIcon value={password} onChange={(e) => setPassword(e.target.value)} icon={
-                        <LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                        type='password' placeholder='Senha' mb={'mb-3'}
-                        feedback={errorMessages.password}
 
-                    />
+                <FormGroupWithIcon
+                    bgBorder={true}
+                    value={document}
+                    onChange={(e) => setDocument(e.target.value)} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                    type='text' placeholder='CPF' mb={'mb-3'}
+                    feedback={errorMessages.document}
 
-                    <FormGroupWithIcon value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} icon={
-                        <KeyIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                        type='password' placeholder='Confirme sua senha' mb={'mb-3'}
-                        feedback={errorMessages.confirmPassword}
+                />
 
-                    />
 
-                </InputGroup>
+                <FormGroupWithIcon
+                    bgBorder={true}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                    type='password' placeholder='Senha' mb={'mb-3'}
+                    feedback={errorMessages.password}
+
+                />
+
+                <FormGroupWithIcon
+                    bgBorder={true}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    icon={<KeyIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                    type='password' placeholder='Confirme sua senha' mb={'mb-3'}
+                    feedback={errorMessages.confirmPassword}
+
+                />
+
                 <div className='d-flex justify-content-center mt-4 pt-3'>
                     <Button variant='red' className='flex-grow-1' type='submit'>Cadastrar-se</Button>
                 </div>

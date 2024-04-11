@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Form, Row, Col, Button, Container } from 'react-bootstrap';
 import { LockIcon, EnvelopeIcon, LoginIcon, AlertIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
 import ConnectionAPI from '../../services/ConnectionAPI';
-import { decodeToken } from 'react-jwt';
+import { useNavigate, useLocation } from "react-router-dom";
+
 
 function LoginPage() {
   return (
@@ -38,11 +39,11 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [errorMessages, setErrorMessages] = useState({});
   const [prevFormDataLogin, setPrevFormDataLogin] = useState({})
-
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const login = async (emailLogin, passwordLogin) => {
-
-    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) &&  !errorMessages.severError)  {
+    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) && !errorMessages.severError) {
       setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
       return;
     }
@@ -53,26 +54,34 @@ function LoginForm() {
         email: emailLogin,
         password: passwordLogin
       });
-      descriptedToken(response.data.token);
+
+      localStorage.setItem('token', response.data.token);
+      navigate("/");
 
     } catch (error) {
       if (error.response) {
         if (error.response.data.field) {
           const { field, message } = error.response.data;
           setErrorMessages({ [field]: message });
-        }else{
-          setErrorMessages({ general: error.response.data.message})
+        } else {
+          setErrorMessages({ general: error.response.data.message })
         }
 
       } else if (error.request) {
-        setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.'  });
+        setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
       }
     }
   };
 
+  useEffect(() => {
+    if (location.state && location.state.email) {
+      setEmail(location.state.email);
+    }
+  }, [location.state]);
+
   return (
     <>
-      {errorMessages.general || errorMessages.severError ?(
+      {errorMessages.general || errorMessages.severError ? (
         <div className='msg alert alert-danger mb-0'>
           <AlertIcon size={"16"} currentColor={"#74373e"} />
           <span className='ms-2'>
@@ -86,7 +95,9 @@ function LoginForm() {
         login(email, password);
       }}>
         <Form.Label className='mt-3 w-100' htmlFor='emailLogin'>Endereço de E-mail</Form.Label>
-        <FormGroupWithIcon value={email}
+        <FormGroupWithIcon
+          bgBorder={true}
+          value={email}
           onChange={(e) => setEmail(e.target.value)}
           icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
           type='email' placeholder='exemplo@gmail.com' mb={'mb-3'}
@@ -94,7 +105,9 @@ function LoginForm() {
         />
 
         <Form.Label htmlFor='passwordLogin' className='w-100'>Senha</Form.Label>
-        <FormGroupWithIcon value={password}
+        <FormGroupWithIcon
+          bgBorder={true}
+          value={password}
           onChange={(e) => setPassword(e.target.value)}
           icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
           type='password' placeholder='•••••••••'
@@ -107,11 +120,6 @@ function LoginForm() {
       </Form>
     </>
   );
-}
-
-function descriptedToken(tokenJWT) {
-  const decodedToken = decodeToken(tokenJWT);
-  console.log(decodedToken);
 }
 
 export default LoginPage;

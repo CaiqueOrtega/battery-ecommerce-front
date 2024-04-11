@@ -103,10 +103,10 @@ function SidebarContent({ onItemClick, selectedOption }) {
     return (
         <ListGroup className='list-group-flush flex-grow-1'>
             {sidebarItems.map((item, index) => (
-                <ListGroup.Item 
+                <ListGroup.Item
                     key={index}
-                    type="button" 
-                    className={`py-2 list-group-item-action ${selectedOption === item.text ? 'active' : ''}`} 
+                    type="button"
+                    className={`py-2 list-group-item-action ${selectedOption === item.text ? 'active' : ''}`}
                     onClick={() => onItemClick(item.text)}
                 >
                     <i className='me-2 color-red'>{item.icon}</i> {item.text}
@@ -127,9 +127,9 @@ function MainContent({ sidebarSelectedOption }) {
     }
 
     return (
-        <div>
+        <main className='flex-fill'>
             {content}
-        </div>
+        </main>
     );
 }
 
