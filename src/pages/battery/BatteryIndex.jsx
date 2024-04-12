@@ -6,11 +6,11 @@ import { useState } from 'react';
 
 function BatteryIndex() {
     const [show, setShow] = useState(false);
-    
+
     return (
         <Container className='pb-5'>
             <Button variant="primary" onClick={() => setShow(true)}>
-                Launch demo modal
+             teste
             </Button>
             <BatteryRegisterForm show={show} setShow={setShow} />
         </Container>
@@ -25,8 +25,9 @@ function BatteryRegisterForm({ show, setShow }) {
 
     return (
         <Modal size="lg" show={show} onHide={() => setShow(false)} backdrop="static" keyboard={false}>
-            <Modal.Header className='bg-red text-white btn-close-white' closeButton>
+            <Modal.Header className='bg-red text-white' >
                 <Modal.Title>Cadastrar Produto</Modal.Title>
+                <button className='btn-close btn-close-white' onClick={() => setShow(false)}/>
             </Modal.Header>
             <Modal.Body>
                 <Row className=''>
@@ -75,7 +76,7 @@ function BatteryRegisterForm({ show, setShow }) {
                                 </Form.Group>
                             </div>
                             <Form.Label>Imagens</Form.Label>
-                            <Form.Control type='file' />
+                            <Form.Control type='file' accept='.png' multiple />
                         </Form>
                     </Col>
                 </Row>
@@ -100,7 +101,7 @@ function BatteryCardRegisterExample({ productName, productDescription, productPr
                 <Card.Text className='text-muted mb-5 small'>
                     {productDescription.trim() || 'Exemplo da descrição do produto'}
                 </Card.Text>
-                <h5>{productPrice.trim() || 'R$ 00,00'}</h5>
+                <h5>R$ {productPrice.trim() || '00,00'}</h5>
             </Card.Body>
         </Card>
     );

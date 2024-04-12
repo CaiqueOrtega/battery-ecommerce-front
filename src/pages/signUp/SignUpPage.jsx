@@ -46,9 +46,8 @@ function SignUpForm() {
 
     async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp, confirmPassword) {
 
-
         if (JSON.stringify(prevFormData) === JSON.stringify({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp, confirmPassword: confirmPassword }) && !errorMessages.severError) {
-            setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
+            setErrorMessages(prevErrors => ({ ...prevErrors, unchangedData: 'Os dados não foram alterados.' }));
             return;
         }
 
@@ -81,11 +80,11 @@ function SignUpForm() {
 
     return (
         <>
-            {errorMessages.general || errorMessages.severError ? (
+            {errorMessages.unchangedData || errorMessages.severError ? (
                 <div className='alert alert-danger mb-0'>
                     <AlertIcon size={"16"} currentColor={"#74373e"} />
                     <span className='ms-2'>
-                        {errorMessages.general ? errorMessages.general : errorMessages.severError}
+                        {errorMessages.unchangedData ? errorMessages.unchangedData : errorMessages.severError}
                     </span>
                 </div>
             ) : null}

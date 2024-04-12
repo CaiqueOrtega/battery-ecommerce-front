@@ -1,14 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Card, Form, Row, Col, Button, Container } from 'react-bootstrap';
 import { LockIcon, EnvelopeIcon, LoginIcon, AlertIcon } from '../../assets/icons/IconsSet';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
-import ConnectionAPI from '../../services/ConnectionAPI';
-import { useNavigate, useLocation } from "react-router-dom";
-
+import { useLocation } from "react-router-dom";
+import { AuthContext } from '../../context/AuthProvider.jsx'
 
 function LoginPage() {
+  const { isLoggedIn, navigate } = useContext(AuthContext);
+  if (isLoggedIn) {
+    navigate('/');
+  }
+  
   return (
     <div className='vh-100 bg-main'>
       <Container className='h-100 d-flex align-items-center justify-content-center'>
@@ -31,47 +35,16 @@ function LoginPage() {
       </Container>
     </div>
   );
+
+
 }
 
 
 function LoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errorMessages, setErrorMessages] = useState({});
-  const [prevFormDataLogin, setPrevFormDataLogin] = useState({})
-  const navigate = useNavigate();
   const location = useLocation();
-
-  const login = async (emailLogin, passwordLogin) => {
-    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) && !errorMessages.severError) {
-      setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
-      return;
-    }
-    setPrevFormDataLogin({ email: emailLogin, password: passwordLogin });
-
-    try {
-      const response = await ConnectionAPI.post('auth/login', {
-        email: emailLogin,
-        password: passwordLogin
-      });
-
-      localStorage.setItem('token', response.data.token);
-      navigate("/");
-
-    } catch (error) {
-      if (error.response) {
-        if (error.response.data.field) {
-          const { field, message } = error.response.data;
-          setErrorMessages({ [field]: message });
-        } else {
-          setErrorMessages({ general: error.response.data.message })
-        }
-
-      } else if (error.request) {
-        setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-      }
-    }
-  };
+  const { login, errorMessages } = useContext(AuthContext);
 
   useEffect(() => {
     if (location.state && location.state.email) {
