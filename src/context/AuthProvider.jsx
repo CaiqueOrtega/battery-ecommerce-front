@@ -3,7 +3,6 @@ import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
 
-
 export const AuthContext = createContext({});
 
 function AuthProvider({ children }) {
@@ -28,6 +27,7 @@ function AuthProvider({ children }) {
       });
 
       localStorage.setItem('token', response.data.token);
+      setToken(response.data.token);
       navigate("/");
 
     } catch (error) {
@@ -48,30 +48,33 @@ function AuthProvider({ children }) {
 
   const getUser = async (email) => {
     try {
-      const response = await ConnectionAPI.get(`users/email/ocaiqueortega@gmail.com`);
+      const response = await ConnectionAPI.get(`users/email/${email}`);
       console.log(response.data);
     } catch (error) {
-      console.log('Erro ao pegar usuario');
+      console.log('Erro ao pegar usuario' + error);
     }
   }
 
+
+
   useEffect(() => {
     const checkToken = async () => {
+
       if (token) {
         try {
           const decodedToken = decodeToken(token);
           const fuso = -3 * 60 * 60 * 1000;
           const dataToken = new Date(decodedToken.exp * 1000 + fuso);
           const dataHoje = new Date(new Date().getTime() + fuso);
-  
+
           if (dataToken < dataHoje) {
-            localStorage.removeItem('token');
-            setIsLoggedIn(false);
+            logout();
           } else {
+            setDecodedTokenEmail(decodedToken.sub);
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
-            const email = decodedToken.email;
-            await getUser(email);
+            getUser(decodedToken.sub)
+
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
@@ -80,9 +83,16 @@ function AuthProvider({ children }) {
         setIsLoggedIn(false);
       }
     };
-  
-    checkToken();
+
+
+      checkToken();
+
   }, [token])
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    setIsLoggedIn(false);
+  }
 
 
   return (
