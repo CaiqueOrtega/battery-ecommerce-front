@@ -31,7 +31,7 @@ const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedb
                     ref={inputRef}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    required
+                    
                 />
                 {icon}
             </div>

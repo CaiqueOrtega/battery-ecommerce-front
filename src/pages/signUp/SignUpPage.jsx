@@ -4,7 +4,7 @@ import { LockIcon, EnvelopeIcon, UserIcon, DocumentIcon, SingUpIcon, AlertIcon, 
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import logoBgWhite from '../../assets/images/logoBgWhite.png';
 import logo from '../../assets/images/logo.png';
-import ConnectionAPI from '../../services/ConnectionAPI';
+import AuthServices from '../../services/auth/AuthServices';
 import { useNavigate } from "react-router-dom";
 
 function SignUpPage() {
@@ -40,43 +40,22 @@ function SignUpForm() {
     const [document, setDocument] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [errorMessages, setErrorMessages] = useState({});
-    const [prevFormData, setPrevFormData] = useState({})
-    const navigate = useNavigate();
+    const [prevFormData, setPrevFormData] = useState({});
 
-    async function signUp(emailSignUp, nameSignUp, documentSignUp, passwordSignUp, confirmPassword) {
+    const { errorMessages, setErrorMessages, signUp } = AuthServices();
 
-        if (JSON.stringify(prevFormData) === JSON.stringify({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp, confirmPassword: confirmPassword }) && !errorMessages.severError) {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (JSON.stringify(prevFormData) === JSON.stringify({ email, name, document, password, confirmPassword }) && !errorMessages.serverError) {
             setErrorMessages(prevErrors => ({ ...prevErrors, unchangedData: 'Os dados não foram alterados.' }));
             return;
         }
 
-        setPrevFormData({ email: emailSignUp, name: nameSignUp, document: documentSignUp, password: passwordSignUp, confirmPassword: confirmPassword });
+       await signUp(email, name, document, password, confirmPassword);
+        setPrevFormData({ email, name, document, password, confirmPassword });
+    };
 
-        console.log(confirmPassword);
-
-        try {
-            const response = await ConnectionAPI.post('auth/register', {
-                email: emailSignUp,
-                password: passwordSignUp,
-                name: nameSignUp,
-                document: documentSignUp,
-                confirmPassword: confirmPassword
-            });
-
-            navigate("/entrar", { state: { email: emailSignUp } });
-
-        } catch (error) {
-
-            if (error.response) {
-                const { field, message } = error.response.data;
-                setErrorMessages({ [field]: message });
-
-            } else if (error.request) {
-                setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-            }
-        }
-    }
 
     return (
         <>
@@ -89,10 +68,7 @@ function SignUpForm() {
                 </div>
             ) : null}
 
-            <Form className="pt-4 " onSubmit={(e) => {
-                e.preventDefault();
-                signUp(email, name, document, password, confirmPassword);
-            }}>
+            <Form className="pt-4 " onSubmit={handleSubmit}>
 
                 <FormGroupWithIcon
                     bgBorder={true}

@@ -3,59 +3,13 @@ import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
 
-export const AuthContext = createContext({});
+const AuthContext = createContext({});
 
 function AuthProvider({ children }) {
-  const navigate = useNavigate();
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [prevFormDataLogin, setPrevFormDataLogin] = useState({})
-  const [errorMessages, setErrorMessages] = useState({});
   const [decodedTokenEmail, setDecodedTokenEmail] = useState('');
-
-  const login = async (emailLogin, passwordLogin) => {
-    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) && !errorMessages.severError) {
-      setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
-      return;
-    }
-    setPrevFormDataLogin({ email: emailLogin, password: passwordLogin });
-
-    try {
-      const response = await ConnectionAPI.post('auth/login', {
-        email: emailLogin,
-        password: passwordLogin
-      });
-
-      localStorage.setItem('token', response.data.token);
-      setToken(response.data.token);
-      navigate("/");
-
-    } catch (error) {
-      if (error.response) {
-        if (error.response.data.field) {
-          const { field, message } = error.response.data;
-          setErrorMessages({ [field]: message });
-        } else {
-          setErrorMessages({ general: error.response.data.message })
-        }
-
-      } else if (error.request) {
-        setErrorMessages({ severError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-      }
-    }
-  };
-
-
-  const getUser = async (email) => {
-    try {
-      const response = await ConnectionAPI.get(`users/email/${email}`);
-      console.log(response.data);
-    } catch (error) {
-      console.log('Erro ao pegar usuario' + error);
-    }
-  }
-
-
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkToken = async () => {
@@ -73,8 +27,7 @@ function AuthProvider({ children }) {
             setDecodedTokenEmail(decodedToken.sub);
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
-            getUser(decodedToken.sub)
-
+            console.log('JOAO')
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
@@ -87,7 +40,7 @@ function AuthProvider({ children }) {
 
       checkToken();
 
-  }, [token])
+  }, [ token ])
 
   const logout = () => {
     localStorage.removeItem('token');
@@ -96,14 +49,13 @@ function AuthProvider({ children }) {
 
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, login, errorMessages, navigate }}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate}}>
       {children}
     </AuthContext.Provider>
   );
 
 }
-export default AuthProvider;
-
+export { AuthContext, AuthProvider };
 
 
 

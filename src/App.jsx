@@ -5,7 +5,7 @@ import HomePage from './pages/home/HomePage';
 import LoginPage from './pages/login/LoginPage';
 import SignUpPage from "./pages/signUp/SignUpPage";
 import DashboardPage from './pages/dashboard/DashboardPage';
-import  AuthProvider  from './context/AuthProvider';
+import  { AuthProvider }   from './context/AuthProvider';
 
 function App() {
  
