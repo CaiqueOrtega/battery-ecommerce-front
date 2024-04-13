@@ -13,10 +13,11 @@ function AuthProvider({ children }) {
   const [decodedTokenEmail, setDecodedTokenEmail] = useState('');
   const navigate = useNavigate();
   const { getUserByEmail } = UserService();
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState({});
 
   useEffect(() => {
     const checkToken = async () => {
+
 
       if (token) {
         try {
@@ -35,6 +36,8 @@ function AuthProvider({ children }) {
 
               const user = await getUserByEmail(decodedToken.sub);
               setUserData(user);
+              
+
 
           }
         } catch (error) {
@@ -49,6 +52,12 @@ function AuthProvider({ children }) {
     checkToken();
 
   }, [ token ])
+
+  useEffect(() => {
+    if(userData.role == 'ADMIN'){
+      navigate('/paineldecontrole')
+    }
+  }, [token, userData])
 
   const logout = () => {
     localStorage.removeItem('token');

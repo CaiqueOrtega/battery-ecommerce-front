@@ -15,6 +15,7 @@ const AuthServices = () => {
 
             localStorage.setItem('token', response.data.token);
             navigate("/");
+            window.location.reload()
 
         } catch (error) {
             handleAPIError(error, setErrorMessages);

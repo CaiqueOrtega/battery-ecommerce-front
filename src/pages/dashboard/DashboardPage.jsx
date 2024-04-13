@@ -10,13 +10,10 @@ function DashboardPage() {
     const { isLoggedIn, userData, navigate } = useContext(AuthContext);
     
     useEffect(() => {
-        if (!userData) {
-            return;
-        }
 
         if (!isLoggedIn || userData.role !== 'ADMIN') {
             navigate('/')
-            return null;
+            return;
         }
 
     }, [userData, isLoggedIn]);

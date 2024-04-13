@@ -5,7 +5,7 @@ const BaterryServices = () => {
 
     const createBattery = async (batteryName, batteryDescription, batteryPrice, batteryQuantity) => {
         try {
-           const response = await ConnectionAPI.post('/battery',{
+           const response = await ConnectionAPI.post('battery',{
                 name: batteryName,
                 description: batteryDescription,
                 value: batteryPrice,
