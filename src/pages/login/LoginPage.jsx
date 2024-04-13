@@ -7,7 +7,7 @@ import logo from '../../assets/images/logo.png';
 import { useLocation } from "react-router-dom";
 import { AuthContext } from '../../context/AuthProvider.jsx'
 import AuthServices from '../../services/auth/AuthServices';
-import { useNavigate } from "react-router-dom";
+
 
 function LoginPage() {
   
@@ -59,7 +59,7 @@ function LoginForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) && !errorMessages.severError) {
+    if (JSON.stringify(prevFormDataLogin) === JSON.stringify({ email: emailLogin, password: passwordLogin }) && !errorMessages.serverError) {
       setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
       return;
     }
@@ -76,11 +76,11 @@ function LoginForm() {
 
   return (
     <>
-      {errorMessages.general || errorMessages.severError ? (
+      {errorMessages.general || errorMessages.serverError ? (
         <div className='msg alert alert-danger mb-0'>
           <AlertIcon size={"16"} currentColor={"#74373e"} />
           <span className='ms-2'>
-            {errorMessages.general ? errorMessages.general : errorMessages.severError}
+            {errorMessages.general ? errorMessages.general : errorMessages.serverError}
           </span>
         </div>
       ) : null}

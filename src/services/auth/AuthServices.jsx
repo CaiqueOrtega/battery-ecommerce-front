@@ -39,14 +39,16 @@ const AuthServices = () => {
         }
     };
 
-    const handleAPIError = (error) => {
-        if (error.response.data.field) {
-            const { field, message } = error.response.data;
-            setErrorMessages({ [field]: message });
-        } else if (error.request) {
+    const handleAPIError = (error, setErrorMessages) => {
+        if (error.response && error.response.data) {
+            if (error.response.data.field) {
+                const { field, message } = error.response.data;
+                setErrorMessages({ [field]: message });
+            } else if (error.response.data.message) {
+                setErrorMessages({ general: error.response.data.message });
+            } 
+        } else {
             setErrorMessages({ serverError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-        }else{
-            setErrorMessages(error.response.data.message);
         }
     };
 

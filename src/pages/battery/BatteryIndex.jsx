@@ -3,17 +3,26 @@ import imagemExemploBateria from '../../assets/images/exemploImageRegister.png'
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import { EnvelopeIcon } from '../../assets/icons/IconsSet';
 import { useState } from 'react';
+import BaterryServices from '../../services/battery/BatteryServices';
 
 function BatteryIndex() {
     const [show, setShow] = useState(false);
 
     return (
-        <Container className='pb-5'>
-            <Button variant="primary" onClick={() => setShow(true)}>
-             teste
+        <Container fluid className='pb-5'>
+
+          
+                    <h3 className='text-muted'>Controle de Baterias</h3>
+                    <hr/>
+
+                <Button className='ms-auto' onClick={() => setShow(true)}>
+                Cadastrar Bateria
             </Button>
             <BatteryRegisterForm show={show} setShow={setShow} />
+      
+
         </Container>
+
     );
 }
 
@@ -22,12 +31,12 @@ function BatteryRegisterForm({ show, setShow }) {
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
-
+    const { createBattery } = BaterryServices();
     return (
         <Modal size="lg" show={show} onHide={() => setShow(false)} backdrop="static" keyboard={false}>
             <Modal.Header className='bg-red text-white' >
                 <Modal.Title>Cadastrar Produto</Modal.Title>
-                <button className='btn-close btn-close-white' onClick={() => setShow(false)}/>
+                <button className='btn-close btn-close-white' onClick={() => setShow(false)} />
             </Modal.Header>
             <Modal.Body>
                 <Row className=''>
@@ -40,7 +49,10 @@ function BatteryRegisterForm({ show, setShow }) {
                         />
                     </Col>
                     <Col>
-                        <Form className=''>
+                        <Form onSubmit={(e) => {
+                             e.preventDefault();
+                            createBattery(productName, productDescription, productPrice, productQuantity)
+                        }}>
                             <Form.Label>Nome do Produto</Form.Label>
                             <FormGroupWithIcon
                                 icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
@@ -77,6 +89,8 @@ function BatteryRegisterForm({ show, setShow }) {
                             </div>
                             <Form.Label>Imagens</Form.Label>
                             <Form.Control type='file' accept='.png' multiple />
+
+                            <Button variant='red' type='submit' className='float-end'>Cadastrar Produto</Button>
                         </Form>
                     </Col>
                 </Row>
@@ -84,7 +98,7 @@ function BatteryRegisterForm({ show, setShow }) {
             </Modal.Body>
 
             <Modal.Footer>
-                <Button variant='red' type='submit' className='float-end'>Cadastrar Produto</Button>
+                
             </Modal.Footer>
         </Modal>
     );

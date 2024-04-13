@@ -48,7 +48,7 @@ function SignUpForm() {
         e.preventDefault();
 
         if (JSON.stringify(prevFormData) === JSON.stringify({ email, name, document, password, confirmPassword }) && !errorMessages.serverError) {
-            setErrorMessages(prevErrors => ({ ...prevErrors, unchangedData: 'Os dados não foram alterados.' }));
+            setErrorMessages(prevErrors => ({ ...prevErrors, general: 'Os dados não foram alterados.' }));
             return;
         }
 
@@ -59,11 +59,11 @@ function SignUpForm() {
 
     return (
         <>
-            {errorMessages.unchangedData || errorMessages.severError ? (
+            {errorMessages.general || errorMessages.serverError ? (
                 <div className='alert alert-danger mb-0'>
                     <AlertIcon size={"16"} currentColor={"#74373e"} />
                     <span className='ms-2'>
-                        {errorMessages.unchangedData ? errorMessages.unchangedData : errorMessages.severError}
+                        {errorMessages.general ? errorMessages.general : errorMessages.serverError}
                     </span>
                 </div>
             ) : null}

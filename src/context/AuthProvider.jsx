@@ -2,14 +2,18 @@ import { useEffect, createContext, useState } from "react";
 import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
+import UserService from "../services/users/UsersServices";
 
 const AuthContext = createContext({});
 
 function AuthProvider({ children }) {
+
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [decodedTokenEmail, setDecodedTokenEmail] = useState('');
   const navigate = useNavigate();
+  const { getUserByEmail } = UserService();
+  const [userData, setUserData] = useState();
 
   useEffect(() => {
     const checkToken = async () => {
@@ -27,7 +31,11 @@ function AuthProvider({ children }) {
             setDecodedTokenEmail(decodedToken.sub);
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
-            console.log('JOAO')
+
+
+              const user = await getUserByEmail(decodedToken.sub);
+              setUserData(user);
+
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
@@ -38,18 +46,19 @@ function AuthProvider({ children }) {
     };
 
 
-      checkToken();
+    checkToken();
 
   }, [ token ])
 
   const logout = () => {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
+    setUserData(null);
   }
 
-
+  
   return (
-    <AuthContext.Provider value={{ isLoggedIn, navigate}}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData}}>
       {children}
     </AuthContext.Provider>
   );

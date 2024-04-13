@@ -1,15 +1,20 @@
 import ConnectionAPI from "../ConnectionAPI";
 
-const UserService = {
-  getUserByEmail: async (email) => {
+const UserService = () => {
+
+  const getUserByEmail = async (email) => {
+    
     try {
       const response = await ConnectionAPI.get(`users/email/${email}`);
+      console.log(response.data);
       return response.data;
+
     } catch (error) {
       console.error('Erro ao pegar usuário:', error);
-      throw error;
     }
-  },
+  }
+
+  return { getUserByEmail };
 };
 
 export default UserService;

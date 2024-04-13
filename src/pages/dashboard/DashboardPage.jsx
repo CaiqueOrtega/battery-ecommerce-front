@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
 import { SearchIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon } from '../../assets/icons/IconsSet';
 import BatteryIndex from '../battery/BatteryIndex';
 import logo from '../../assets/images/logo.png';
 import './dashboard.css';
+import { AuthContext } from '../../context/AuthProvider'
 
 function DashboardPage() {
+    const { isLoggedIn, userData, navigate } = useContext(AuthContext);
+    
+    useEffect(() => {
+        if (!userData) {
+            return;
+        }
+
+        if (!isLoggedIn || userData.role !== 'ADMIN') {
+            navigate('/')
+            return null;
+        }
+
+    }, [userData, isLoggedIn]);
+
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarSelectedOption, setSidebarSelectedOption] = useState("Controle Baterias");
 
@@ -14,16 +30,19 @@ function DashboardPage() {
             <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
             <Row className='g-0 flex-grow-1 overflow-hidden'>
                 <Collapse in={sidebarOpen} className='d-lg-block'>
-                    <Col xs={12} lg={2} id='sidebarDashboard' className='bg-white shadow py-lg-5 px-2'>
+                    <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2'>
                         <SidebarContent onItemClick={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
                     </Col>
                 </Collapse>
+
+
                 <Col className='d-flex h-100 overflow-auto p-4'>
                     <MainContent sidebarSelectedOption={sidebarSelectedOption} />
                 </Col>
             </Row>
         </div>
     );
+
 }
 
 function NavbarContent({ toggleSidebar }) {
