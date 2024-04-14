@@ -54,20 +54,24 @@ function AuthProvider({ children }) {
   }, [ token ])
 
   useEffect(() => {
-    if(userData.role == 'ADMIN'){
-      navigate('/paineldecontrole')
+    if(userData){
+      if(userData.role == 'ADMIN'){
+        navigate('/paineldecontrole')
+      }
     }
   }, [token, userData])
 
   const logout = () => {
-    localStorage.removeItem('token');
+    localStorage.clear();
     setIsLoggedIn(false);
     setUserData(null);
+    setToken('');
+    window.location.reload()
   }
 
   
   return (
-    <AuthContext.Provider value={{ isLoggedIn, navigate, userData}}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout}}>
       {children}
     </AuthContext.Provider>
   );

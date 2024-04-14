@@ -6,23 +6,34 @@ import { useState } from 'react';
 import BaterryServices from '../../services/battery/BatteryServices';
 
 function BatteryIndex() {
+    
+    return(
+        <BatteryNavBar/>
+        
+    )
+
+}
+
+function BatteryNavBar(){
     const [show, setShow] = useState(false);
 
     return (
-        <Container fluid className='pb-5'>
+        <>
+            <Container fluid className=' d-flex flex-row align-items-center'>
 
-          
-                    <h3 className='text-muted'>Controle de Baterias</h3>
-                    <hr/>
+            
+                <h3 className='text-muted text-align-center'>Controle de Baterias</h3>
 
-                <Button className='ms-auto' onClick={() => setShow(true)}>
-                Cadastrar Bateria
-            </Button>
-            <BatteryRegisterForm show={show} setShow={setShow} />
-      
 
-        </Container>
+                <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => setShow(true)}>
+                    Cadastrar Bateria
+                </Button>
 
+                <BatteryRegisterForm show={show} setShow={setShow} />
+
+            </Container>
+            <hr/>
+        </>
     );
 }
 

@@ -91,6 +91,8 @@ function NotificationsDropdown() {
 }
 
 function UserDropdown() {
+    const { navigate, logout } = useContext(AuthContext);
+
     return (
         <Dropdown as={NavItem} className='dropdown-no-carret ms-1'>
             <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
@@ -101,7 +103,7 @@ function UserDropdown() {
                 <Dropdown.Item>Minha Conta</Dropdown.Item>
                 <Dropdown.Item>Configurações</Dropdown.Item>
                 <Dropdown.Divider />
-                <Dropdown.Item>Sair</Dropdown.Item>
+                <Dropdown.Item onClick={logout}>Sair</Dropdown.Item>
             </Dropdown.Menu>
         </Dropdown>
     );
