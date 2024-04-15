@@ -64,9 +64,12 @@ function BatteryRegisterForm({ show, setShow }) {
                         />
                     </Col>
                     <Col>
-                        <Form onSubmit={(e) => {
+                        <Form onSubmit={async (e) => {
                              e.preventDefault();
-                            createBattery(productName, productDescription, productPrice, productQuantity)
+                            const response = await createBattery(productName, productDescription, productPrice, productQuantity)
+                            if (response == 201){
+                                setShow(false)
+                            }
                         }}>
                             <Form.Label>Nome do Produto</Form.Label>
                             <FormGroupWithIcon

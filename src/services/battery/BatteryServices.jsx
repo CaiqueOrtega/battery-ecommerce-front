@@ -1,6 +1,7 @@
 import ConnectionAPI from "../ConnectionAPI";
 import { useState, useEffect } from "react";
 import { BatteryCardRegisterExample } from "../../pages/battery/BatteryIndex"; 
+import { Row, Col } from 'react-bootstrap';
 
 const BaterryServices = () => {
 
@@ -13,7 +14,7 @@ const BaterryServices = () => {
                 value: batteryPrice,
                 quantity: batteryQuantity
             });
-            
+            return response.status
         } catch (error) {
             console.log(error)
         }
@@ -46,19 +47,20 @@ const BaterryServices = () => {
             fetchBatteries();
         }, []);
         return (
-            <div className=' me-5'>
-                <div className='d-flex flex-row justify-content-evenly'>
+            <div className="ms-5">
+                <Row xs={1} md={3} >
                     {batteries.map(battery => (
-                    <BatteryCardRegisterExample
-                        key={battery.batteryId}
-                        productName={battery.name}
-                        productDescription={battery.description}
-                        productPrice={battery.value}
-                        productQuantity={battery.quantity}
-                    />
+                        <Col key={battery.batteryId} className="d-flex justify-content-center mb-5">
+                            <BatteryCardRegisterExample
+                                productName={battery.name}
+                                productDescription={battery.description}
+                                productPrice={battery.value}
+                                productQuantity={battery.quantity}
+                            />
+                        </Col>
                     ))}
-                </div>
-           </div>
+                </Row>
+            </div>
         );
       }
 
