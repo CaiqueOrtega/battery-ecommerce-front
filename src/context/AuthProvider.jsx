@@ -66,7 +66,7 @@ function AuthProvider({ children }) {
     setIsLoggedIn(false);
     setUserData(null);
     setToken('');
-    window.location.reload()
+
   }
 
   

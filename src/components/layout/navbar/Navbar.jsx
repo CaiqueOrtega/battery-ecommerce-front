@@ -1,27 +1,13 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col } from 'react-bootstrap';
 import { SearchIcon, CartIcon, UserCircleIcon, CarretUpIcon, UserCircleOutlineIcon } from '../../../assets/icons/IconsSet';
 import logo from '../../../assets/images/logo.png';
 import LoginSignupButton from '../../common/LoginSignupButton';
 import './navbar.css';
+import { AuthContext } from '../../../context/AuthProvider'; 
+import { UserIcon } from '../../../assets/icons/IconsSet';
 
 function NavbarComponent() {
-
-  const renderLoginDropdown = () => (
-    <Dropdown as={NavItem} className="d-none d-lg-block">
-      <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
-        <UserCircleIcon className="float-start me-1" />
-        Entre ou se <br /> Cadastre
-      </Dropdown.Toggle>
-      <Dropdown.Menu className="dropdown-menu-end  dropdow-menu-size shadow border-0 mt-2 p-4">
-        <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
-        <p className="fw-lighter lh-sm small text-muted">Confira seus pedidos e desfrute de uma experiência exclusiva ao fazer login na sua conta!</p>
-        <LoginSignupButton
-          classNameBtnLogin="btn-yellow d-block mb-2"
-          classNameBtnSignUp="btn-red-outline d-block" />
-      </Dropdown.Menu>
-    </Dropdown>
-  );
 
   const renderMobileLogin = () => (
     <div className="d-lg-none row mt-3">
@@ -74,7 +60,7 @@ function NavbarComponent() {
         <Col className='col-auto d-flex order-md-0 order-first '>
 
           {renderCart()}
-          {renderLoginDropdown()}
+          <RenderDropdown/>
 
           <Navbar.Toggle className="border-0 ms-1" aria-controls="navbarContent" />
         </Col>
@@ -86,6 +72,44 @@ function NavbarComponent() {
       </Row>
     </Navbar >
   );
+}
+
+function RenderDropdown() {
+  const { navigate, logout, userData, isLoggedIn } = useContext(AuthContext);
+
+  if(isLoggedIn){
+    return(
+        <Dropdown as={NavItem} className='dropdown-no-carret ms-1 '>
+          <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
+              <UserIcon currentColor={'f11100'} size={'30'} className={'hover-color-red'} />
+              <span className='ms-1 d-none d-md-block text-white hover-color-red'>{userData.name}</span>
+          </Dropdown.Toggle>
+          <Dropdown.Menu className='shadow dropdown-menu-end '>
+          <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
+              <Dropdown.Item>Minha Conta</Dropdown.Item>
+              <Dropdown.Item>Configurações</Dropdown.Item>
+              <Dropdown.Divider />
+              <Dropdown.Item onClick={logout}>Sair</Dropdown.Item>
+          </Dropdown.Menu>
+        </Dropdown>
+    )
+  } else {
+    return(
+      <Dropdown as={NavItem} className="d-none d-lg-block">
+      <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
+        <UserCircleIcon className="float-start me-1" />
+        Entre ou se <br /> Cadastre
+      </Dropdown.Toggle>
+      <Dropdown.Menu className="dropdown-menu-end  dropdow-menu-size shadow border-0 mt-2 p-4">
+        <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
+        <p className="fw-lighter lh-sm small text-muted">Confira seus pedidos e desfrute de uma experiência exclusiva ao fazer login na sua conta!</p>
+        <LoginSignupButton
+          classNameBtnLogin="btn-yellow d-block mb-2"
+          classNameBtnSignUp="btn-red-outline d-block" />
+      </Dropdown.Menu>
+      </Dropdown>
+    )
+  }
 }
 
 export default NavbarComponent;
