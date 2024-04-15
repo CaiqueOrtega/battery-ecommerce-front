@@ -7,12 +7,12 @@ import { useState, useEffect } from 'react';
 import BaterryServices from '../../services/battery/BatteryServices';
 
 function BatteryIndex() {
-
+    const {showBatteries} = BaterryServices()
 
     return(
         <>
             <BatteryNavBar />
-            <ShowBatteries/>
+            {showBatteries()}
         </>
     );
 }
@@ -119,7 +119,7 @@ function BatteryRegisterForm({ show, setShow }) {
     );
 }
 
-function BatteryCardRegisterExample({ productName, productDescription, productPrice, productQuantity }) {
+export function BatteryCardRegisterExample({ productName, productDescription, productPrice, productQuantity }) {
     return (
         <Card className='shadow rounded-3 me-2' style={{ maxWidth: '14rem' }}>
             <div className='p-3 rounded-3' style={{ background: "#fafafa" }}>
@@ -136,38 +136,7 @@ function BatteryCardRegisterExample({ productName, productDescription, productPr
     );
 }
 
-function ShowBatteries() {
-    const [batteries, setBatteries] = useState([]);
 
-    useEffect(() => {
-        async function fetchBatteries() {
-            try {
-                const { getBatteries } = BaterryServices();
-                const batteriesData = await getBatteries();
-                setBatteries(batteriesData);
-            } catch (error) {
-                console.error('Erro ao carregar baterias');
-            }
-        }
-
-        fetchBatteries();
-    }, []);
-    return (
-        <div className=' me-5'>
-            <div className='d-flex flex-row justify-content-evenly'>
-                {batteries.map(battery => (
-                <BatteryCardRegisterExample
-                    key={battery.batteryId}
-                    productName={battery.name}
-                    productDescription={battery.description}
-                    productPrice={battery.value}
-                    productQuantity={battery.quantity}
-                />
-                ))}
-            </div>
-       </div>
-    );
-  }
   
   
 

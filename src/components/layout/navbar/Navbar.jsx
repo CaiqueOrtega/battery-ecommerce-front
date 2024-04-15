@@ -40,7 +40,7 @@ function NavbarComponent() {
   );
 
   return (
-    <Navbar expand="lg" className="bg-yellow shadow" variant="dark">
+    <Navbar expand="lg" className="bg-yellow shadow mb-5" variant="dark">
       <Row className="d-flex flex-fill g-0 px-2 px-md-4 align-items-center justify-content-between">
         <Col className='col-auto order-first ms-md-3'>
           <Navbar.Brand className='m-0'>
