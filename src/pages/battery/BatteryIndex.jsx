@@ -1,18 +1,22 @@
+
 import { Card, Form, Row, Col, Button, Container, Modal } from 'react-bootstrap';
 import imagemExemploBateria from '../../assets/images/exemploImageRegister.png'
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import { EnvelopeIcon } from '../../assets/icons/IconsSet';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import BaterryServices from '../../services/battery/BatteryServices';
 
 function BatteryIndex() {
-    
-    return(
-        <BatteryNavBar/>
-        
-    )
 
+
+    return(
+        <>
+            <BatteryNavBar />
+            <ShowBatteries/>
+        </>
+    );
 }
+
 
 function BatteryNavBar(){
     const [show, setShow] = useState(false);
@@ -117,7 +121,7 @@ function BatteryRegisterForm({ show, setShow }) {
 
 function BatteryCardRegisterExample({ productName, productDescription, productPrice, productQuantity }) {
     return (
-        <Card className='shadow rounded-3' style={{ maxWidth: '14rem' }}>
+        <Card className='shadow rounded-3 me-2' style={{ maxWidth: '14rem' }}>
             <div className='p-3 rounded-3' style={{ background: "#fafafa" }}>
                 <Card.Img className="img-fluid" variant="top" src={imagemExemploBateria} height={160} />
             </div>
@@ -126,10 +130,45 @@ function BatteryCardRegisterExample({ productName, productDescription, productPr
                 <Card.Text className='text-muted mb-5 small'>
                     {productDescription.trim() || 'Exemplo da descrição do produto'}
                 </Card.Text>
-                <h5>R$ {productPrice.trim() || '00,00'}</h5>
+                <h5>R$ {productPrice || '00,00'}</h5>
             </Card.Body>
         </Card>
     );
 }
+
+function ShowBatteries() {
+    const [batteries, setBatteries] = useState([]);
+
+    useEffect(() => {
+        async function fetchBatteries() {
+            try {
+                const { getBatteries } = BaterryServices();
+                const batteriesData = await getBatteries();
+                setBatteries(batteriesData);
+            } catch (error) {
+                console.error('Erro ao carregar baterias');
+            }
+        }
+
+        fetchBatteries();
+    }, []);
+    return (
+        <div className=' me-5'>
+            <div className='d-flex flex-row justify-content-evenly'>
+                {batteries.map(battery => (
+                <BatteryCardRegisterExample
+                    key={battery.batteryId}
+                    productName={battery.name}
+                    productDescription={battery.description}
+                    productPrice={battery.value}
+                    productQuantity={battery.quantity}
+                />
+                ))}
+            </div>
+       </div>
+    );
+  }
+  
+  
 
 export default BatteryIndex;

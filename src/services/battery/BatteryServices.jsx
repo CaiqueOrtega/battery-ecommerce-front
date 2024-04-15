@@ -17,7 +17,17 @@ const BaterryServices = () => {
         }
     }
 
-    return { createBattery }
+    const getBatteries = async () => {
+        try {
+            const response = await ConnectionAPI.get('battery')
+            console.log(response.data)
+            return response.data
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    return { createBattery, getBatteries }
 }
 
 export default BaterryServices;
