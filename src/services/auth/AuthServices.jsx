@@ -26,7 +26,9 @@ const AuthServices = () => {
     const userRoleAuhtorization = async (userEmail) => {
         try {
             const response = await ConnectionAPI.get(`auth/${userEmail}`);
+            console.log('NAO DEU ERRO')
         } catch (error) {
+            console.log('DEU ERRO');
             navigate('/');
         }
 

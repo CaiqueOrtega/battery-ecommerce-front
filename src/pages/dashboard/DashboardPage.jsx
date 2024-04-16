@@ -8,45 +8,52 @@ import { AuthContext } from '../../context/AuthProvider'
 import ModalLogout from '../../components/common/ModalLogout';
 import AuthServices from '../../services/auth/AuthServices';
 
-function VerifyAuth() {
+function VerifyAuth({ children }) {
     const { isLoggedIn, userData, navigate } = useContext(AuthContext);
     const { userRoleAuhtorization } = AuthServices();
+    const [ loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
-            if (isLoggedIn) {
-                await userRoleAuhtorization(userData.email);
+            if (!isLoggedIn || !userData.email) {
+                setLoading(false);
+                navigate('/');
+                return;
             }
+
+            await userRoleAuhtorization(userData.email);
         }
         fetchData();
-      
-    }, [userData, isLoggedIn]);
+
+    }, [userData ]);
+
+    return loading ? null : children;
 }
 
 
 
 function DashboardPage() {
-    VerifyAuth();
-
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarSelectedOption, setSidebarSelectedOption] = useState("Controle Baterias");
 
     return (
-        <div className="d-flex flex-column vh-100 bg-main">
-            <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-            <Row className='g-0 flex-grow-1 overflow-hidden'>
-                <Collapse in={sidebarOpen} className='d-lg-block'>
-                    <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2'>
-                        <SidebarContent onItemClick={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
+        <VerifyAuth>
+            <div className="d-flex flex-column vh-100 bg-main">
+                <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+                <Row className='g-0 flex-grow-1 overflow-hidden'>
+                    <Collapse in={sidebarOpen} className='d-lg-block'>
+                        <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2'>
+                            <SidebarContent onItemClick={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
+                        </Col>
+                    </Collapse>
+
+
+                    <Col className='d-flex h-100 overflow-auto p-4'>
+                        <MainContent sidebarSelectedOption={sidebarSelectedOption} />
                     </Col>
-                </Collapse>
-
-
-                <Col className='d-flex h-100 overflow-auto p-4'>
-                    <MainContent sidebarSelectedOption={sidebarSelectedOption} />
-                </Col>
-            </Row>
-        </div>
+                </Row>
+            </div>
+        </VerifyAuth>
     );
 
 }
