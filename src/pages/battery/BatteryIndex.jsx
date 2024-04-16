@@ -7,9 +7,9 @@ import { useState, useEffect } from 'react';
 import BaterryServices from '../../services/battery/BatteryServices';
 
 function BatteryIndex() {
-    const {showBatteries} = BaterryServices()
+    const { showBatteries } = BaterryServices()
 
-    return(
+    return (
         <>
             <BatteryNavBar />
             {showBatteries()}
@@ -18,15 +18,15 @@ function BatteryIndex() {
 }
 
 
-function BatteryNavBar(){
+function BatteryNavBar() {
     const [show, setShow] = useState(false);
 
     return (
         <>
-            <Container fluid className=' d-flex flex-row align-items-center'>
+            <Container  className=' d-flex flex-row align-items-center'>
 
-            
-                <h3 className='text-muted text-align-center'>Controle de Baterias</h3>
+
+                <h3 className='text-muted text-align-center mb-0'>Controle de Baterias</h3>
 
 
                 <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => setShow(true)}>
@@ -36,7 +36,7 @@ function BatteryNavBar(){
                 <BatteryRegisterForm show={show} setShow={setShow} />
 
             </Container>
-            <hr/>
+            <hr />
         </>
     );
 }
@@ -55,7 +55,7 @@ function BatteryRegisterForm({ show, setShow }) {
             </Modal.Header>
             <Modal.Body>
                 <Row className=''>
-                    <Col xs={12} className='col-lg-auto d-flex justify-content-center mb-4'>
+                    <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
                         <BatteryCardRegisterExample
                             productName={productName}
                             productDescription={productDescription}
@@ -64,24 +64,18 @@ function BatteryRegisterForm({ show, setShow }) {
                         />
                     </Col>
                     <Col>
-                        <Form onSubmit={async (e) => {
-                             e.preventDefault();
-                            const response = await createBattery(productName, productDescription, productPrice, productQuantity)
-                            if (response == 201){
-                                setShow(false)
-                            }
-                        }}>
+                        <Form>
                             <Form.Label>Nome do Produto</Form.Label>
                             <FormGroupWithIcon
                                 icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                                type='text' placeholder='Nome do Produto(Ex: Bateria123)' mb={'mb-3'}
+                                type='text' placeholder='Nome do Produto(Ex: Bateria123)' mb={'mb-4'}
                                 value={productName}
                                 onChange={(e) => setProductName(e.target.value)}
                             />
                             <Form.Label>Descrição do Produto</Form.Label>
                             <FormGroupWithIcon
                                 icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                                type='text' placeholder='Descrição do produto(Ex: )' mb={'mb-3'}
+                                type='text' placeholder='Descrição do produto(Ex: )' mb={'mb-4'}
                                 value={productDescription}
                                 onChange={(e) => setProductDescription(e.target.value)}
                             />
@@ -90,7 +84,7 @@ function BatteryRegisterForm({ show, setShow }) {
                                     <Form.Label>Preço</Form.Label>
                                     <FormGroupWithIcon
                                         icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                                        type='text' placeholder='Preço do produto (Ex: R$ 00,00 )' mb={'mb-3'}
+                                        type='text' placeholder='Preço do produto (Ex: R$ 00,00 )' mb={'mb-4'}
                                         value={productPrice}
                                         onChange={(e) => setProductPrice(e.target.value)}
                                     />
@@ -99,24 +93,28 @@ function BatteryRegisterForm({ show, setShow }) {
                                     <Form.Label>Quantidade</Form.Label>
                                     <FormGroupWithIcon
                                         icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                                        type='number' placeholder='Quantidade em estoque' mb={'mb-3'}
+                                        type='number' placeholder='Quantidade em estoque' mb={'mb-4'}
                                         value={productQuantity}
                                         onChange={(e) => setProductQuantity(e.target.value)}
                                     />
                                 </Form.Group>
                             </div>
-                            <Form.Label>Imagens</Form.Label>
-                            <Form.Control type='file' accept='.png' multiple />
 
-                            <Button variant='red' type='submit' className='float-end'>Cadastrar Produto</Button>
+                            <Form.Label >Imagens</Form.Label>
+                            <Form.Control type='file' accept='.png' multiple />
                         </Form>
                     </Col>
                 </Row>
-
             </Modal.Body>
 
             <Modal.Footer>
-                
+                <Button className='float-end' variant='red' onClick={async (e) => {
+                    e.preventDefault();
+                    const response = await createBattery(productName, productDescription, productPrice, productQuantity)
+                    if (response == 201) {
+                        setShow(false)
+                    }
+                }}>Cadastrar Produto</Button>
             </Modal.Footer>
         </Modal>
     );
@@ -138,9 +136,5 @@ export function BatteryCardRegisterExample({ productName, productDescription, pr
         </Card>
     );
 }
-
-
-  
-  
 
 export default BatteryIndex;

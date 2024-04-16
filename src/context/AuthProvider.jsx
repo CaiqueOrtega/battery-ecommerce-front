@@ -33,12 +33,8 @@ function AuthProvider({ children }) {
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
 
-
               const user = await getUserByEmail(decodedToken.sub);
               setUserData(user);
-              
-
-
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
@@ -53,13 +49,7 @@ function AuthProvider({ children }) {
 
   }, [ token ])
 
-  useEffect(() => {
-    if(userData){
-      if(userData.role == 'ADMIN'){
-        navigate('/paineldecontrole')
-      }
-    }
-  }, [token, userData])
+
 
   const logout = () => {
     localStorage.clear();

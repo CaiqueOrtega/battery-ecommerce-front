@@ -23,6 +23,15 @@ const AuthServices = () => {
         }
     };
 
+    const userRoleAuhtorization = async (userEmail) => {
+        try {
+            const response = await ConnectionAPI.get(`auth/${userEmail}`);
+        } catch (error) {
+            navigate('/');
+        }
+
+    }
+
     const signUp = async (emailSignUp, nameSignUp, documentSignUp, passwordSignUp, confirmPassword) => {
         try {
 
@@ -47,13 +56,13 @@ const AuthServices = () => {
                 setErrorMessages({ [field]: message });
             } else if (error.response.data.message) {
                 setErrorMessages({ general: error.response.data.message });
-            } 
+            }
         } else {
             setErrorMessages({ serverError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
         }
     };
 
-    return { errorMessages, setErrorMessages, login, signUp };
+    return { errorMessages, setErrorMessages, login, signUp, userRoleAuhtorization};
 };
 
 export default AuthServices;

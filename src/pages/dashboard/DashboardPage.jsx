@@ -5,19 +5,28 @@ import BatteryIndex from '../battery/BatteryIndex';
 import logo from '../../assets/images/logo.png';
 import './dashboard.css';
 import { AuthContext } from '../../context/AuthProvider'
+import ModalLogout from '../../components/common/ModalLogout';
+import AuthServices from '../../services/auth/AuthServices';
+
+function VerifyAuth() {
+    const { isLoggedIn, userData, navigate } = useContext(AuthContext);
+    const { userRoleAuhtorization } = AuthServices();
+
+    useEffect(() => {
+        async function fetchData() {
+            if (isLoggedIn) {
+                await userRoleAuhtorization(userData.email);
+            }
+        }
+        fetchData();
+      
+    }, [userData, isLoggedIn]);
+}
+
+
 
 function DashboardPage() {
-    const { isLoggedIn, userData, navigate } = useContext(AuthContext);
-    
-    useEffect(() => {
-
-        if (!isLoggedIn || userData.role !== 'ADMIN') {
-            navigate('/')
-            return;
-        }
-
-    }, [userData, isLoggedIn]);
-
+    VerifyAuth();
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [sidebarSelectedOption, setSidebarSelectedOption] = useState("Controle Baterias");
@@ -91,22 +100,29 @@ function NotificationsDropdown() {
 }
 
 function UserDropdown() {
-    const { navigate, logout } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
+    const [showModal, setShowModal] = useState(false);
 
     return (
-        <Dropdown as={NavItem} className='dropdown-no-carret ms-1'>
-            <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
-                <UserIcon currentColor={'f11100'} size={'20'} />
-                <span className='ms-1 d-none d-md-block'>Caique</span>
-            </Dropdown.Toggle>
-            <Dropdown.Menu className='shadow dropdown-menu-end '>
-                <Dropdown.Item>Minha Conta</Dropdown.Item>
-                <Dropdown.Item>Configurações</Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={logout}>Sair</Dropdown.Item>
-            </Dropdown.Menu>
-        </Dropdown>
+        <>
+            <Dropdown as={NavItem} className='dropdown-no-carret ms-1'>
+                <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
+                    <UserIcon currentColor={'f11100'} size={'20'} />
+                    <span className='ms-1 d-none d-md-block'>Caique</span>
+                </Dropdown.Toggle>
+                <Dropdown.Menu className='shadow dropdown-menu-end '>
+                    <Dropdown.Item>Minha Conta</Dropdown.Item>
+                    <Dropdown.Item>Configurações</Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item onClick={() => setShowModal(true)}>Sair</Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+
+            <ModalLogout showModal={showModal} setShowModal={setShowModal} logout={logout} />
+        </>
+
     );
+
 }
 
 function SidebarContent({ onItemClick, selectedOption }) {
