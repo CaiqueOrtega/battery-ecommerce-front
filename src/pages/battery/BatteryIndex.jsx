@@ -122,9 +122,9 @@ function BatteryRegisterForm({ show, setShow }) {
     );
 }
 
-export function BatteryCardRegisterExample({ productName, productDescription, productPrice, productQuantity }) {
+export function BatteryCardRegisterExample({ productName, productDescription, productPrice, productQuantity, onClick }) {
     return (
-        <Card className='shadow rounded-3 me-2' style={{ maxWidth: '14rem' }}>
+        <Card className='shadow rounded-3 me-2' style={{ maxWidth: '14rem' }} onClick={onClick}>
             <div className='p-3 rounded-3' style={{ background: "#fafafa" }}>
                 <Card.Img className="img-fluid" variant="top" src={imagemExemploBateria} height={160} />
             </div>

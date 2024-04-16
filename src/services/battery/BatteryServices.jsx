@@ -1,7 +1,9 @@
 import ConnectionAPI from "../ConnectionAPI";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { BatteryCardRegisterExample } from "../../pages/battery/BatteryIndex"; 
 import { Row, Col } from 'react-bootstrap';
+import { AuthContext } from "../../context/AuthProvider";
+import { useLocation, Link } from "react-router-dom";
 
 const BaterryServices = () => {
 
@@ -32,6 +34,7 @@ const BaterryServices = () => {
 
     const showBatteries = () => {
         const [batteries, setBatteries] = useState([]);
+        const { navigate } = useContext(AuthContext);
     
         useEffect(() => {
             async function fetchBatteries() {
@@ -46,6 +49,7 @@ const BaterryServices = () => {
     
             fetchBatteries();
         }, []);
+
         return (
             <div className="ms-5">
                 <Row xs={1} md={3} >
@@ -56,6 +60,7 @@ const BaterryServices = () => {
                                 productDescription={battery.description}
                                 productPrice={battery.value}
                                 productQuantity={battery.quantity}
+                                onClick={() => navigate('/bateria')}
                             />
                         </Col>
                     ))}
