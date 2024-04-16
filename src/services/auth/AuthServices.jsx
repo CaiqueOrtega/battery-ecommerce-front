@@ -1,9 +1,12 @@
 import ConnectionAPI from "../ConnectionAPI";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../context/AuthProvider";
 
 const AuthServices = () => {
     const [errorMessages, setErrorMessages] = useState({});
+    const { isLoggedIn, userData } = useContext(AuthContext);
+
     const navigate = useNavigate();
 
     const login = async (emailLogin, passwordLogin) => {
@@ -23,13 +26,15 @@ const AuthServices = () => {
         }
     };
 
-    const userRoleAuhtorization = async (userEmail) => {
+    const userRoleAuhtorization = async () => {
         try {
-            const response = await ConnectionAPI.get(`auth/${userEmail}`);
+            const response = await ConnectionAPI.get(`auth/${userData.email}`);
             console.log('NAO DEU ERRO')
         } catch (error) {
-            console.log('DEU ERRO');
-            navigate('/');
+            if(error.response.status == 401){
+                console.log('DEU ERRO');
+                navigate('/');
+            }
         }
 
     }

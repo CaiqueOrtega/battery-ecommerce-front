@@ -15,13 +15,12 @@ function VerifyAuth({ children }) {
 
     useEffect(() => {
         async function fetchData() {
-            if (!isLoggedIn || !userData.email) {
+            if (!isLoggedIn) {
                 setLoading(false);
-                navigate('/');
-                return;
+
             }
 
-            await userRoleAuhtorization(userData.email);
+            await userRoleAuhtorization();
         }
         fetchData();
 
