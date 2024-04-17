@@ -15,10 +15,10 @@ function VerifyAuth({ children }) {
 
     useEffect(() => {
         async function fetchData() {
-            if (isContextLoaded) {
+          
                 await userRoleAuhtorization(userData);
                 setLoading(false); 
-            }
+            
         }
 
         fetchData();
@@ -45,7 +45,7 @@ function DashboardPage() {
                     </Collapse>
 
 
-                    <Col className='d-flex h-100 overflow-auto p-4'>
+                    <Col className='d-flex h-100 overflow-auto px-5 py-4'>
                         <MainContent sidebarSelectedOption={sidebarSelectedOption} />
                     </Col>
                 </Row>
@@ -165,7 +165,7 @@ function MainContent({ sidebarSelectedOption }) {
     }
 
     return (
-        <main className='flex-fill'>
+        <main className='flex-fill '>
             {content}
         </main>
     );

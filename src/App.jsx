@@ -6,23 +6,23 @@ import LoginPage from './pages/login/LoginPage';
 import SignUpPage from "./pages/signUp/SignUpPage";
 import DashboardPage from './pages/dashboard/DashboardPage';
 import BatteryInfo from './pages/battery/BatteryInfo';
-import  { AuthContext, AuthProvider }   from './context/AuthProvider';
+import { AuthProvider } from './context/AuthProvider';
+import { BatteryProvider } from './context/BatteryProvider';
 
 function App() {
 
   return (
     <Router>
-      <AuthProvider >
+      <AuthProvider>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<BatteryProvider><HomePage /></BatteryProvider>} />
+          <Route path="/paineldecontrole" element={<BatteryProvider><DashboardPage /></BatteryProvider>} />
+          <Route path='/bateria' element={<BatteryProvider><BatteryInfo /></BatteryProvider>} />
           <Route path="/entrar" element={<LoginPage />} />
           <Route path="/cadastrar" element={<SignUpPage />} />
-          <Route path="/paineldecontrole" element={<DashboardPage />} />
-          <Route path='/bateria' element={<BatteryInfo/>}/>
         </Routes>
       </AuthProvider>
-    </Router >
-
+    </Router>
   );
 }
 

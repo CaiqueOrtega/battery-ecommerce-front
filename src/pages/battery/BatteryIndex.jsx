@@ -1,62 +1,59 @@
 
-import { Card, Form, Row, Col, Button, Container, Modal } from 'react-bootstrap';
-import imagemExemploBateria from '../../assets/images/exemploImageRegister.png'
+import { Form, Row, Col, Button, Container, Modal, Table, Card } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import { EnvelopeIcon } from '../../assets/icons/IconsSet';
-import { useState, useEffect } from 'react';
-import BaterryServices from '../../services/battery/BatteryServices';
+import { EnvelopeIcon, TrashIcon } from '../../assets/icons/IconsSet';
+import { useState, useContext, useEffect } from 'react';
+import BatteryServices from '../../services/battery/BatteryServices';
+import { BatteryContext } from '../../context/BatteryProvider';
+import BatteryCard from '../../components/common/BatteryCard';
 
 function BatteryIndex() {
-    const { showBatteries } = BaterryServices()
-
-    return (
-        <>
-            <BatteryNavBar />
-            {showBatteries()}
-        </>
-    );
-}
-
-
-function BatteryNavBar() {
     const [show, setShow] = useState(false);
+    const { batteries } = useContext(BatteryContext);
+    const [selectedBattery, setSelectedBattery] = useState('');
+    const [request, setRequest] = useState('');
 
     return (
         <>
-            <Container  className=' d-flex flex-row align-items-center'>
 
+            <BatteryTable batteries={batteries} setShow={setShow} setSelectedBattery={setSelectedBattery} setRequest={setRequest} request={request} />
 
-                <h3 className='text-muted text-align-center mb-0'>Controle de Baterias</h3>
-
-
-                <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => setShow(true)}>
-                    Cadastrar Bateria
-                </Button>
-
-                <BatteryRegisterForm show={show} setShow={setShow} />
-
-            </Container>
-            <hr />
+            <BatteryRegisterForm show={show} setShow={setShow} selectedBattery={selectedBattery} request={request} />
         </>
     );
 }
 
-function BatteryRegisterForm({ show, setShow }) {
+
+
+function BatteryRegisterForm({ show, setShow, request, selectedBattery }) {
     const [productName, setProductName] = useState('');
     const [productDescription, setProductDescription] = useState('');
     const [productPrice, setProductPrice] = useState('');
     const [productQuantity, setProductQuantity] = useState('');
-    const { createBattery } = BaterryServices();
+    const verifyRequest = request === 'editBattery';
+
+    useEffect(() => {
+        setProductName(verifyRequest ? selectedBattery.name : '');
+        setProductDescription(verifyRequest ? selectedBattery.description : '');
+        setProductPrice(verifyRequest ? selectedBattery.value : '');
+        setProductQuantity(verifyRequest ? selectedBattery.quantity : '');
+    }, [request, selectedBattery]);
+
+
+
+
+    const { createBattery, updateBattery, deleteBattery } = BatteryServices();
+
     return (
         <Modal size="lg" show={show} onHide={() => setShow(false)} backdrop="static" keyboard={false}>
-            <Modal.Header className='bg-red text-white' >
-                <Modal.Title>Cadastrar Produto</Modal.Title>
+            <Modal.Header className='bg-red text-white'>
+                <Modal.Title>{verifyRequest ? 'Editar Produto' : 'Cadastrar Produto'}</Modal.Title>
                 <button className='btn-close btn-close-white' onClick={() => setShow(false)} />
             </Modal.Header>
             <Modal.Body>
                 <Row className=''>
                     <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
-                        <BatteryCardRegisterExample
+                        <BatteryCard
                             productName={productName}
                             productDescription={productDescription}
                             productPrice={productPrice}
@@ -108,30 +105,87 @@ function BatteryRegisterForm({ show, setShow }) {
             </Modal.Body>
 
             <Modal.Footer>
+                {verifyRequest ? (
+                    <Button variant='red' className='float-end' onClick={async (e) => {
+                        const response = await deleteBattery(selectedBattery.batteryId);
+                    }}>Deletar Produto</Button>
+                ) : null}
+
+
                 <Button className='float-end' variant='red' onClick={async (e) => {
                     e.preventDefault();
-                    const response = await createBattery(productName, productDescription, productPrice, productQuantity)
-                    if (response == 201) {
-                        setShow(false)
-                    }
-                }}>Cadastrar Produto</Button>
+
+                    const response = verifyRequest
+                        ? await updateBattery(selectedBattery.batteryId, productName, productDescription, productPrice, productQuantity)
+                        : await createBattery(productName, productDescription, productPrice, productQuantity);
+
+                    (response === 200 || response === 201) ? setShow(false) : null;
+
+                }}>{verifyRequest ? 'Atualizar Produto' : 'Cadastrar Produto'}</Button>
+
             </Modal.Footer>
         </Modal>
     );
 }
 
-export function BatteryCardRegisterExample({ productName, productDescription, productPrice, productQuantity, onClick }) {
+
+function BatteryTable({ batteries, setShow, setSelectedBattery, setRequest }) {
+    const [lastClickedBattery, setLastClickedBattery] = useState(null);
+    const [clickTimeout, setClickTimeout] = useState(null);
+
+    const handleRowClick = (battery) => {
+        if (lastClickedBattery === battery) {
+            setSelectedBattery(battery);
+            setRequest('editBattery');
+            setShow(true);
+            clearTimeout(clickTimeout);
+            setLastClickedBattery(null);
+
+        } else {
+            setLastClickedBattery(battery);
+
+            const newClickTimeout = setTimeout(() => {
+                setLastClickedBattery(null);
+            }, 300);
+
+            setClickTimeout(newClickTimeout);
+        }
+    }
+
     return (
-        <Card className='shadow rounded-3 me-2' style={{ maxWidth: '14rem' }} onClick={onClick}>
-            <div className='p-3 rounded-3' style={{ background: "#fafafa" }}>
-                <Card.Img className="img-fluid" variant="top" src={imagemExemploBateria} height={160} />
-            </div>
+        <Card className='shadow rounded-3 mb-5'>
+            <Card.Header className='py-3 d-flex'>
+                <h3 className='text-align-center mb-0'>Controle de Baterias</h3>
+
+
+                <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
+                    setShow(true);
+                    setRequest('create')
+                }}>
+                    Cadastrar Bateria
+                </Button>
+            </Card.Header>
             <Card.Body>
-                <Card.Title as="h6" className='fw-'>{productName.trim() || 'Exemplo do Nome do Produto'}</Card.Title>
-                <Card.Text className='text-muted mb-5 small'>
-                    {productDescription.trim() || 'Exemplo da descrição do produto'}
-                </Card.Text>
-                <h5>R$ {productPrice || '00,00'}</h5>
+                <Table responsive hover bordered>
+                    <thead >
+                        <tr >
+                            <th className='bg-table-header'>Nome</th>
+                            <th className='bg-table-header'>Descrição</th>
+                            <th className='bg-table-header'>Preço</th>
+                            <th className='bg-table-header'>Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {batteries.map(battery => (
+                            <tr key={battery.batteryId} onClick={() => handleRowClick(battery)}>
+                                <td>{battery.name}</td>
+                                <td>{battery.description}</td>
+                                <td>{battery.value}</td>
+                                <td>{battery.quantity}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
             </Card.Body>
         </Card>
     );

@@ -2,6 +2,7 @@ body {
     font-family: 'Arial', sans-serif;
 }
 
+
 .bg-yellow {
     background-color: #ffdc00;
 }
@@ -10,9 +11,12 @@ body {
     background-color: #c00d0d; 
 }
 
+.bg-table-header{
+    background-color: #f0f0f0 !important;
+}
 
 .bg-main{
-    background-color: #f8f9fc;
+    background-color: #f8f9fc !important;
 }
 .dropdown-no-carret .dropdown-toggle::after {
     display: none;
