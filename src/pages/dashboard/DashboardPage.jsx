@@ -9,26 +9,24 @@ import ModalLogout from '../../components/common/ModalLogout';
 import AuthServices from '../../services/auth/AuthServices';
 
 function VerifyAuth({ children }) {
-    const { isLoggedIn, userData, navigate } = useContext(AuthContext);
+    const { isLoggedIn, userData, isContextLoaded } = useContext(AuthContext);
     const { userRoleAuhtorization } = AuthServices();
-    const [ loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
-            if (!isLoggedIn) {
-                setLoading(false);
-
+            if (isContextLoaded) {
+                await userRoleAuhtorization(userData);
+                setLoading(false); 
             }
-
-            await userRoleAuhtorization();
         }
+
         fetchData();
 
-    }, [userData ]);
+    }, [userData, isContextLoaded]);
 
     return loading ? null : children;
 }
-
 
 
 function DashboardPage() {
@@ -41,7 +39,7 @@ function DashboardPage() {
                 <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
                 <Row className='g-0 flex-grow-1 overflow-hidden'>
                     <Collapse in={sidebarOpen} className='d-lg-block'>
-                        <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2'>
+                        <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2 bg-white'>
                             <SidebarContent onItemClick={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
                         </Col>
                     </Collapse>

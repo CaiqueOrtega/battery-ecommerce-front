@@ -1,11 +1,11 @@
 import ConnectionAPI from "../ConnectionAPI";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../context/AuthProvider";
+
 
 const AuthServices = () => {
     const [errorMessages, setErrorMessages] = useState({});
-    const { isLoggedIn, userData } = useContext(AuthContext);
+
 
     const navigate = useNavigate();
 
@@ -26,15 +26,14 @@ const AuthServices = () => {
         }
     };
 
-    const userRoleAuhtorization = async () => {
+    const userRoleAuhtorization = async (userData) => {
         try {
-            const response = await ConnectionAPI.get(`auth/${userData.email}`);
-            console.log('NAO DEU ERRO')
+                const response = await ConnectionAPI.get(`auth/${userData.email}`);
+            
         } catch (error) {
-            if(error.response.status == 401){
-                console.log('DEU ERRO');
-                navigate('/');
-            }
+            console.log(error.message);
+           navigate('/');
+
         }
 
     }
@@ -69,7 +68,7 @@ const AuthServices = () => {
         }
     };
 
-    return { errorMessages, setErrorMessages, login, signUp, userRoleAuhtorization};
+    return { errorMessages, setErrorMessages, login, signUp, userRoleAuhtorization };
 };
 
 export default AuthServices;

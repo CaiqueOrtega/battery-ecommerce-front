@@ -6,12 +6,11 @@ import LoginPage from './pages/login/LoginPage';
 import SignUpPage from "./pages/signUp/SignUpPage";
 import DashboardPage from './pages/dashboard/DashboardPage';
 import BatteryInfo from './pages/battery/BatteryInfo';
-import  { AuthProvider }   from './context/AuthProvider';
+import  { AuthContext, AuthProvider }   from './context/AuthProvider';
 
 function App() {
- 
-  return (
 
+  return (
     <Router>
       <AuthProvider >
         <Routes>

@@ -10,6 +10,7 @@ function AuthProvider({ children }) {
 
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isContextLoaded, setIsContextLoaded] = useState(false);
   const [decodedTokenEmail, setDecodedTokenEmail] = useState('');
   const navigate = useNavigate();
   const { getUserByEmail } = UserService();
@@ -17,7 +18,6 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     const checkToken = async () => {
-
 
       if (token) {
         try {
@@ -28,19 +28,24 @@ function AuthProvider({ children }) {
 
           if (dataToken < dataHoje) {
             logout();
+            setIsContextLoaded(true);
           } else {
             setDecodedTokenEmail(decodedToken.sub);
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
-
-              const user = await getUserByEmail(decodedToken.sub);
-              setUserData(user);
+        
+            const user = await getUserByEmail(decodedToken.sub);
+            setUserData(user);
+            setIsContextLoaded(true);
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
         }
       } else {
+        setUserData(null);
+        console.log(" Erro ao chegar o token")
         setIsLoggedIn(false);
+        setIsContextLoaded(true);
       }
     };
 
@@ -56,12 +61,11 @@ function AuthProvider({ children }) {
     setIsLoggedIn(false);
     setUserData(null);
     setToken('');
-
   }
 
-  
+
   return (
-    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout}}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, isContextLoaded }}>
       {children}
     </AuthContext.Provider>
   );
