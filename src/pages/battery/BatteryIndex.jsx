@@ -10,7 +10,7 @@ import { BatteryContext } from '../../context/BatteryProvider';
 function BatteryIndex() {
     const { batteries, setUpdateTable } = useContext(BatteryContext);
     const formRef = useRef(null);
-    const [battetyValues, setBattetyValues] = useState({
+    const [formValues, setFormValues] = useState({
         name: '',
         description: '',
         value: '',
@@ -20,23 +20,22 @@ function BatteryIndex() {
     const [showBatteryFormModal, setShowBatteryFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [action, setAction] = useState('');
-    const [errorMessages, setErrorMessages] = useState({});
     const [lastClickedBattery, setLastClickedBattery] = useState(null);
     const [clickTimeout, setClickTimeout] = useState(null);
 
-    const { createBattery, updateBattery, deleteBattery } = BatteryServices();
+    const { createBattery, updateBattery, deleteBattery, errorMessages, setErrorMessages } = BatteryServices();
 
     useEffect(() => {
         setErrorMessages({});
         if (selectedBattery) {
-            setBattetyValues({
+            setFormValues({
                 name: selectedBattery.name || '',
                 description: selectedBattery.description || '',
                 value: selectedBattery.value || '',
                 quantity: selectedBattery.quantity || ''
             });
         } else {
-            setBattetyValues({
+            setFormValues({
                 name: '',
                 description: '',
                 value: '',
@@ -51,8 +50,8 @@ function BatteryIndex() {
 
         if (form.reportValidity()) {
             const response = action === 'update'
-                ? await updateBattery(selectedBattery?.batteryId, battetyValues.name, battetyValues.description, battetyValues.value, battetyValues.quantity)
-                : await createBattery(battetyValues.name, battetyValues.description, battetyValues.value, battetyValues.quantity);
+                ? await updateBattery(selectedBattery?.batteryId, formValues.name, formValues.description, formValues.value, formValues.quantity)
+                : await createBattery(formValues.name, formValues.description, formValues.value, formValues.quantity);
             if (response === 200 || response === 201) {
                 setShowBatteryFormModal(false);
                 setShowConfirmChangesModal(false);
@@ -66,7 +65,7 @@ function BatteryIndex() {
             setShowConfirmChangesModal(false);
         }
         const response = action === 'update'
-            ? await updateBattery(selectedBattery?.batteryId, battetyValues.name, battetyValues.description, battetyValues.value, battetyValues.quantity)
+            ? await updateBattery(selectedBattery?.batteryId, formValues.name, formValues.description, formValues.value, formValues.quantity)
             : await deleteBattery(selectedBattery?.batteryId);
         if (response === 200 || response === 201) {
             setShowBatteryFormModal(false);
@@ -135,10 +134,10 @@ function BatteryIndex() {
                     <Row>
                         <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
                             <BatteryCard
-                                productName={battetyValues.name}
-                                productDescription={battetyValues.description}
-                                productPrice={battetyValues.value}
-                                productQuantity={battetyValues.quantity}
+                                productName={formValues.name}
+                                productDescription={formValues.description}
+                                productPrice={formValues.value}
+                                productQuantity={formValues.quantity}
                             />
                         </Col>
                         <Col>
@@ -149,8 +148,8 @@ function BatteryIndex() {
                                     type='text'
                                     placeholder='Nome do Produto(Ex: Bateria123)'
                                     mb={'mb-4'}
-                                    value={battetyValues.name}
-                                    onChange={(e) => setBattetyValues({ ...battetyValues, name: e.target.value })}
+                                    value={formValues.name}
+                                    onChange={(e) => setFormValues({ ...formValues, name: e.target.value })}
                                     feedback={errorMessages.name}
                                 />
                                 <Form.Label className='w-100'>Descrição do Produto</Form.Label>
@@ -159,8 +158,8 @@ function BatteryIndex() {
                                     type='text'
                                     placeholder='Descrição do produto(Ex: )'
                                     mb={'mb-4'}
-                                    value={battetyValues.description}
-                                    onChange={(e) => setBattetyValues({ ...battetyValues, description: e.target.value })}
+                                    value={formValues.description}
+                                    onChange={(e) => setFormValues({ ...formValues, description: e.target.value })}
                                     feedback={errorMessages.description}
                                 />
                                 <div className='d-flex'>
@@ -171,8 +170,8 @@ function BatteryIndex() {
                                             type='text'
                                             placeholder='Preço do produto (Ex: R$ 00,00 )'
                                             mb={'mb-4'}
-                                            value={battetyValues.value}
-                                            onChange={(e) => setBattetyValues({ ...battetyValues, value: e.target.value })}
+                                            value={formValues.value}
+                                            onChange={(e) => setFormValues({ ...formValues, value: e.target.value })}
                                             feedback={errorMessages.value}
                                         />
                                     </Form.Group>
@@ -183,8 +182,8 @@ function BatteryIndex() {
                                             type='number'
                                             placeholder='Quantidade em estoque'
                                             mb={'mb-4'}
-                                            value={battetyValues.quantity}
-                                            onChange={(e) => setBattetyValues({ ...battetyValues, quantity: e.target.value })}
+                                            value={formValues.quantity}
+                                            onChange={(e) => setFormValues({ ...formValues, quantity: e.target.value })}
                                             feedback={errorMessages.quantity}
                                         />
                                     </Form.Group>
