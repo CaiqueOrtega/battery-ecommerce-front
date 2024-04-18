@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const ConnectionAPI =  axios.create({
-    baseURL: 'http://localhost:8080/'
+    baseURL: 'https://18cc-168-205-148-130.ngrok-free.app/'
 });
 
 

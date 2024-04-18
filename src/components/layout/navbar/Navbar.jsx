@@ -84,10 +84,13 @@ function RenderDropdown() {
   if (isLoggedIn) {
     return (
       <>
-        <Dropdown as={NavItem} className='dropdown-no-carret ms-1 '>
-          <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
-            <UserIcon currentColor={'f11100'} size={'30'} className={'hover-color-red'} />
-            <span className='ms-1 d-none d-md-block text-white hover-color-red'>{userData.name}</span>
+        <Dropdown as={NavItem}>
+          <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
+            <UserCircleIcon className="float-start me-2" />
+            Olá, {userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}
+            <br/>
+            Minha Conta
+    
           </Dropdown.Toggle>
           <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2'>
             <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
@@ -95,7 +98,7 @@ function RenderDropdown() {
             <Dropdown.Item>Configurações</Dropdown.Item>
             <Link to="/paineldecontrole" className='dropdown-item' > Painel de Controle </Link>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={()=> setShowLogoutModal(true)}>Sair</Dropdown.Item>
+            <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Sair</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
 
@@ -112,10 +115,10 @@ function RenderDropdown() {
         </Dropdown.Toggle>
         <Dropdown.Menu className="dropdown-menu-end  dropdow-menu-size shadow border-0 mt-2 p-4">
           <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
-          <p className="fw-lighter lh-sm small text-muted">Confira seus pedidos e desfrute de uma experiência exclusiva ao fazer login na sua conta!</p>
+          <p className="fw-lighter lh-sm small text-muted mt-2 mb-4">Confira seus pedidos e desfrute de uma experiência exclusiva ao fazer login na sua conta!</p>
           <LoginSignupButton
             classNameBtnLogin="btn-yellow d-block mb-2"
-            classNameBtnSignUp="btn-red-outline d-block" />
+            classNameBtnSignUp="btn-red-outline d-block mb-2" />
         </Dropdown.Menu>
       </Dropdown>
     )
