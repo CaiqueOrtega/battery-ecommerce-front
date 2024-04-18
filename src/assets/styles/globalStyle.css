@@ -2,7 +2,9 @@ body {
     font-family: 'Arial', sans-serif;
 }
 
-
+.color-gray{
+    color: #a3a29f;
+}
 .bg-yellow {
     background-color: #ffdc00;
 }

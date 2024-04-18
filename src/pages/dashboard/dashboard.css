@@ -1,6 +1,6 @@
   
 .list-group-item.active .color-red{
-    color: white; 
+    color: white !important; 
     
   }
 

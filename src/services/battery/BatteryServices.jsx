@@ -46,7 +46,7 @@ const BaterryServices = () => {
         try {
             const response = await ConnectionAPI.delete(`battery/${batteryId}`)
 
-            console.log(response);
+            return response.status;
         } catch (error) {
             console.log(error);
         }

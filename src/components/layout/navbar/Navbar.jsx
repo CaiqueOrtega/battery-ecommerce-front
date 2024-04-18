@@ -78,7 +78,7 @@ function NavbarComponent() {
 
 function RenderDropdown() {
   const { logout, userData, isLoggedIn } = useContext(AuthContext);
-  const [showModal, setShowModal] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 
   if (isLoggedIn) {
@@ -95,12 +95,12 @@ function RenderDropdown() {
             <Dropdown.Item>Configurações</Dropdown.Item>
             <Link to="/paineldecontrole" className='dropdown-item' > Painel de Controle </Link>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={()=> setShowModal(true)}>Sair</Dropdown.Item>
+            <Dropdown.Item onClick={()=> setShowLogoutModal(true)}>Sair</Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
 
 
-        <ModalLogout showModal={showModal} setShowModal={setShowModal} logout={logout} />
+        <ModalLogout showLogoutModal={showLogoutModal} setShowLogoutModal={setShowLogoutModal} logout={logout} />
       </>
     )
   } else {
