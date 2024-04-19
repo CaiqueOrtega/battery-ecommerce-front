@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
-import { SearchIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon } from '../../assets/icons/IconsSet';
+import { SearchIcon, CaretUpIcon, ExitIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon, HomeIcon, GearIcon } from '../../assets/icons/IconsSet';
 import BatteryIndex from '../battery/BatteryIndex';
 import UserIndex from '../user/UserIndex';
 import logo from '../../assets/images/logo.png';
 import './dashboard.css';
-import { AuthContext } from '../../context/AuthProvider'    
+import { AuthContext } from '../../context/AuthProvider'
 import ModalLogout from '../../components/common/ModalLogout';
 import AuthServices from '../../services/auth/AuthServices';
 import { Link } from 'react-router-dom';
@@ -116,13 +116,21 @@ function UserDropdown() {
                     <UserIcon currentColor={'f11100'} size={'20'} />
                     <span className='ms-1 d-none d-md-block'>{userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}</span>
                 </Dropdown.Toggle>
-                <Dropdown.Menu className='shadow dropdown-menu-end '>
-                    <Dropdown.Item>Minha Conta</Dropdown.Item>
-                    <Dropdown.Item>Configurações</Dropdown.Item>
+                <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-3'>
+                <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
+                    <Dropdown.Item className='d-flex align-items-center mb-1'>
+                        <UserIconCropped /> <span className='ms-2'>Minha Conta</span>
+                    </Dropdown.Item>
+                    <Dropdown.Item className='d-flex align-items-center mb-1'>
+                        <GearIcon /> <span className='ms-2'>Configurações</span>
+                    </Dropdown.Item>
                     <Link to="/" className='dropdown-item d-flex align-items-center' >
-                        <span className='ms-2'>Home</span></Link>
+                        <HomeIcon /> <span className='ms-2'>Home</span>
+                    </Link>
                     <Dropdown.Divider />
-                    <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Sair</Dropdown.Item>
+                    <Dropdown.Item onClick={() => setShowLogoutModal(true)}>
+                        <ExitIcon />  <span className='ms-2'>Sair da conta</span>
+                    </Dropdown.Item>
                 </Dropdown.Menu>
             </Dropdown>
 
