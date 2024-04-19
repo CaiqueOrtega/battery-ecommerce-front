@@ -1,6 +1,6 @@
-import { Form, Row, Col, Button, Container, Modal, Table, Card } from 'react-bootstrap';
+import { Form, Row, Col, Button, Modal, Table, Card } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, AlertIcon, CheckIcon } from '../../assets/icons/IconsSet';
+import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon } from '../../assets/icons/IconsSet';
 import { useState, useContext, useEffect, useRef } from 'react';
 import BatteryServices from '../../services/battery/BatteryServices';
 import { BatteryContext } from '../../context/BatteryProvider';

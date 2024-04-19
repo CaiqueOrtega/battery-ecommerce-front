@@ -2,11 +2,13 @@ import React, { useContext, useEffect, useState } from 'react';
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
 import { SearchIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon } from '../../assets/icons/IconsSet';
 import BatteryIndex from '../battery/BatteryIndex';
+import UserIndex from '../user/UserIndex';
 import logo from '../../assets/images/logo.png';
 import './dashboard.css';
-import { AuthContext } from '../../context/AuthProvider'
+import { AuthContext } from '../../context/AuthProvider'    
 import ModalLogout from '../../components/common/ModalLogout';
 import AuthServices from '../../services/auth/AuthServices';
+import { Link } from 'react-router-dom';
 
 function VerifyAuth({ children }) {
     const { isLoggedIn, userData, isContextLoaded } = useContext(AuthContext);
@@ -15,10 +17,10 @@ function VerifyAuth({ children }) {
 
     useEffect(() => {
         async function fetchData() {
-          
-                const response = await userRoleAuthorization(userData, true);
-                setLoading(false); 
-            
+
+            const response = await userRoleAuthorization(userData, true);
+            setLoading(false);
+
         }
 
         fetchData();
@@ -104,7 +106,7 @@ function NotificationsDropdown() {
 }
 
 function UserDropdown() {
-    const { logout } = useContext(AuthContext);
+    const { logout, userData } = useContext(AuthContext);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
 
     return (
@@ -112,11 +114,13 @@ function UserDropdown() {
             <Dropdown as={NavItem} className='dropdown-no-carret ms-1'>
                 <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
                     <UserIcon currentColor={'f11100'} size={'20'} />
-                    <span className='ms-1 d-none d-md-block'>Caique</span>
+                    <span className='ms-1 d-none d-md-block'>{userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}</span>
                 </Dropdown.Toggle>
                 <Dropdown.Menu className='shadow dropdown-menu-end '>
                     <Dropdown.Item>Minha Conta</Dropdown.Item>
                     <Dropdown.Item>Configurações</Dropdown.Item>
+                    <Link to="/" className='dropdown-item d-flex align-items-center' >
+                        <span className='ms-2'>Home</span></Link>
                     <Dropdown.Divider />
                     <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Sair</Dropdown.Item>
                 </Dropdown.Menu>
@@ -159,6 +163,9 @@ function MainContent({ sidebarSelectedOption }) {
     switch (sidebarSelectedOption) {
         case "Controle Baterias":
             content = <BatteryIndex />;
+            break;
+        case 'Usuários':
+            content = <UserIndex />
             break;
         default:
             content = null;
