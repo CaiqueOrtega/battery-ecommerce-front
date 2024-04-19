@@ -26,13 +26,14 @@ const AuthServices = () => {
         }
     };
 
-    const userRoleAuhtorization = async (userData) => {
+    const userRoleAuthorization = async (userData, request) => {
         try {
                 const response = await ConnectionAPI.get(`auth/${userData.email}`);
-            
+                return response.status;
         } catch (error) {
-            console.log(error.message);
-           navigate('/');
+            if (request){
+                navigate('/');
+            }
 
         }
 
@@ -68,7 +69,7 @@ const AuthServices = () => {
         }
     };
 
-    return { errorMessages, setErrorMessages, login, signUp, userRoleAuhtorization };
+    return { errorMessages, setErrorMessages, login, signUp, userRoleAuthorization };
 };
 
 export default AuthServices;

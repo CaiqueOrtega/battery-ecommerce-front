@@ -1,13 +1,36 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col } from 'react-bootstrap';
-import { SearchIcon, CartIcon, UserCircleIcon, CarretUpIcon, UserCircleOutlineIcon } from '../../../assets/icons/IconsSet';
+import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, UserIconCropped, OrderIcon, MapIcon, GearIcon, ControlIcon } from '../../../assets/icons/IconsSet';
 import logo from '../../../assets/images/logo.png';
 import LoginSignupButton from '../../common/LoginSignupButton';
 import './navbar.css';
 import { AuthContext } from '../../../context/AuthProvider';
-import { UserIcon } from '../../../assets/icons/IconsSet';
+import AuthServices from '../../../services/auth/AuthServices';
 import { Link } from 'react-router-dom';
 import ModalLogout from '../../common/ModalLogout';
+
+function VerifyAuth({ children }) {
+  const { userData, isContextLoaded } = useContext(AuthContext);
+  const { userRoleAuthorization } = AuthServices();
+  const [auth, setAuth] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+
+      const response = await userRoleAuthorization(userData);
+      console.log(response);
+      if (response == 200){
+        setAuth(false);
+      }
+
+    }
+
+    fetchData();  
+
+  }, [userData, isContextLoaded]);
+
+  return auth ? null : children;
+}
 
 function NavbarComponent() {
 
@@ -34,7 +57,7 @@ function NavbarComponent() {
         <CartIcon />
       </Dropdown.Toggle>
       <Dropdown.Menu className="rounded-4 shadow border-0 dropdown-menu-end dropdow-menu-size mt-2 py-5 px-4">
-        <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
+        <CaretUpIcon className="position-absolute carret-menuDropdow-possition" />
         <h5 className='text-muted '>Entre na sua conta, para ter acesso ao carrinho</h5>
       </Dropdown.Menu>
     </Dropdown>
@@ -77,7 +100,7 @@ function NavbarComponent() {
 }
 
 function RenderDropdown() {
-  const { logout, userData, isLoggedIn } = useContext(AuthContext);
+  const { logout, userData, isLoggedIn, isContextLoaded } = useContext(AuthContext);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 
@@ -88,17 +111,33 @@ function RenderDropdown() {
           <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
             <UserCircleIcon className="float-start me-2" />
             Olá, {userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}
-            <br/>
+            <br />
             Minha Conta
-    
+
           </Dropdown.Toggle>
-          <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2'>
-            <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
-            <Dropdown.Item>Minha Conta</Dropdown.Item>
-            <Dropdown.Item>Configurações</Dropdown.Item>
-            <Link to="/paineldecontrole" className='dropdown-item' > Painel de Controle </Link>
+          <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-3'>
+            <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
+            <Dropdown.Item className='d-flex align-items-center mb-1'>
+              <UserIconCropped /> <span className='ms-2'>Minha Conta</span>
+            </Dropdown.Item>
+            <Dropdown.Item className='d-flex align-items-center mb-1'>
+              <GearIcon /> <span className='ms-2'>Configurações</span>
+            </Dropdown.Item>
+            <Dropdown.Item className='d-flex align-items-center mb-1'>
+              <OrderIcon /> <span className='ms-2'>Pedidos</span>
+            </Dropdown.Item >
+            <Dropdown.Item className='d-flex align-items-center mb-1'>
+              <MapIcon /> <span className='ms-2'>Endereço</span>
+            </Dropdown.Item>
+            <VerifyAuth>
+              <Link to="/paineldecontrole" className='dropdown-item d-flex align-items-center' >
+                <ControlIcon />
+                <span className='ms-2'>Painel de Controle</span></Link>
+            </VerifyAuth>
             <Dropdown.Divider />
-            <Dropdown.Item onClick={() => setShowLogoutModal(true)}>Sair</Dropdown.Item>
+            <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>
+              <ExitIcon />  <span className='ms-2'>Sair da conta</span>
+            </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
 
@@ -113,8 +152,8 @@ function RenderDropdown() {
           <UserCircleIcon className="float-start me-1" />
           Entre ou se <br /> Cadastre
         </Dropdown.Toggle>
-        <Dropdown.Menu className="dropdown-menu-end  dropdow-menu-size shadow border-0 mt-2 p-4">
-          <CarretUpIcon className="position-absolute carret-menuDropdow-possition" />
+        <Dropdown.Menu className="dropdown-menu-end  dropdown-menu-size shadow border-0 mt-2 p-4">
+          <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
           <p className="fw-lighter lh-sm small text-muted mt-2 mb-4">Confira seus pedidos e desfrute de uma experiência exclusiva ao fazer login na sua conta!</p>
           <LoginSignupButton
             classNameBtnLogin="btn-yellow d-block mb-2"

@@ -1,6 +1,6 @@
 import { Form, Row, Col, Button, Container, Modal, Table, Card } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon } from '../../assets/icons/IconsSet';
+import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, AlertIcon, CheckIcon } from '../../assets/icons/IconsSet';
 import { useState, useContext, useEffect, useRef } from 'react';
 import BatteryServices from '../../services/battery/BatteryServices';
 import { BatteryContext } from '../../context/BatteryProvider';
@@ -18,32 +18,38 @@ function BatteryIndex() {
     const [request, setRequest] = useState('');
     const [action, setAction] = useState('');
 
-    const [productName, setProductName] = useState('');
-    const [productDescription, setProductDescription] = useState('');
-    const [productPrice, setProductPrice] = useState('');
-    const [productQuantity, setProductQuantity] = useState('');
-
+    const [batteryValues, setBatteryValues] = useState({
+        name: '',
+        description: '',
+        value: '',
+        quantity: ''
+    });
     const [lastClickedBattery, setLastClickedBattery] = useState(null);
     const [clickTimeout, setClickTimeout] = useState(null);
     const formRef = useRef(null);
-
+    const [successMessages, setSuccessMessages] = useState('');
     const { createBattery, updateBattery, deleteBattery, errorMessages, setErrorMessages } = BatteryServices();
 
 
     useEffect(() => {
         setErrorMessages({});
         if (request === 'editBattery') {
-            setProductName(selectedBattery?.name || '');
-            setProductDescription(selectedBattery?.description || '');
-            setProductPrice(selectedBattery?.value || '');
-            setProductQuantity(selectedBattery?.quantity || 0);
+            setBatteryValues({
+                name: selectedBattery.name || '',
+                description: selectedBattery.description || '',
+                value: selectedBattery.value || '',
+                quantity: selectedBattery.quantity || 0
+            });
             setVerifyRequest(true);
         } else {
-            setProductName('');
-            setProductDescription('');
-            setProductPrice('');
-            setProductQuantity('');
+            setBatteryValues({
+                name: '',
+                description: '',
+                value: '',
+                quantity: ''
+            });
             setVerifyRequest(false);
+            setSuccessMessages('');
         }
     }, [request, selectedBattery, showBatteryFormModal]);
 
@@ -52,13 +58,25 @@ function BatteryIndex() {
 
         if (form.reportValidity()) {
             e.preventDefault();
-            const response = verifyRequest
-                ? (setAction('update'), setShowConfirmChangesModal(true))
-                : (await createBattery(productName, productDescription, productPrice, productQuantity), setUpdateTable(prevValue => !prevValue));
-            if (response === 200 || response === 201) {
-                setShowBatteryFormModal(false);
+            if (verifyRequest) {
+                (setAction('update'), setShowConfirmChangesModal(true))
+            } else {
+                const response = await createBattery(batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
+                setUpdateTable(prevValue => !prevValue);
+
+                console.log("fora", response);
+
+                if (response === 200 || response === 201) {
+                    setSuccessMessages('Bateria Cadastrada com Sucesso!')
+                    setBatteryValues({
+                        name: '',
+                        description: '',
+                        value: '',
+                        quantity: ''
+                    });
+                }
             }
-        } 
+        }
     };
 
     const handleConfirmChangesModal = async () => {
@@ -66,7 +84,7 @@ function BatteryIndex() {
             setShowConfirmChangesModal(false);
         }
         const response = action === 'update'
-            ? await updateBattery(selectedBattery?.batteryId, productName, productDescription, productPrice, productQuantity)
+            ? await updateBattery(selectedBattery?.batteryId, batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
             : await deleteBattery(selectedBattery?.batteryId);
         if (response === 200 || response === 201) {
             setShowBatteryFormModal(false);
@@ -107,13 +125,23 @@ function BatteryIndex() {
                     <Row>
                         <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
                             <BatteryCard
-                                productName={productName}
-                                productDescription={productDescription}
-                                productPrice={productPrice}
-                                productQuantity={productQuantity}
+                                batteryName={batteryValues.name}
+                                batteryDescription={batteryValues.description}
+                                batteryPrice={batteryValues.value}
+                                batteryQuantity={batteryValues.quantity}
                             />
                         </Col>
                         <Col>
+                            {successMessages && (
+                                    <div className='msg alert alert-success mb-0 d-flex align-items-center mb-3'>
+                                        <CheckIcon size={"16"} currentColor={"#1b4532"} />
+                                        <span className='ms-2'>
+                                            {successMessages}
+                                        </span>
+                                    </div>
+                                )
+                            }
+
                             <Form ref={formRef}>
                                 <Form.Label className='w-100'>Nome do Produto</Form.Label>
                                 <FormGroupWithIcon
@@ -121,8 +149,8 @@ function BatteryIndex() {
                                     type='text'
                                     placeholder='Nome do Produto(Ex: Bateria123)'
                                     mb={'mb-4'}
-                                    value={productName}
-                                    onChange={(e) => setProductName(e.target.value)}
+                                    value={batteryValues.name}
+                                    onChange={(e) => setBatteryValues({ ...batteryValues, name: e.target.value })}
                                     feedback={errorMessages.name}
                                 />
                                 <Form.Label className='w-100'>Descrição do Produto</Form.Label>
@@ -131,8 +159,8 @@ function BatteryIndex() {
                                     type='text'
                                     placeholder='Descrição do produto(Ex: )'
                                     mb={'mb-4'}
-                                    value={productDescription}
-                                    onChange={(e) => setProductDescription(e.target.value)}
+                                    value={batteryValues.description}
+                                    onChange={(e) => setBatteryValues({ ...batteryValues, description: e.target.value })}
                                     feedback={errorMessages.description}
                                 />
                                 <div className='d-flex'>
@@ -143,8 +171,8 @@ function BatteryIndex() {
                                             type='text'
                                             placeholder='Preço do produto (Ex: R$ 00,00 )'
                                             mb={'mb-4'}
-                                            value={productPrice}
-                                            onChange={(e) => setProductPrice(e.target.value)}
+                                            value={batteryValues.value}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, value: e.target.value })}
                                             feedback={errorMessages.value}
                                         />
                                     </Form.Group>
@@ -155,8 +183,8 @@ function BatteryIndex() {
                                             type='number'
                                             placeholder='Quantidade em estoque'
                                             mb={'mb-4'}
-                                            value={productQuantity}
-                                            onChange={(e) => setProductQuantity(e.target.value)}
+                                            value={batteryValues.quantity}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, quantity: e.target.value })}
                                             feedback={errorMessages.quantity}
                                         />
                                     </Form.Group>

@@ -14,10 +14,10 @@ function HomePage() {
           {batteries.map(battery => (
             <Col key={battery.batteryId} className="d-flex justify-content-center mb-5">
               <BatteryCard
-                productName={battery.name}
-                productDescription={battery.description}
-                productPrice={battery.value}
-                productQuantity={battery.quantity}
+                batteryName={battery.name}
+                batteryDescription={battery.description}
+                batteryPrice={battery.value}
+                batteryQuantity={battery.quantity}
               />
             </Col>
           ))}

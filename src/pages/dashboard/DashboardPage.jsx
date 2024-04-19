@@ -10,13 +10,13 @@ import AuthServices from '../../services/auth/AuthServices';
 
 function VerifyAuth({ children }) {
     const { isLoggedIn, userData, isContextLoaded } = useContext(AuthContext);
-    const { userRoleAuhtorization } = AuthServices();
+    const { userRoleAuthorization } = AuthServices();
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         async function fetchData() {
           
-                await userRoleAuhtorization(userData);
+                const response = await userRoleAuthorization(userData, true);
                 setLoading(false); 
             
         }

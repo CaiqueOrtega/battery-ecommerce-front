@@ -1,9 +1,9 @@
-.carret-menuDropdow-possition {
+.caret-menuDropdown-position {
     top: -15px;
     left: calc(90% - 0.6em);
 
 }
 
-.dropdow-menu-size {
+.dropdown-menu-size {
     width: 250px;
 }
