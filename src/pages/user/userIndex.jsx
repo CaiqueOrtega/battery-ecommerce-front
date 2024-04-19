@@ -85,7 +85,7 @@ function UserIndex() {
         <>
             <Card className='shadow rounded-3 mb-5'>
                 <Card.Header className='py-3 d-flex'>
-                    <h3 className='text-align-center mb-0'>Controle de Usuarios</h3>
+                    <h3 className='text-align-center mb-0'>Controle de Usuários</h3>
                 </Card.Header>
                 <Card.Body>
                     <Table responsive hover bordered>
