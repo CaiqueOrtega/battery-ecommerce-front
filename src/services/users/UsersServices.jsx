@@ -15,6 +15,7 @@ const UserService = () => {
   }
 
   const getUsers = async () => {
+    console.log('teste dentro:')
     try{
       const response = await ConnectionAPI.get('users')
       console.log(response.data)
@@ -24,17 +25,18 @@ const UserService = () => {
     }
   }
 
-  const turnAdmin = async (userId) => {
+  const changeRole = async (userId, selectedRole) => {
     try{
-      const response = await ConnectionAPI.put(`users/turnadmin/${userId}`)
+      const response = await ConnectionAPI.put(`users/changeRole/${userId}`,{
+        role: selectedRole
+      })
       return response.status
-      console.log(response.data)
     } catch (error) {
       console.log("DEU PAU")
     }
   }
 
-  return {getUserByEmail, getUsers, turnAdmin}
+  return {getUserByEmail, getUsers, changeRole}
 };
 
 export default UserService;

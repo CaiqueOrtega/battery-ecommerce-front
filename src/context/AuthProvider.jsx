@@ -11,7 +11,7 @@ function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isContextLoaded, setIsContextLoaded] = useState(false);
-  const [decodedTokenEmail, setDecodedTokenEmail] = useState('');
+
   const navigate = useNavigate();
   const { getUserByEmail } = UserService();
   const [userData, setUserData] = useState({});
@@ -29,7 +29,6 @@ function AuthProvider({ children }) {
           if (dataToken < dataHoje) {
             logout();
           } else {
-            setDecodedTokenEmail(decodedToken.sub);
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             setIsLoggedIn(true);
         
@@ -52,8 +51,7 @@ function AuthProvider({ children }) {
     
   }, [ token ])
 
-
-
+  
   const logout = () => {
     localStorage.clear();
     setIsLoggedIn(false);

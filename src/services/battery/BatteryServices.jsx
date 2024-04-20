@@ -31,7 +31,7 @@ const BaterryServices = () => {
 
     const updateBattery = async (batteryId, batteryName, batteryDescription, batteryPrice, batteryQuantity) => {
         try {
-            const response = await ConnectionAPI.put(`battery/${batteryId}`, {
+            const response = await ConnectionAPI.patch(`battery/${batteryId}`, {
                 name: batteryName,
                 description: batteryDescription,
                 value: batteryPrice,

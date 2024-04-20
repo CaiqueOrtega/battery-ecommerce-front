@@ -17,6 +17,7 @@ function BatteryIndex() {
     const [verifyRequest, setVerifyRequest] = useState(false);
     const [request, setRequest] = useState('');
     const [action, setAction] = useState('');
+    const [fieldChange, setFieldChange] = useState({});
 
     const [batteryValues, setBatteryValues] = useState({
         name: '',
@@ -24,8 +25,6 @@ function BatteryIndex() {
         value: '',
         quantity: ''
     });
-    const [lastClickedBattery, setLastClickedBattery] = useState(null);
-    const [clickTimeout, setClickTimeout] = useState(null);
     const formRef = useRef(null);
     const [successMessages, setSuccessMessages] = useState('');
     const { createBattery, updateBattery, deleteBattery, errorMessages, setErrorMessages } = BatteryServices();
@@ -54,20 +53,24 @@ function BatteryIndex() {
     }, [request, selectedBattery, showBatteryFormModal]);
 
     const handleFormSubmit = async (e) => {
+        e.preventDefault();
         const form = formRef.current;
-
         if (form.reportValidity()) {
-            e.preventDefault();
             if (verifyRequest) {
-                (setAction('update'), setShowConfirmChangesModal(true))
+                const changedFields = {};
+                for (const key in batteryValues) {
+                    if (batteryValues[key] !== selectedBattery[key]) {
+                        changedFields[key] = batteryValues[key];
+                    }
+                }
+                
+                setAction('update');
+                setShowConfirmChangesModal(true);
             } else {
-                const response = await createBattery(batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
+                const response = await createBattery(batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity);
                 setUpdateTable(prevValue => !prevValue);
-
-                console.log("fora", response);
-
                 if (response === 200 || response === 201) {
-                    setSuccessMessages('Bateria Cadastrada com Sucesso!')
+                    setSuccessMessages('Bateria Cadastrada com Sucesso!');
                     setBatteryValues({
                         name: '',
                         description: '',
@@ -79,39 +82,20 @@ function BatteryIndex() {
         }
     };
 
+
     const handleConfirmChangesModal = async () => {
         if (errorMessages) {
             setShowConfirmChangesModal(false);
         }
         const response = action === 'update'
             ? await updateBattery(selectedBattery?.batteryId, batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
-            : await deleteBattery(selectedBattery?.batteryId);
+            : await deleteBattery(selectedBattery?.batteryId)
         if (response === 200 || response === 201) {
             setShowBatteryFormModal(false);
             setShowConfirmChangesModal(false);
         }
 
     };
-
-    const handleRowClick = (battery) => {
-
-        if (lastClickedBattery === battery) {
-            setSelectedBattery(battery);
-            setRequest('editBattery');
-            setShowBatteryFormModal(true);
-            clearTimeout(clickTimeout);
-            setLastClickedBattery(null);
-
-        } else {
-            setLastClickedBattery(battery);
-
-            const newClickTimeout = setTimeout(() => {
-                setLastClickedBattery(null);
-            }, 300);
-
-            setClickTimeout(newClickTimeout);
-        }
-    }
 
 
     const renderBatteryFormModal = () => (
@@ -133,13 +117,13 @@ function BatteryIndex() {
                         </Col>
                         <Col>
                             {successMessages && (
-                                    <div className='msg alert alert-success mb-0 d-flex align-items-center mb-3'>
-                                        <CheckIcon size={"16"} currentColor={"#1b4532"} />
-                                        <span className='ms-2'>
-                                            {successMessages}
-                                        </span>
-                                    </div>
-                                )
+                                <div className='msg alert alert-success mb-0 d-flex align-items-center mb-3'>
+                                    <CheckIcon size={"16"} currentColor={"#1b4532"} />
+                                    <span className='ms-2'>
+                                        {successMessages}
+                                    </span>
+                                </div>
+                            )
                             }
 
                             <Form ref={formRef}>
@@ -199,6 +183,7 @@ function BatteryIndex() {
                 <Modal.Footer>
                     {verifyRequest && (
                         <Button variant='red' className='float-end' onClick={() => {
+                            setFieldChange({ fieldDeleted: selectedBattery.name});
                             setShowConfirmChangesModal(true);
                             setAction('delete');
                         }}>Deletar Produto</Button>
@@ -216,6 +201,7 @@ function BatteryIndex() {
                 action={action}
                 handleConfirmChanges={handleConfirmChangesModal}
                 setUpdateTable={setUpdateTable}
+                field={fieldChange}
             />
         </>
     )
@@ -244,7 +230,11 @@ function BatteryIndex() {
                         </thead>
                         <tbody>
                             {batteries.map((battery) => (
-                                <tr key={battery.batteryId} onClick={() => handleRowClick(battery)}>
+                                <tr key={battery.batteryId} onDoubleClick={() => {
+                                    setSelectedBattery(battery);
+                                    setRequest('editBattery');
+                                    setShowBatteryFormModal(true);
+                                }}>
                                     <td>{battery.name}</td>
                                     <td>{battery.description}</td>
                                     <td className='text-end'>{battery.value}</td>
