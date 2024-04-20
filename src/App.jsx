@@ -9,6 +9,7 @@ import BatteryInfo from './pages/battery/BatteryInfo';
 import { AuthProvider } from './context/AuthProvider';
 import { BatteryProvider } from './context/BatteryProvider';
 import { UserProvider } from './context/UsersProvider';
+import { PromotionProvider } from './context/PromotionProvider';
 
 function App() {
 
@@ -17,7 +18,15 @@ function App() {
       <AuthProvider>
         <Routes>
           <Route path="/" element={<BatteryProvider><HomePage /></BatteryProvider>} />
-          <Route path="/paineldecontrole" element={<BatteryProvider><UserProvider><DashboardPage /></UserProvider></BatteryProvider>} />
+          <Route path="/paineldecontrole" element={
+            <BatteryProvider>
+              <UserProvider>
+                <PromotionProvider>
+                  <DashboardPage />
+                </PromotionProvider>
+              </UserProvider>
+            </BatteryProvider>
+          } />
           <Route path='/bateria' element={<BatteryProvider><BatteryInfo /></BatteryProvider>} />
           <Route path="/entrar" element={<LoginPage />} />
           <Route path="/cadastrar" element={<SignUpPage />} />

@@ -16,7 +16,6 @@ function UserProvider({children}){
         }catch (error){
             console.log("ERRO AQUI")
         }
-        console.log(users)
         setIsContextLoaded(true);
     }
 

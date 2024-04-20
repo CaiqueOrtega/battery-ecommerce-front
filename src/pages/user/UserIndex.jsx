@@ -26,7 +26,7 @@ function UserIndex() {
             <>
                 <Modal show={showUserModal} onHide={() => setShowUserModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }} centered>
                     <Modal.Header className='bg-red text-white'>
-                        <Modal.Title>Controle de Usuário</Modal.Title>
+                        <Modal.Title>Controle de Usuário: {selectedUser.name}</Modal.Title>
                         <button className='btn-close btn-close-white' onClick={() => setShowUserModal(false)} />
                     </Modal.Header>
                     <Modal.Body>

@@ -3,6 +3,7 @@ import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLin
 import { SearchIcon, CaretUpIcon, ExitIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon, HomeIcon, GearIcon } from '../../assets/icons/IconsSet';
 import BatteryIndex from '../battery/BatteryIndex';
 import UserIndex from '../user/UserIndex';
+import PromotionIndex from '../promotion/PromotionIndex';
 import logo from '../../assets/images/logo.png';
 import './dashboard.css';
 import { AuthContext } from '../../context/AuthProvider'
@@ -117,7 +118,7 @@ function UserDropdown() {
                     <span className='ms-1 d-none d-md-block'>{userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}</span>
                 </Dropdown.Toggle>
                 <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-3'>
-                <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
+                    <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
                     <Dropdown.Item className='d-flex align-items-center mb-1'>
                         <UserIconCropped /> <span className='ms-2'>Minha Conta</span>
                     </Dropdown.Item>
@@ -164,7 +165,7 @@ function SidebarContent({ onItemClick, selectedOption }) {
             ))}
         </ListGroup>
     );
-}
+}   
 
 function MainContent({ sidebarSelectedOption }) {
     let content = null;
@@ -174,6 +175,9 @@ function MainContent({ sidebarSelectedOption }) {
             break;
         case 'Usuários':
             content = <UserIndex />
+            break;
+        case 'Promoções':
+            content = <PromotionIndex />
             break;
         default:
             content = null;

@@ -13,10 +13,10 @@ function ConfirmChanges({ showConfirmChangesModal, setShowConfirmChangesModal, a
             <Modal.Header closeButton>
                 <Modal.Title>
                     {action === 'update' 
-                    ? 'Confirmar Edição de Bateria ' 
+                    ? 'Confirmar Edição' 
                     : action === 'userRoleChange' 
                     ? 'Confirmar alteração de Cargo'
-                    : 'Confirmar exclusão de Bateria '}
+                    : 'Confirmar exclusão'}
                 </Modal.Title>
             </Modal.Header>
 

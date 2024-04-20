@@ -6,19 +6,15 @@ const UserService = () => {
 
     try {
       const response = await ConnectionAPI.get(`users/email/${email}`);
-      console.log(response.data);
       return response.data;
-
     } catch (error) {
       console.error('Erro ao pegar usuário:', error);
     }
   }
 
   const getUsers = async () => {
-    console.log('teste dentro:')
     try{
       const response = await ConnectionAPI.get('users')
-      console.log(response.data)
       return response.data
     } catch (error){
       console.log("DEU PAU")
