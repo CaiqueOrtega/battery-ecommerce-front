@@ -7,7 +7,7 @@ function BatteryProvider({ children }) {
     const { getBatteries } = BatteryServices();
     const [batteries, setBatteries] = useState([]);
     const [isContextLoaded, setIsContextLoaded] = useState(false);
-    const [updateTable, setUpdateTable] = useState(false);
+    const [updateTable, setUpdateTable] = useState();
 
     const fetchBatteries = async () => {
         try {
@@ -16,19 +16,19 @@ function BatteryProvider({ children }) {
         } catch (error) {
             console.log(error);
         }
-        console.log(batteries);
         setIsContextLoaded(true);
     };
 
     useEffect(() => {
+
         fetchBatteries();
-    }, [ updateTable ])
+    }, [updateTable])
 
     return isContextLoaded ? (
-        <BatteryContext.Provider value={{ batteries, setUpdateTable }}>
+        <BatteryContext.Provider value={{ batteries, setUpdateTable, isContextLoaded }}>
             {children}
         </BatteryContext.Provider>
-    ) : null;
+    ): null;
 
 }
 

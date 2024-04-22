@@ -7,7 +7,7 @@ import logo from '../../assets/images/logo.png';
 import { useLocation } from "react-router-dom";
 import { AuthContext } from '../../context/AuthProvider.jsx'
 import AuthServices from '../../services/auth/AuthServices';
-
+import { AuthProvider } from '../../context/AuthProvider.jsx';
 
 function LoginPage() {
   
@@ -31,7 +31,7 @@ function LoginPage() {
                     <h4><LoginIcon currentColor='c00d0d' /> Acesse sua conta</h4>
                     <img className="d-md-none ms-auto mb-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
                   </div>
-                  <LoginForm />
+                  <LoginForm navigate={navigate}/>
                 </Card.Body>
               </Col>
               <Col md={5} className='d-none d-md-flex align-items-center bg-yellow rounded-end'>
@@ -46,9 +46,7 @@ function LoginPage() {
 }
 
 
-
-
-function LoginForm() {
+function LoginForm({ navigate }) {
   const [emailLogin, setEmailLogin] = useState('');
   const [passwordLogin, setPasswordLogin] = useState('');
   const location = useLocation();

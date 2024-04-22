@@ -19,20 +19,20 @@ function VerifyAuth({ children }) {
 
       const response = await userRoleAuthorization(userData);
       console.log(response);
-      if (response == 200){
+      if (response == 200) {
         setAuth(false);
       }
 
     }
 
-    fetchData();  
+    fetchData();
 
   }, [userData, isContextLoaded]);
 
   return auth ? null : children;
 }
 
-function NavbarComponent() {
+function NavbarComponent({ setNavbarContent }) {
 
   const renderMobileLogin = () => (
     <div className="d-lg-none row mt-3">
@@ -52,16 +52,40 @@ function NavbarComponent() {
   );
 
   const renderCart = () => (
-    <Dropdown as={NavItem} className="dropdown-no-carret text-white hover-color-red">
+    <Dropdown as={NavItem} className="dropdown-no-carret  text-white hover-color-red">
       <Dropdown.Toggle as={NavLink} className='me-3'>
         <CartIcon />
       </Dropdown.Toggle>
-      <Dropdown.Menu className="rounded-4 shadow border-0 dropdown-menu-end dropdow-menu-size mt-2 py-5 px-4">
-        <CaretUpIcon className="position-absolute carret-menuDropdow-possition" />
+      <Dropdown.Menu className="dropdown-menu-size rounded-4 shadow border-0 dropdown-menu-end  mt-2 py-5 px-4">
+        <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
         <h5 className='text-muted '>Entre na sua conta, para ter acesso ao carrinho</h5>
       </Dropdown.Menu>
     </Dropdown>
+  );
 
+  const navbarContent = () => (
+    <>
+      <Col md={6} className='order-last order-md-0 mt-3 mt-md-0'>
+        <form className="position-relative">
+          <Form.Control className="py-2 input-search-size" type="text" placeholder="Pesquise rapidamente a bateria ideal e energize..." />
+          <a type="button" className="position-absolute top-50 end-0 translate-middle-y bg-white border-start ps-2 me-2">
+            <SearchIcon currentColor={"f11100"} size={"28"} />
+          </a>
+        </form>
+      </Col>
+
+      <Col className='col-auto d-flex order-md-0 order-first '>
+
+        {renderCart()}
+        <RenderDropdown />
+
+        <Navbar.Toggle className="border-0 ms-1" aria-controls="navbarContent" />
+      </Col>
+
+      <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
+        {renderMobileLogin()}
+      </Navbar.Collapse>
+    </>
   );
 
   return (
@@ -73,31 +97,14 @@ function NavbarComponent() {
           </Navbar.Brand>
         </Col>
 
-        <Col md={6} className='order-last order-md-0 mt-3 mt-md-0'>
-          <form className="position-relative">
-            <Form.Control className="py-2 input-search-size" type="text" placeholder="Pesquise rapidamente a bateria ideal e energize..." />
-            <a type="button" className="position-absolute top-50 end-0 translate-middle-y bg-white border-start ps-2 me-2">
-              <SearchIcon currentColor={"f11100"} size={"28"} />
-            </a>
-          </form>
-        </Col>
-
-        <Col className='col-auto d-flex order-md-0 order-first '>
-
-          {renderCart()}
-          <RenderDropdown />
-
-          <Navbar.Toggle className="border-0 ms-1" aria-controls="navbarContent" />
-        </Col>
-
-        <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
-          {renderMobileLogin()}
-        </Navbar.Collapse>
+        {setNavbarContent ? navbarContent() : null}
 
       </Row>
     </Navbar >
   );
 }
+
+
 
 function RenderDropdown() {
   const { logout, userData, isLoggedIn, isContextLoaded } = useContext(AuthContext);
@@ -110,19 +117,16 @@ function RenderDropdown() {
         <Dropdown as={NavItem}>
           <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
             <UserCircleIcon className="float-start me-2" />
-            Olá, {userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}
+            Olá, { userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}
             <br />
             Minha Conta
 
           </Dropdown.Toggle>
-          <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-3'>
+          <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-2'>
             <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
-            <Dropdown.Item className='d-flex align-items-center mb-1'>
+            <Link to="/configuracoes" className='d-flex align-items-center mb-1 dropdown-item'>
               <UserIconCropped /> <span className='ms-2'>Minha Conta</span>
-            </Dropdown.Item>
-            <Dropdown.Item className='d-flex align-items-center mb-1'>
-              <GearIcon /> <span className='ms-2'>Configurações</span>
-            </Dropdown.Item>
+            </Link>
             <Dropdown.Item className='d-flex align-items-center mb-1'>
               <OrderIcon /> <span className='ms-2'>Pedidos</span>
             </Dropdown.Item >
@@ -132,7 +136,7 @@ function RenderDropdown() {
             <VerifyAuth>
               <Link to="/paineldecontrole" className='dropdown-item d-flex align-items-center' >
                 <ControlIcon />
-                <span className='ms-2'>Painel de Controle</span></Link>
+                <span className='ms-2'>Painel de controle</span></Link>
             </VerifyAuth>
             <Dropdown.Divider />
             <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>

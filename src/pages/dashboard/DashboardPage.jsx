@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
 import { SearchIcon, CaretUpIcon, ExitIcon, BellIcon, UserIcon, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon, HomeIcon, GearIcon } from '../../assets/icons/IconsSet';
-import BatteryIndex from '../battery/BatteryIndex';
-import UserIndex from '../user/UserIndex';
-import PromotionIndex from '../promotion/PromotionIndex';
+import BatteryIndex from './battery/BatteryIndex';
+import UserIndex from './user/UserIndex';
+import PromotionIndex from './promotion/PromotionIndex';
 import logo from '../../assets/images/logo.png';
 import './dashboard.css';
 import { AuthContext } from '../../context/AuthProvider'
@@ -117,7 +117,7 @@ function UserDropdown() {
                     <UserIcon currentColor={'f11100'} size={'20'} />
                     <span className='ms-1 d-none d-md-block'>{userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name}</span>
                 </Dropdown.Toggle>
-                <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-3'>
+                <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 px-2'>
                     <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
                     <Dropdown.Item className='d-flex align-items-center mb-1'>
                         <UserIconCropped /> <span className='ms-2'>Minha Conta</span>

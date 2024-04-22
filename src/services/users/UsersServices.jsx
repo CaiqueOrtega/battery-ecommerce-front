@@ -13,26 +13,26 @@ const UserService = () => {
   }
 
   const getUsers = async () => {
-    try{
+    try {
       const response = await ConnectionAPI.get('users')
       return response.data
-    } catch (error){
-      console.log("DEU PAU")
-    }
-  }
-
-  const changeRole = async (userId, selectedRole) => {
-    try{
-      const response = await ConnectionAPI.put(`users/changeRole/${userId}`,{
-        role: selectedRole
-      })
-      return response.status
     } catch (error) {
       console.log("DEU PAU")
     }
   }
 
-  return {getUserByEmail, getUsers, changeRole}
+  const changeRole = async (userId, selectedRole) => {
+    try {
+      const response = await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`);
+      if (response.status >= 200 && response.status < 300) {
+        return true;
+      }
+    } catch (error) {
+      return error.response.data.message;
+    }
+  }
+
+  return { getUserByEmail, getUsers, changeRole }
 };
 
 export default UserService;

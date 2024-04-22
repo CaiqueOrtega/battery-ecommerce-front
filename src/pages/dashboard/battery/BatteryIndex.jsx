@@ -1,11 +1,11 @@
 import { Form, Row, Col, Button, Modal, Table, Card } from 'react-bootstrap';
-import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon } from '../../assets/icons/IconsSet';
+import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
+import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon } from '../../../assets/icons/IconsSet';
 import { useState, useContext, useEffect, useRef } from 'react';
-import BatteryServices from '../../services/battery/BatteryServices';
-import { BatteryContext } from '../../context/BatteryProvider';
-import BatteryCard from '../../components/common/BatteryCard';
-import ConfirmChanges from '../../components/common/ConfirmChangesModal';
+import BatteryServices from '../../../services/battery/BatteryServices';
+import { BatteryContext } from '../../../context/BatteryProvider';
+import BatteryCard from '../../../components/common/BatteryCard';
+import ConfirmChanges from '../../../components/common/ConfirmChangesModal';
 
 function BatteryIndex() {
     const { batteries, setUpdateTable } = useContext(BatteryContext);
@@ -52,6 +52,7 @@ function BatteryIndex() {
         }
     }, [request, selectedBattery, showBatteryFormModal]);
 
+
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         const form = formRef.current;
@@ -63,7 +64,7 @@ function BatteryIndex() {
                         changedFields[key] = batteryValues[key];
                     }
                 }
-                
+
                 setAction('update');
                 setShowConfirmChangesModal(true);
             } else {
@@ -93,6 +94,7 @@ function BatteryIndex() {
         if (response === 200 || response === 201) {
             setShowBatteryFormModal(false);
             setShowConfirmChangesModal(false);
+            setUpdateTable(prevValue => !prevValue);
         }
 
     };
@@ -160,6 +162,7 @@ function BatteryIndex() {
                                             feedback={errorMessages.value}
                                         />
                                     </Form.Group>
+
                                     <Form.Group className='ms-5 flex-grow-1'>
                                         <Form.Label className='w-100'>Quantidade</Form.Label>
                                         <FormGroupWithIcon
@@ -173,6 +176,7 @@ function BatteryIndex() {
                                         />
                                     </Form.Group>
                                 </div>
+
                                 <Form.Label >Imagens</Form.Label>
                                 <Form.Control type='file' accept='.png' multiple />
                             </Form>
@@ -183,7 +187,7 @@ function BatteryIndex() {
                 <Modal.Footer>
                     {verifyRequest && (
                         <Button variant='red' className='float-end' onClick={() => {
-                            setFieldChange({ fieldDeleted: selectedBattery.name});
+                            setFieldChange({ fieldDeleted: selectedBattery.name });
                             setShowConfirmChangesModal(true);
                             setAction('delete');
                         }}>Deletar Produto</Button>

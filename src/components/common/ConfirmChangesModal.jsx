@@ -1,7 +1,7 @@
 import { Modal, Button } from 'react-bootstrap';
 
 
-function ConfirmChanges({ showConfirmChangesModal, setShowConfirmChangesModal, action, handleConfirmChanges, setUpdateTable, field }) {
+function ConfirmChanges({ showConfirmChangesModal, setShowConfirmChangesModal, action, handleConfirmChanges, field }) {
     const confirmMessage = action === 'update' 
     ? 'Deseja realmente editar este produto?' 
     : action === 'userRoleChange'
@@ -28,7 +28,6 @@ function ConfirmChanges({ showConfirmChangesModal, setShowConfirmChangesModal, a
                 <Button variant="secondary" onClick={() => setShowConfirmChangesModal(false)}>Fechar</Button>
                 <Button variant="red" onClick={async () => {
                     await handleConfirmChanges()
-                    setUpdateTable(prevValue => !prevValue);
                 }}>Confirmar</Button>
             </Modal.Footer>
         </Modal>

@@ -27,7 +27,7 @@ const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedb
                     onChange={onChange}
                     type={type}
                     placeholder={placeholder}
-                    className={`ps-5 py-2  ${ bgBorder && 'bg-main border-0'} rounded-1 ${feedback && 'is-invalid'}`}
+                    className={`ps-5 py-2  ${ bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''}`}
                     ref={inputRef}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}

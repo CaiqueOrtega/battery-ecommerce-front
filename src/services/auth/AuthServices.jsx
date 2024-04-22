@@ -1,11 +1,11 @@
 import ConnectionAPI from "../ConnectionAPI";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { AuthContext } from "../../context/AuthProvider";
 
 const AuthServices = () => {
     const [errorMessages, setErrorMessages] = useState({});
-
+    const { handleLogin } = useContext(AuthContext);
 
     const navigate = useNavigate();
 
@@ -15,11 +15,7 @@ const AuthServices = () => {
                 email: emailLogin,
                 password: passwordLogin
             });
-
-            localStorage.setItem('token', response.data.token);
-            navigate("/");
-            window.location.reload()
-
+                handleLogin(response.data.token);
         } catch (error) {
             handleAPIError(error, setErrorMessages);
 
@@ -28,10 +24,10 @@ const AuthServices = () => {
 
     const userRoleAuthorization = async (userData, request) => {
         try {
-                const response = await ConnectionAPI.get(`auth/${userData.email}`);
-                return response.status;
+            const response = await ConnectionAPI.get(`auth/${userData.email}`);
+            return response.status;
         } catch (error) {
-            if (request){
+            if (request) {
                 navigate('/');
             }
 

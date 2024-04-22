@@ -30,28 +30,27 @@ function AuthProvider({ children }) {
             logout();
           } else {
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
-            setIsLoggedIn(true);
-        
             const user = await getUserByEmail(decodedToken.sub);
             setUserData(user);
+            setIsLoggedIn(true);
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
         }
       } else {
         setUserData(null);
-        console.log(" Erro ao chegar o token")
+        console.log(" Erro ao chegar o token", token)
         setIsLoggedIn(false);
-    
+
       }
       setIsContextLoaded(true);
     };
     checkToken();
- 
-    
-  }, [ token ])
 
-  
+
+  }, [token])
+
+
   const logout = () => {
     localStorage.clear();
     setIsLoggedIn(false);
@@ -59,10 +58,17 @@ function AuthProvider({ children }) {
     setToken('');
   }
 
+  const handleLogin = (generatedToken) => {
+    console.log('CONTEXTO', generatedToken);
+    setToken(generatedToken);
+    localStorage.setItem('token', generatedToken);
+    navigate('/');
+  }
 
-  return isContextLoaded ?  (
-    
-    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout }}>
+
+
+  return isContextLoaded ? (
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin }}>
       {children}
     </AuthContext.Provider>
   ) : null;

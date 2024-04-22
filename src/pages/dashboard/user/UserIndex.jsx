@@ -1,8 +1,8 @@
 import React, { useContext, useState } from "react";
 import { Card, Table, Modal, Button, Form } from "react-bootstrap";
-import { UserContext } from "../../context/UsersProvider";
-import UserService from "../../services/users/UsersServices";
-import ConfirmChanges from "../../components/common/ConfirmChangesModal";
+import { UserContext } from "../../../context/UsersProvider";
+import UserService from "../../../services/users/UsersServices";
+import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 
 function UserIndex() {
     const { users, setUpdateTable } = useContext(UserContext)
@@ -11,12 +11,21 @@ function UserIndex() {
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [selectedRole, setSelectedRole] = useState('');
     const [fieldChange, setFieldChange] = useState({});
+    
 
     const { changeRole } = UserService()
 
 
     const handleConfirmChangesModal = async () => {
         const response = await changeRole(selectedUser.userId, selectedRole);
+
+        if (response === true) {
+            setShowConfirmChangesModal(false);
+            setShowUserModal(false);
+            setUpdateTable(prevValue => !prevValue);
+        }else{
+            console.log(response)
+        }
     }
 
     const renderUserAdminModal = () => {
@@ -26,12 +35,21 @@ function UserIndex() {
             <>
                 <Modal show={showUserModal} onHide={() => setShowUserModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }} centered>
                     <Modal.Header className='bg-red text-white'>
-                        <Modal.Title>Controle de Usuário: {selectedUser.name}</Modal.Title>
+                        <Modal.Title>Controle de Usuário</Modal.Title>
                         <button className='btn-close btn-close-white' onClick={() => setShowUserModal(false)} />
                     </Modal.Header>
                     <Modal.Body>
-                        <Form.Select value={selectedRole}  onChange={(e) => setSelectedRole(e.target.value)}>
-                            <option hidden >{selectedUser.role}</option>
+                        <div className="my-3 ">
+                        <hr />
+                            <h6> <span className='fw-bold'>Nome do usuário: </span>{selectedUser.name}</h6>
+                            <h6> <span className='fw-bold'>Email: </span>{selectedUser.email}</h6>
+                            <h6> <span className='fw-bold'>Cargo: </span>{selectedUser.role}</h6>
+                        <hr />
+                        </div>
+                        
+                        <Form.Select defaultValue={selectedRole.role} value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
+                            <option hidden>Selecione o cargo que deseja...</option>
+                            <option value={selectedUser.role}>{selectedUser.role === 'ADMIN' ? 'Adiministrador' : 'Usuário'}</option>
                             {selectedUser.role === 'ADMIN'
                                 ? (<option value="USER">Usuário</option>)
                                 : (<option value="ADMIN">Adiministrador</option>)}
@@ -40,23 +58,24 @@ function UserIndex() {
                     </Modal.Body>
 
                     <Modal.Footer>
-                        <Button className='float-end' variant='red' onClick={() => { 
-                            setFieldChange({role: selectedUser.role, roleChange: selectedRole})
-                            setShowConfirmChangesModal(true); }}>
+                        <Button className='float-end' variant='red' onClick={() => {
+                            setFieldChange({ role: selectedUser.role, roleChange: selectedRole })
+                            setShowConfirmChangesModal(true);
+                        }}>
                             Confirmar
                         </Button>
                     </Modal.Footer>
                 </Modal>
 
 
-            <ConfirmChanges
-                showConfirmChangesModal={showConfirmChangesModal}
-                setShowConfirmChangesModal={setShowConfirmChangesModal}
-                action={'userRoleChange'}
-                handleConfirmChanges={handleConfirmChangesModal}
-                setUpdateTable={setUpdateTable}
-                field={fieldChange}
-            />
+                <ConfirmChanges
+                    showConfirmChangesModal={showConfirmChangesModal}
+                    setShowConfirmChangesModal={setShowConfirmChangesModal}
+                    action={'userRoleChange'}
+                    handleConfirmChanges={handleConfirmChangesModal}
+                    setUpdateTable={setUpdateTable}
+                    field={fieldChange}
+                />
             </>
 
         )
