@@ -60,9 +60,13 @@ const PromotionService = () => {
         }
     }
 
-    const reactivePromotion = async (promotionCode) => {
+    const reactivePromotion = async (promotion) => {
         try{
-            const response = await ConnectionAPI.post(`promotion/reactive/${promotionCode}`)
+            const response = await ConnectionAPI.post(`promotion/reactive/${promotion.code}`, {
+                expirationDate: promotion.expirationDate,
+                percentage: promotion.percentage,
+                code: promotion.code
+            })
             return response.status
         } catch (error){
             handleAPIError(error)

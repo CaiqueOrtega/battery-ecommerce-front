@@ -1,5 +1,5 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
-import { Card, Table, Modal, Row, Col, Form, Button } from "react-bootstrap";
+import { Card, Table, Modal, Row, Col, Form, Button, ModalBody } from "react-bootstrap";
 import { PromotionContext } from "../../context/PromotionProvider";
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon } from '../../assets/icons/IconsSet';
@@ -11,6 +11,7 @@ export default function PromotionIndex() {
     const [selectedPromotion, setSelectedPromotion] = useState(null);
 
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
+    const [showReactiveModal, setShowReactiveModal] = useState(false)
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
 
     const [verifyRequest, setVerifyRequest] = useState(false);
@@ -95,7 +96,7 @@ export default function PromotionIndex() {
 
     const renderPromotionFormModal = () => (
         <>
-            <Modal size="lg" show={showPromotionFormModal} onHide={() => setShowPromotionFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
+            <Modal size="lg" show={showPromotionFormModal} onHide={() => setShowPromotionFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }} centered>
                 <Modal.Header className='bg-red text-white'>
                     <Modal.Title>{verifyRequest ? 'Editar Promoção' : 'Cadastrar Promoção'}</Modal.Title>
                     <button className='btn-close btn-close-white' onClick={() => setShowPromotionFormModal(false)} />
@@ -150,6 +151,14 @@ export default function PromotionIndex() {
                 </Modal.Body>
 
                 <Modal.Footer>
+                    {selectedPromotion && selectedPromotion.status == "INACTIVE" ?
+                        <Button variant="red" className="float-end" onClick={() => {
+                            setShowReactiveModal(true)
+                        }}>
+                            Reativar Promoção
+                        </Button>
+                        : null}
+
                     {verifyRequest && (
                         <Button variant='red' className='float-end' onClick={() => {
                             setFieldChange({ fieldDeleted: selectedPromotion.code });
@@ -161,6 +170,24 @@ export default function PromotionIndex() {
                     <Button className='float-end' variant='red' onClick={handleFormSubmit}>
                         {verifyRequest ? 'Atualizar Promoção' : 'Cadastrar Promoção'}
                     </Button>
+                </Modal.Footer>
+            </Modal>
+
+            <Modal size="lg" show={showReactiveModal} onHide={() => setShowReactiveModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }} centered>
+                <Modal.Header className='bg-red text-white'>
+                    <Modal.Title>Reativar Promoção</Modal.Title>
+                    <button className='btn-close btn-close-white' onClick={() => setShowReactiveModal(false)} />
+                </Modal.Header>
+                <Modal.Body>
+                    Deseja realmente reativar a promoção: {selectedPromotion ? selectedPromotion.code : ''}
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowReactiveModal(false)}>Fechar</Button>
+                    <Button variant="red" onClick={async () => {
+                        const response = await reactivePromotion(selectedPromotion)
+                        setUpdateTable(prevValue => !prevValue);
+                        response === 200 ? (setShowReactiveModal(false), setShowPromotionFormModal(false)) : null
+                    }}>Confirmar</Button>
                 </Modal.Footer>
             </Modal>
 
