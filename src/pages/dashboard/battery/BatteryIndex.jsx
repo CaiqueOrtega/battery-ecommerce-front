@@ -58,13 +58,6 @@ function BatteryIndex() {
         const form = formRef.current;
         if (form.reportValidity()) {
             if (verifyRequest) {
-                const changedFields = {};
-                for (const key in batteryValues) {
-                    if (batteryValues[key] !== selectedBattery[key]) {
-                        changedFields[key] = batteryValues[key];
-                    }
-                }
-
                 setAction('update');
                 setShowConfirmChangesModal(true);
             } else {
@@ -88,9 +81,24 @@ function BatteryIndex() {
         if (errorMessages) {
             setShowConfirmChangesModal(false);
         }
-        const response = action === 'update'
-            ? await updateBattery(selectedBattery?.batteryId, batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
-            : await deleteBattery(selectedBattery?.batteryId)
+
+
+        if (action === 'update') {
+            const hasChanges =
+                selectedBattery.naprevBatteryValues) => prevBatteryValues.name) ||
+                selectedBattery.description !== ((prevBatteryValues) => prevBatteryValues.description) ||
+                selectedBattery.value !== ((prevBatteryValues) => prevBatteryValues.value) ||
+                selectedBattery.quantity !== ((prevBatteryValues) => prevBatteryValues.quantity);
+
+            if (!hasChanges) {
+                console.log('teste')
+            } else {
+                const response = await updateBattery(selectedBattery?.batteryId, batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
+            }
+        } else {
+            const response = await deleteBattery(selectedBattery?.batteryId);
+        }
+
         if (response === 200 || response === 201) {
             setShowBatteryFormModal(false);
             setShowConfirmChangesModal(false);

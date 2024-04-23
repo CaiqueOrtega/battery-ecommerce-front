@@ -2,7 +2,7 @@ import React, { useContext, useState, useRef, useEffect } from "react";
 import { Card, Table, Modal, Row, Col, Form, Button, ModalBody } from "react-bootstrap";
 import { PromotionContext } from "../../../context/PromotionProvider";
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon } from '../../../assets/icons/IconsSet';
+import {BarCode, CheckIcon, PercentIcon, FailDate } from '../../../assets/icons/IconsSet';
 import PromotionService from "../../../services/promotion/PromotionService";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 
@@ -103,7 +103,7 @@ export default function PromotionIndex() {
                             <Col>
                                 {successMessages && (
                                     <div className='msg alert alert-success mb-0 d-flex align-items-center mb-3'>
-                                        <CheckIcon size={"16"} currentColor={"#1b4532"} />
+                                        <CheckIcon className={'position-absolute'} currentColor={"#1b4532"} />
                                         <span className='ms-2'>
                                             {successMessages}
                                         </span>
@@ -114,7 +114,7 @@ export default function PromotionIndex() {
                                 <Form ref={formRef}>
                                     <Form.Label className='w-100'>Código da Promoção</Form.Label>
                                     <FormGroupWithIcon
-                                        icon={<AtomIcon className='position-absolute ms-3 color-gray' />}
+                                        icon={<BarCode className='position-absolute ms-3 color-gray' />}
                                         type='text'
                                         placeholder='Código da Promoção(Ex: cupom10)'
                                         mb={'mb-4'}
@@ -124,7 +124,7 @@ export default function PromotionIndex() {
                                     />
                                     <Form.Label className='w-100'>Porcentagem da Promoção</Form.Label>
                                     <FormGroupWithIcon
-                                        icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                                        icon={<PercentIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                                         type='number'
                                         placeholder='Porcentagem da Promoção(Ex: 10)'
                                         mb={'mb-4'}
@@ -134,7 +134,7 @@ export default function PromotionIndex() {
                                     />
                                     <Form.Label className='w-100'>Data Validade</Form.Label>
                                     <FormGroupWithIcon
-                                        icon={<StockIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                                        icon={<FailDate className='position-absolute ms-3' currentColor='#a3a29f' />}
                                         type='text'
                                         placeholder='Data Validade da Promoção (Ex: dd/MM/yyyy)'
                                         mb={'mb-4'}

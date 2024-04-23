@@ -1,7 +1,7 @@
 import ConnectionAPI from "../ConnectionAPI";
 import { useState } from "react";
 
-const BaterryServices = () => {
+const BatteryServices = () => {
     const [errorMessages, setErrorMessages] = useState({});
 
 
@@ -68,4 +68,4 @@ const BaterryServices = () => {
     return {errorMessages, setErrorMessages, createBattery, getBatteries, updateBattery, deleteBattery }
 }
 
-export default BaterryServices;
+export default BatteryServices;

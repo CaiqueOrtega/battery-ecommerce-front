@@ -8,7 +8,7 @@ import { RotatingLines } from 'react-loader-spinner';
 function HomePage() {
   const { batteries, isContextLoaded } = useContext(BatteryContext);
 
-  const renderBateries = () => (
+  const renderBatteries = () => (
     <div className="ms-5">
       <Row xs={1} md={3} >
         {batteries.map(battery => (
@@ -29,7 +29,7 @@ function HomePage() {
     <div >
       <NavbarComponent setNavbarContent={true} />
 
-      {renderBateries()}
+      {renderBatteries()}
     </div>
   );
 }
