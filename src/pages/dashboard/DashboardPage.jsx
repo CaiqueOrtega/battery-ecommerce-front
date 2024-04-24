@@ -20,7 +20,7 @@ function VerifyAuth({ children }) {
         async function fetchData() {
 
             const response = await userRoleAuthorization(userData, true);
-            setLoading(false);
+            setLoading(true);
 
         }
 
@@ -28,7 +28,7 @@ function VerifyAuth({ children }) {
 
     }, [userData, isContextLoaded]);
 
-    return loading ? null : children;
+    return loading ? children : null;
 }
 
 

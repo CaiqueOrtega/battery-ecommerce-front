@@ -8,10 +8,11 @@ const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedb
 
 
     useEffect(() => {
+       
         if (feedback && inputRef.current) {
             inputRef.current.focus();
         }
-    }, [feedback]);
+    }, [ feedback]);
     
     return (
         <>

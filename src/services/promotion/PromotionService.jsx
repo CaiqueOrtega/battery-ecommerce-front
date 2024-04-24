@@ -54,9 +54,10 @@ const PromotionService = () => {
                 percentage: promotion.percentage,
                 code: promotion.code
             })
-            return response.status
+            return {success: true};
         } catch(error){
-            handleAPIError(error)
+            handleAPIError(error);
+            return {success: false}
         }
     }
 

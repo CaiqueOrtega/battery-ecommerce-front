@@ -1,6 +1,8 @@
+import React, { useContext, useState } from "react";
 import ConnectionAPI from "../ConnectionAPI";
 
 const UserService = () => {
+  const [errorMessages, setErrorMessages] = useState({});
 
   const getUserByEmail = async (email) => {
 
@@ -23,16 +25,28 @@ const UserService = () => {
 
   const changeRole = async (userId, selectedRole) => {
     try {
-      const response = await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`);
-      if (response.status >= 200 && response.status < 300) {
-        return true;
-      }
+      await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`);
+
+      return { success: true }
     } catch (error) {
-      return error.response.data.message;
+      handleAPIError(error)
+      return { success: false }
     }
   }
 
-  return { getUserByEmail, getUsers, changeRole }
+  const handleAPIError = (error) => {
+    if (error.response.data.field) {
+        const { field, message } = error.response.data;
+        setErrorMessages({ [field]: message });
+    } else if (error.response.data.message) {
+        setErrorMessages({ general: error.response.data.message });
+    } else {
+        setErrorMessages({ serverError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
+    }
+};
+
+
+  return { getUserByEmail, getUsers, changeRole, errorMessages, setErrorMessages }
 };
 
 export default UserService;

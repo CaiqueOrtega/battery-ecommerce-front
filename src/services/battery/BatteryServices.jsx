@@ -7,15 +7,16 @@ const BatteryServices = () => {
 
     const createBattery = async (batteryName, batteryDescription, batteryPrice, batteryQuantity) => {
         try {
-            const response = await ConnectionAPI.post('battery', {
+            await ConnectionAPI.post('battery', {
                 name: batteryName,
                 description: batteryDescription,
                 value: batteryPrice,
                 quantity: batteryQuantity
             });
-            return response.status
+            return { success: true }
         } catch (error) {
-             handleAPIError(error);
+            handleAPIError(error);
+            return { success: false }
         }
     }
 
@@ -30,26 +31,28 @@ const BatteryServices = () => {
 
     const updateBattery = async (batteryId, batteryName, batteryDescription, batteryPrice, batteryQuantity) => {
         try {
-            const response = await ConnectionAPI.patch(`battery/${batteryId}`, {
+            await ConnectionAPI.patch(`battery/${batteryId}`, {
                 name: batteryName,
                 description: batteryDescription,
                 value: batteryPrice,
                 quantity: batteryQuantity
             }
             )
-            return response.status;
+            return { success: true }
         } catch (error) {
             handleAPIError(error);
+            return { success: false }
         }
     }
 
     const deleteBattery = async (batteryId) => {
         try {
-            const response = await ConnectionAPI.delete(`battery/${batteryId}`)
+            await ConnectionAPI.delete(`battery/${batteryId}`)
 
-            return response.status;
+            return { success: true }
         } catch (error) {
             console.log(error);
+            return { success: false }
         }
     }
 
@@ -65,7 +68,7 @@ const BatteryServices = () => {
     };
 
 
-    return {errorMessages, setErrorMessages, createBattery, getBatteries, updateBattery, deleteBattery }
+    return { errorMessages, setErrorMessages, createBattery, getBatteries, updateBattery, deleteBattery }
 }
 
 export default BatteryServices;

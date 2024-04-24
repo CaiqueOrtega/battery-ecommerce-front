@@ -1,11 +1,11 @@
 import { Form, Row, Col, Button, Modal, Table, Card } from 'react-bootstrap';
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon } from '../../../assets/icons/IconsSet';
+import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon, AlertIcon } from '../../../assets/icons/IconsSet';
 import { useState, useContext, useEffect, useRef } from 'react';
 import BatteryServices from '../../../services/battery/BatteryServices';
 import { BatteryContext } from '../../../context/BatteryProvider';
 import BatteryCard from '../../../components/common/BatteryCard';
-import ConfirmChanges from '../../../components/common/ConfirmChangesModal';
+import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
 
 function BatteryIndex() {
     const { batteries, setUpdateTable } = useContext(BatteryContext);
@@ -14,57 +14,35 @@ function BatteryIndex() {
     const [showBatteryFormModal, setShowBatteryFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
 
-    const [verifyRequest, setVerifyRequest] = useState(false);
-    const [request, setRequest] = useState('');
+    const [request, setRequest] = useState(false);
     const [action, setAction] = useState('');
     const [fieldChange, setFieldChange] = useState({});
 
-    const [batteryValues, setBatteryValues] = useState({
-        name: '',
-        description: '',
-        value: '',
-        quantity: ''
-    });
+    const [batteryValues, setBatteryValues] = useState({ name: '', description: '', value: '', quantity: '' });
+    const [prevBatteryValues, setPrevBatteryValues] = useState({});
+
     const formRef = useRef(null);
-    const [successMessages, setSuccessMessages] = useState('');
     const { createBattery, updateBattery, deleteBattery, errorMessages, setErrorMessages } = BatteryServices();
 
 
-    useEffect(() => {
-        setErrorMessages({});
-        if (request === 'editBattery') {
-            setBatteryValues({
-                name: selectedBattery.name || '',
-                description: selectedBattery.description || '',
-                value: selectedBattery.value || '',
-                quantity: selectedBattery.quantity || 0
-            });
-            setVerifyRequest(true);
-        } else {
-            setBatteryValues({
-                name: '',
-                description: '',
-                value: '',
-                quantity: ''
-            });
-            setVerifyRequest(false);
-            setSuccessMessages('');
-        }
-    }, [request, selectedBattery, showBatteryFormModal]);
-
-
-    const handleFormSubmit = async (e) => {
+    const handleFormSubmit = async (e, action) => {
         e.preventDefault();
         const form = formRef.current;
+
         if (form.reportValidity()) {
-            if (verifyRequest) {
+            if (verifyBatteryChangedData()) {
+                return;
+            }
+            if (action === 'update') {
                 setAction('update');
                 setShowConfirmChangesModal(true);
-            } else {
+                
+                errorMessages ? null : setPrevBatteryValues({});
+            } else if (action === 'create') {
                 const response = await createBattery(batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity);
-                setUpdateTable(prevValue => !prevValue);
-                if (response === 200 || response === 201) {
-                    setSuccessMessages('Bateria Cadastrada com Sucesso!');
+                if (response.success) {
+                    setUpdateTable(prevValue => !prevValue);
+                    setErrorMessages({ success: 'Bateria Cadastrada com sucesso' })
                     setBatteryValues({
                         name: '',
                         description: '',
@@ -74,45 +52,82 @@ function BatteryIndex() {
                 }
             }
         }
-    };
+    }
 
 
     const handleConfirmChangesModal = async () => {
-        if (errorMessages) {
-            setShowConfirmChangesModal(false);
-        }
-
-
+        let response;
         if (action === 'update') {
-            const hasChanges =
-                selectedBattery.naprevBatteryValues) => prevBatteryValues.name) ||
-                selectedBattery.description !== ((prevBatteryValues) => prevBatteryValues.description) ||
-                selectedBattery.value !== ((prevBatteryValues) => prevBatteryValues.value) ||
-                selectedBattery.quantity !== ((prevBatteryValues) => prevBatteryValues.quantity);
-
-            if (!hasChanges) {
-                console.log('teste')
-            } else {
-                const response = await updateBattery(selectedBattery?.batteryId, batteryValues.name, batteryValues.description, batteryValues.value, batteryValues.quantity)
-            }
+            response = await updateBattery(
+                selectedBattery?.batteryId,
+                batteryValues.name,
+                batteryValues.description,
+                batteryValues.value,
+                batteryValues.quantity
+            );
         } else {
-            const response = await deleteBattery(selectedBattery?.batteryId);
+            response = await deleteBattery(selectedBattery?.batteryId);
         }
 
-        if (response === 200 || response === 201) {
+        if (response && response.success) {
             setShowBatteryFormModal(false);
-            setShowConfirmChangesModal(false);
             setUpdateTable(prevValue => !prevValue);
         }
-
     };
+
+
+    const verifyBatteryChangedData = () => {
+        console.log(prevBatteryValues);
+        console.log(batteryValues);
+
+        let isEqual;
+
+        if (prevBatteryValues) {
+            isEqual =
+                prevBatteryValues.name === batteryValues.name &&
+                prevBatteryValues.description === batteryValues.description &&
+                prevBatteryValues.value === batteryValues.value &&
+                prevBatteryValues.quantity === batteryValues.quantity;
+
+
+            if (isEqual) {
+                setErrorMessages(prevErrors => ({
+                    ...prevErrors, general: 'Os dados não foram alterados.'
+                }));
+            }
+        }
+
+        setPrevBatteryValues(batteryValues);
+
+        return isEqual;
+    };
+
+
+    useEffect(() => {
+        setErrorMessages({});
+        if (request) {
+            setBatteryValues({
+                name: selectedBattery.name || '',
+                description: selectedBattery.description || '',
+                value: selectedBattery.value || '',
+                quantity: selectedBattery.quantity || 0
+            });
+        } else {
+            setBatteryValues({
+                name: '',
+                description: '',
+                value: '',
+                quantity: ''
+            });
+        }
+    }, [showBatteryFormModal]);
 
 
     const renderBatteryFormModal = () => (
         <>
             <Modal size="lg" show={showBatteryFormModal} onHide={() => setShowBatteryFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
                 <Modal.Header className='bg-red text-white'>
-                    <Modal.Title>{verifyRequest ? 'Editar Produto' : 'Cadastrar Produto'}</Modal.Title>
+                    <Modal.Title>{request ? 'Editar Produto' : 'Cadastrar Produto'}</Modal.Title>
                     <button className='btn-close btn-close-white' onClick={() => setShowBatteryFormModal(false)} />
                 </Modal.Header>
                 <Modal.Body>
@@ -126,15 +141,20 @@ function BatteryIndex() {
                             />
                         </Col>
                         <Col>
-                            {successMessages && (
-                                <div className='msg alert alert-success mb-0 d-flex align-items-center mb-3'>
-                                    <CheckIcon size={"16"} currentColor={"#1b4532"} />
+
+                            {errorMessages.general || errorMessages.success ? (
+                                <div className={`msg alert ${errorMessages.general ? 'alert-danger' : 'alert-success'} mb-0 d-flex align-items-center mb-3`}>
+                                    {errorMessages.success
+                                        ? (<CheckIcon />)
+                                        : (<AlertIcon size={"16"} currentColor={"#69282f"} />)
+                                    }
+
                                     <span className='ms-2'>
-                                        {successMessages}
+                                        {errorMessages.general ? errorMessages.general : errorMessages.success}
                                     </span>
                                 </div>
-                            )
-                            }
+                            ) : null}
+
 
                             <Form ref={formRef}>
                                 <Form.Label className='w-100'>Nome do Produto</Form.Label>
@@ -193,7 +213,7 @@ function BatteryIndex() {
                 </Modal.Body>
 
                 <Modal.Footer>
-                    {verifyRequest && (
+                    {request && (
                         <Button variant='red' className='float-end' onClick={() => {
                             setFieldChange({ fieldDeleted: selectedBattery.name });
                             setShowConfirmChangesModal(true);
@@ -201,13 +221,14 @@ function BatteryIndex() {
                         }}>Deletar Produto</Button>
                     )}
 
-                    <Button className='float-end' variant='red' onClick={handleFormSubmit}>
-                        {verifyRequest ? 'Atualizar Produto' : 'Cadastrar Produto'}
+
+                    <Button className='float-end' variant='red' onClick={(e) => handleFormSubmit(e, request ? 'update' : 'create')}>
+                        {request ? 'Atualizar Produto' : 'Cadastrar Produto'}
                     </Button>
                 </Modal.Footer>
             </Modal>
 
-            <ConfirmChanges
+            <ConfirmChangesModal
                 showConfirmChangesModal={showConfirmChangesModal}
                 setShowConfirmChangesModal={setShowConfirmChangesModal}
                 action={action}
@@ -218,6 +239,7 @@ function BatteryIndex() {
         </>
     )
 
+
     return (
         <>
             <Card className='shadow rounded-3 mb-5'>
@@ -225,7 +247,7 @@ function BatteryIndex() {
                     <h3 className='text-align-center mb-0'>Controle de Baterias</h3>
                     <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
                         setShowBatteryFormModal(true);
-                        setRequest('create');
+                        setRequest(false);
                     }}>
                         Cadastrar Bateria
                     </Button>
@@ -244,7 +266,8 @@ function BatteryIndex() {
                             {batteries.map((battery) => (
                                 <tr key={battery.batteryId} onDoubleClick={() => {
                                     setSelectedBattery(battery);
-                                    setRequest('editBattery');
+                                    setPrevBatteryValues(battery);
+                                    setRequest(true);
                                     setShowBatteryFormModal(true);
                                 }}>
                                     <td>{battery.name}</td>
