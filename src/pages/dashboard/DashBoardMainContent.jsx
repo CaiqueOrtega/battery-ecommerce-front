@@ -23,6 +23,7 @@ function DashboardMainContent({ selectedOption }) {
     const [showModal, setShowModal] = useState(false);
     const formRef = useRef(null);
 
+    
     const { handleSubmit, renderConfirmChangesModal } = DashboardServices(
         itemValues, setItemValues,
         prevItemValues, setPrevItemValues,
@@ -42,6 +43,7 @@ function DashboardMainContent({ selectedOption }) {
     const renderUsers = () => {
         setColumnNameTable(['Nome', 'Email', 'Permissão', 'Situação']);
         const mappedData = users.map(user => ({
+            user: user.userId,
             name: user.name,
             email: user.email,
             role: user.role,
@@ -50,7 +52,7 @@ function DashboardMainContent({ selectedOption }) {
         setDataTable(mappedData);
     };
 
-    
+
     const renderPromotions = () => {
         setColumnNameTable(['Código', 'Porcentagem', 'Data início', 'Data validade', 'Situação']);
         setItemValues({ code: '', percentage: 0, expirationDate: '' });
@@ -69,7 +71,6 @@ function DashboardMainContent({ selectedOption }) {
         }));
         setDataTable(mappedData);
     };
-
 
     const renderBatteries = () => {
         setColumnNameTable(['Nome', 'Descrição', 'Preço', 'Quantidade', 'Status']);
@@ -90,26 +91,29 @@ function DashboardMainContent({ selectedOption }) {
         setDataTable(mappedData);
     };
 
-    useEffect(() => {
-        const renderDataFunctions = {
-            'Usuários': renderUsers,
-            'Promoções': renderPromotions,
-            'Baterias': renderBatteries
-        };
 
-        if (renderDataFunctions[selectedOption]) {
-            renderDataFunctions[selectedOption]();
-        } else {
-            setDataTable([]);
-            setModalContent(null);
+    useEffect(() => {
+        if (Object.keys(batteries).length !== 0 || Object.keys(users).length !== 0 || Object.keys(promotions).length !== 0) {
+            const renderDataFunctions = {
+                'Usuários': renderUsers,
+                'Promoções': renderPromotions,
+                'Baterias': renderBatteries
+            };
+
+            if (renderDataFunctions[selectedOption]) {
+                renderDataFunctions[selectedOption]();
+            } else {
+                setDataTable([]);
+            }
         }
-    }, [ selectedOption ]);
+
+    }, [selectedOption, batteries, users, promotions]);
 
 
     const renderModalContent = () => {
         switch (selectedOption) {
             case 'Usuários':
-                return <RenderUserModal selectedUser={selectedItem} />;
+                return <RenderUserModal selectedUserData={selectedItem}  setSelectedUserValues={setItemValues} selectedUserValues={itemValues} errorMessages={errorMessages}/>;
             case 'Promoções':
                 return <RenderPromotionFormModal promotionValues={itemValues} setPromotionValues={setItemValues} formRef={formRef} errorMessages={errorMessages} />;
             case 'Baterias':
@@ -153,21 +157,21 @@ function DashboardMainContent({ selectedOption }) {
             <Card className='shadow rounded-3 mb-5'>
                 <Card.Header className='py-3 d-flex'>
                     <h3 className='text-align-center mb-0'>Controle de {selectedOption}</h3>
-                    {selectedOption === 'Baterias' && (
+                    {selectedOption === 'Baterias' || selectedOption === 'Promoções' ? (
                         <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
                             setSelectedItem({});
                             setShowModal(true);
                         }}>
-                            Cadastrar Bateria
+                            Cadastrar {selectedOption}
                         </Button>
-                    )}
+                    ):null}
                 </Card.Header>
                 <Card.Body>
                     <DashBoardTable data={dataTable} columnName={columnNameTable} onRowDoubleClick={handleRowDoubleClick} />
                 </Card.Body>
             </Card>
 
-            <Modal size="lg" show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
+            <Modal size={`${selectedOption === 'Baterias' ? 'lg' : ''}`} show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
                 <Modal.Header className='bg-red text-white'>
                     <Modal.Title>{selectedItem && Object.keys(selectedItem).length !== 0 ? 'Editar' : 'Cadastrar'}</Modal.Title>
                     <button className='btn-close btn-close-white' onClick={() => setShowModal(false)} />

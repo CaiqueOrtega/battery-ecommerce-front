@@ -5,7 +5,7 @@ import BatteryCard from '../../components/common/BatteryCard';
 
 
 const AlertError = ({ errorMessages }) => (
-    errorMessages.general ? (
+    errorMessages.general && (
         <div className={`msg alert ${errorMessages.general ? 'alert-danger' : 'alert-success'} mb-0 d-flex align-items-center mb-3`}>
             {errorMessages.success
                 ? (<CheckIcon />)
@@ -16,7 +16,7 @@ const AlertError = ({ errorMessages }) => (
                 {errorMessages.general ? errorMessages.general : errorMessages.success}
             </span>
         </div>
-    ) : null
+    )
 );
 
 
@@ -92,11 +92,11 @@ export const RenderBatteryFormModal = ({ batteryValues, setBatteryValues, formRe
 }
 
 
-export const RenderPromotionFormModal = ({ promotionValues, setPromotionValues, formRef, error }) => {
+export const RenderPromotionFormModal = ({ promotionValues, setPromotionValues, formRef, errorMessages }) => {
     return (
         <Row>
             <Col>
-                <alertError />
+                <AlertError errorMessages={errorMessages} />
                 <Form ref={formRef}>
                     <Form.Label className='w-100'>Código da Promoção</Form.Label>
                     <FormGroupWithIcon
@@ -106,6 +106,7 @@ export const RenderPromotionFormModal = ({ promotionValues, setPromotionValues, 
                         mb={'mb-4'}
                         value={promotionValues.code}
                         onChange={(e) => setPromotionValues({ ...promotionValues, code: e.target.value })}
+                        feedback={errorMessages.code}
                     />
                     <Form.Label className='w-100'>Porcentagem da Promoção</Form.Label>
                     <FormGroupWithIcon
@@ -115,15 +116,18 @@ export const RenderPromotionFormModal = ({ promotionValues, setPromotionValues, 
                         mb={'mb-4'}
                         value={promotionValues.percentage}
                         onChange={(e) => setPromotionValues({ ...promotionValues, percentage: e.target.value })}
+                        feedback={errorMessages.percentage}
                     />
                     <Form.Label className='w-100'>Data Validade</Form.Label>
                     <FormGroupWithIcon
+                        mask={'99/99/9999'}
                         icon={<FailDate className='position-absolute ms-3' currentColor='#a3a29f' />}
                         type='text'
                         placeholder='Data Validade da Promoção (Ex: dd/MM/yyyy)'
                         mb={'mb-4'}
                         value={promotionValues.expirationDate}
                         onChange={(e) => setPromotionValues({ ...promotionValues, expirationDate: e.target.value })}
+                        feedback={errorMessages.expirationDate}
                     />
                 </Form>
             </Col>
@@ -131,27 +135,31 @@ export const RenderPromotionFormModal = ({ promotionValues, setPromotionValues, 
     )
 }
 
-export const RenderUserModal = ({ selectedUser }) => {
+export const RenderUserModal = ({ selectedUserData, setSelectedUserValues, selectedUserValues, errorMessages }) => {
 
     return (
         <>
+         <AlertError errorMessages={errorMessages} />
+
             <div className="my-3 ">
                 <hr />
-                <h6> <span className='fw-bold'>Nome do usuário: </span>{selectedUser.name}</h6>
-                <h6> <span className='fw-bold'>Email: </span>{selectedUser.email}</h6>
-                <h6> <span className='fw-bold'>Cargo: </span>{selectedUser.role}</h6>
+                <h6> <span className='fw-bold'>Nome do usuário: </span>{selectedUserData.name}</h6>
+                <h6> <span className='fw-bold'>Email: </span>{selectedUserData.email}</h6>
+                <h6> <span className='fw-bold'>Cargo: </span>{selectedUserData.role}</h6>
                 <hr />
             </div>
 
             <InputGroup hasValidation>
-                <Form.Select className={`rounded-start`} >
+                <Form.Select className={`rounded-start`} value={selectedUserValues.role} onChange={(e) => setSelectedUserValues(e.target.value)} >
                     <option hidden>Selecione o cargo que deseja...</option>
-                    <option disabled value={selectedUser.role}>{selectedUser.role === 'ADMIN' ? 'Adiministrador' : 'Usuário'}</option>
-                    {selectedUser.role === 'ADMIN'
+                    <option disabled value={selectedUserData.role}>{selectedUserData.role === 'ADMIN' ? 'Adiministrador' : 'Usuário'}</option>
+                    {selectedUserData.role === 'ADMIN'
                         ? (<option value="USER">Usuário</option>)
                         : (<option value="ADMIN">Adiministrador</option>)}
-
                 </Form.Select>
+                <Form.Control.Feedback type="invalid" className="ms-1">
+                    <AlertIcon size="14" currentColor={"currentcolor"} /> {errorMessages ? errorMessages.role : null}
+                </Form.Control.Feedback>
             </InputGroup>
         </>
     )

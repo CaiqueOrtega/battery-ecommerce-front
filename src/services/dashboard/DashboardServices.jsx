@@ -14,14 +14,15 @@ function DashboardServices(
     const [confrimChangesModalData, setConfrimChangesModalData] = useState({});
 
     useEffect(() => {
-        setErrorMessages({});
-        const updatedValues = Object.keys(currentValues).reduce((acc, key) => {
-            acc[key] = selectedData ? selectedData[key] || '' : '';
-            return acc;
-        }, {});
+        if (showFormModal) {
+            setErrorMessages({});
+            const updatedValues = Object.keys(currentValues).reduce((acc, key) => {
+                acc[key] = selectedData ? selectedData[key] || '' : '';
+                return acc;
+            }, {});
+            setCurrentValues(updatedValues);
+        }
 
-
-        setCurrentValues(updatedValues);
     }, [showFormModal]);
 
 
@@ -49,14 +50,14 @@ function DashboardServices(
 
 
     const handleCreate = async () => {
-            const response = await serviceRequestsFunctions.createFunction(currentValues);
-            if (response.success) {
-                Object.keys(currentValues).forEach(key => {
-                    currentValues[key] = '';
-                });
-            } else {
-                handleAPIError(response); 
-            }
+        const response = await serviceRequestsFunctions.createFunction(currentValues);
+        if (response.success) {
+            Object.keys(currentValues).forEach(key => {
+                currentValues[key] = '';
+            });
+        } else {
+            handleAPIError(response);
+        }
     };
 
 
@@ -69,7 +70,7 @@ function DashboardServices(
             setShowConfirmChangesModal(true);
             console.log('TESTE,', showConfirmChangesModal)
         } else {
-            
+
             console.log('TEM ERRO', errorMessages);
 
         }
@@ -105,8 +106,8 @@ function DashboardServices(
             if (isEqual) {
                 console.log('os dados nao foram alterafdos teste')
                 setErrorMessages(prevErrors => ({
-                   ...prevErrors, general: 'Os dados não foram alterados.'
-                 }));
+                    ...prevErrors, general: 'Os dados não foram alterados.'
+                }));
             }
 
             setPrevValues(currentValues);
