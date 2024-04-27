@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Card, Table, Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { AlertIcon } from "../../../assets/icons/IconsSet";
-import { UserContext } from "../../../context/UsersProvider";
+import { DashBoardContext } from "../../../context/DashBoardProvider";
 import UserService from "../../../services/users/UsersServices";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import { AuthContext } from '../../../context/AuthProvider';
 
 function UserIndex() {
-    const { users, setUpdateTable } = useContext(UserContext)
+    const { users, setUpdateTable } = useContext(DashBoardContext)
     const { userData } = useContext(AuthContext);
 
     const [showUserModal, setShowUserModal] = useState(false);
@@ -88,7 +88,6 @@ function UserIndex() {
                     setShowConfirmChangesModal={setShowConfirmChangesModal}
                     action={'userRoleChange'}
                     handleConfirmChanges={handleConfirmChangesModal}
-                    setUpdateTable={setUpdateTable}
                     field={fieldChange}
                 />
             </>

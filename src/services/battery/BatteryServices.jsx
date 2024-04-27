@@ -1,24 +1,6 @@
 import ConnectionAPI from "../ConnectionAPI";
-import { useState } from "react";
 
 const BatteryServices = () => {
-    const [errorMessages, setErrorMessages] = useState({});
-
-
-    const createBattery = async (batteryName, batteryDescription, batteryPrice, batteryQuantity) => {
-        try {
-            await ConnectionAPI.post('battery', {
-                name: batteryName,
-                description: batteryDescription,
-                value: batteryPrice,
-                quantity: batteryQuantity
-            });
-            return { success: true }
-        } catch (error) {
-            handleAPIError(error);
-            return { success: false }
-        }
-    }
 
     const getBatteries = async () => {
         try {
@@ -29,19 +11,34 @@ const BatteryServices = () => {
         }
     }
 
-    const updateBattery = async (batteryId, batteryName, batteryDescription, batteryPrice, batteryQuantity) => {
+    const createBattery = async (batteryValues) => {
+        try {
+            await ConnectionAPI.post('battery', {
+                name: batteryValues.name,
+                description: batteryValues.description,
+                value: batteryValues.value,
+                quantity: batteryValues.quantity
+            });
+            return { success: true }
+        } catch (error) {
+            console.log("Create battery", error)
+            return error;
+        }
+    }
+
+    const updateBattery = async (batteryId, batteryValues) => {
+        console.log("TESTE UPDATE", batteryId, batteryValues);
         try {
             await ConnectionAPI.patch(`battery/${batteryId}`, {
-                name: batteryName,
-                description: batteryDescription,
-                value: batteryPrice,
-                quantity: batteryQuantity
+                name: batteryValues.name,
+                description: batteryValues.description,
+                value: batteryValues.value,
+                quantity: batteryValues.quantity
             }
             )
             return { success: true }
         } catch (error) {
-            handleAPIError(error);
-            return { success: false }
+            return error;
         }
     }
 
@@ -51,24 +48,11 @@ const BatteryServices = () => {
 
             return { success: true }
         } catch (error) {
-            console.log(error);
-            return { success: false }
+            return error;
         }
     }
 
-    const handleAPIError = (error) => {
-        if (error.response.data.field) {
-            const { field, message } = error.response.data;
-            setErrorMessages({ [field]: message });
-        } else if (error.response.data.message) {
-            setErrorMessages({ general: error.response.data.message });
-        } else {
-            setErrorMessages({ serverError: 'Não foi possível conectar ao servidor. Por favor, tente novamente mais tarde.' });
-        }
-    };
-
-
-    return { errorMessages, setErrorMessages, createBattery, getBatteries, updateBattery, deleteBattery }
+    return { createBattery, getBatteries, updateBattery, deleteBattery }
 }
 
 export default BatteryServices;

@@ -20,57 +20,57 @@ const PromotionService = () => {
         try {
             const response = await ConnectionAPI.get('promotion')
             return response.data
-        } catch (error){
+        } catch (error) {
             console.error(error)
         }
     }
 
     const updatePromotion = async (promotionId, promotionCode, promotionExpirationDate, promotionPercentage) => {
-        try{
+        try {
             const response = await ConnectionAPI.patch(`promotion/${promotionId}`, {
                 expirationDate: promotionExpirationDate,
                 percentage: promotionPercentage,
                 code: promotionCode
             })
             return response.status
-        } catch (error){
-            handleAPIError(error)
+        } catch (error) {
+            return error;
         }
     }
 
     const deletePromotion = async (promotionCode) => {
-        try{
+        try {
             const response = await ConnectionAPI.delete(`promotion/${promotionCode}`)
             return response.status
-        } catch (error){
+        } catch (error) {
             console.error("erro aqui")
         }
     }
 
     const createPromotion = async (promotion) => {
-        try{
+        try {
             const response = await ConnectionAPI.post('promotion', {
                 expirationDate: promotion.expirationDate,
                 percentage: promotion.percentage,
                 code: promotion.code
             })
-            return {success: true};
-        } catch(error){
+            return { success: true };
+        } catch (error) {
             handleAPIError(error);
-            return {success: false}
+            return { success: false }
         }
     }
 
     const reactivePromotion = async (promotionId, promotionValues) => {
         console.log(promotionValues);
-        try{
+        try {
             const response = await ConnectionAPI.post(`promotion/reactive/${promotionId}`, {
                 expirationDate: promotionValues.expirationDate,
                 percentage: promotionValues.percentage,
                 code: promotionValues.code
             })
             return response.status
-        } catch (error){
+        } catch (error) {
             handleAPIError(error)
         }
     }

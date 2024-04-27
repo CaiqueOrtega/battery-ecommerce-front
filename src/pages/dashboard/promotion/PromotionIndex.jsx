@@ -1,91 +1,59 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
-import { Card, Table, Modal, Row, Col, Form, Button, ModalBody } from "react-bootstrap";
-import { PromotionContext } from "../../../context/PromotionProvider";
+import { Card, Table, Modal, Row, Col, Form, Button } from "react-bootstrap";
+import { DashBoardContext } from "../../../context/DashBoardProvider";
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import { BarCode, CheckIcon, PercentIcon, FailDate } from '../../../assets/icons/IconsSet';
+import { BarCode, CheckIcon, PercentIcon, FailDate, AlertIcon } from '../../../assets/icons/IconsSet';
 import PromotionService from "../../../services/promotion/PromotionService";
-import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
+import CheckConditions from '../../../services/dashboard/DashboardServices';
 
 export default function PromotionIndex() {
-    const { promotions, setUpdateTable } = useContext(PromotionContext)
+    const { promotions, setUpdateTable } = useContext(DashBoardContext)
     const [selectedPromotion, setSelectedPromotion] = useState(null);
-
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
-    const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
-
-    const [request, setRequest] = useState(false);
-    const [action, setAction] = useState('');
-
     const [promotionValues, setPromotionsValues] = useState({
         code: '',
         percentage: 0,
         expirationDate: ''
     });
-
-    const formRef = useRef(null);
-    const [fieldChange, setFieldChange] = useState({});
-    const { setErrorMessages, errorMessages, updatePromotion, deletePromotion, createPromotion, reactivePromotion } = PromotionService()
-
-    useEffect(() => {
-        setErrorMessages({});
-        if (request) {
-            setPromotionsValues({
-                code: selectedPromotion.code || '',
-                expirationDate: selectedPromotion.expirationDate || '',
-                percentage: selectedPromotion.percentage || 0
-            });
-
-        } else {
-            setPromotionsValues({
-                code: '',
-                expirationDate: '',
-                percentage: ''
-            });
-        }
-    }, [showPromotionFormModal]);
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        const form = formRef.current;
-        if (form.reportValidity()) {
-            const response = await createPromotion(promotionValues);
-            if (response.success) {
-                setUpdateTable(prevValue => !prevValue);
-                setPromotionsValues({
-                    code: '',
-                    expirationDate: '',
-                    percentage: ''
-                });
-            }
-        }
-    }
+    const [prevPromotionValues, setPrevPromotionValues] = useState({});
 
 
-    const handleConfirmChangesModal = async () => {
-        if (errorMessages) {
-            setShowConfirmChangesModal(false);
-        }
-        const response = action === 'update'
-            ? await updatePromotion(selectedPromotion?.promotionId, promotionValues.code, promotionValues.expirationDate, promotionValues.percentage)
-            : await deletePromotion(selectedPromotion?.code)
-        if (response === 200 || response === 201) {
-            setShowPromotionFormModal(false);
-            setShowConfirmChangesModal(false);
-            setUpdateTable(prevValue => !prevValue);
-        }
+    const { errorMessages, setErrorMessages, updatePromotion, deletePromotion, createPromotion, reactivePromotion } = PromotionService();
 
-    };
+
+    const { formRef, handleSubmit, renderConfirmChangesModal } = CheckConditions(
+        promotionValues, setPromotionsValues,
+        prevPromotionValues, setPrevPromotionValues,
+        showPromotionFormModal, setShowPromotionFormModal,
+        selectedPromotion,
+        errorMessages, setErrorMessages,
+        createPromotion, updatePromotion, deletePromotion
+    );
+
 
     const renderPromotionFormModal = () => (
         <>
             <Modal show={showPromotionFormModal} onHide={() => setShowPromotionFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }} centered>
                 <Modal.Header className='bg-red text-white'>
-                    <Modal.Title>{request ? 'Editar Promoção' : 'Cadastrar Promoção'}</Modal.Title>
+                    <Modal.Title>{selectedPromotion ? 'Editar Promoção' : 'Cadastrar Promoção'}</Modal.Title>
                     <button className='btn-close btn-close-white' onClick={() => setShowPromotionFormModal(false)} />
                 </Modal.Header>
                 <Modal.Body>
                     <Row>
                         <Col>
+                            {errorMessages.general || errorMessages.success ? (
+                                <div className={`msg alert ${errorMessages.general ? 'alert-danger' : 'alert-success'} mb-0 d-flex align-items-center mb-3`}>
+                                    {errorMessages.success
+                                        ? (<CheckIcon />)
+                                        : (<AlertIcon size={"16"} currentColor={"#69282f"} />)
+                                    }
+
+                                    <span className='ms-2'>
+                                        {errorMessages.general ? errorMessages.general : errorMessages.success}
+                                    </span>
+                                </div>
+                            ) : null}
+
                             <Form ref={formRef}>
                                 <Form.Label className='w-100'>Código da Promoção</Form.Label>
                                 <FormGroupWithIcon
@@ -100,7 +68,7 @@ export default function PromotionIndex() {
                                 <Form.Label className='w-100'>Porcentagem da Promoção</Form.Label>
                                 <FormGroupWithIcon
                                     icon={<PercentIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                    type='number'
+                                    type='numbsetSelectedBatteryer'
                                     placeholder='Porcentagem da Promoção(Ex: 10)'
                                     mb={'mb-4'}
                                     value={promotionValues.percentage}
@@ -122,39 +90,37 @@ export default function PromotionIndex() {
                     </Row>
                 </Modal.Body>
 
+
                 <Modal.Footer>
-                    {selectedPromotion && selectedPromotion.status == "INACTIVE" &&
-                        <Button variant="red" className="float-end" onClick={() => {
-                            setShowReactiveModal(true)
-                        }}>
+
+                    {!selectedPromotion && Object.keys(selectedPromotion).length == 0 ?(
+                        <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'create')}>
+                            Cadastrar Promoção
+                        </Button>
+                    ):null }
+
+                    {/* Botão para reativar promoção */}
+                    {selectedPromotion && selectedPromotion.status === 'INACTIVE' && (
+                        <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'reactivate')}>
                             Reativar Promoção
                         </Button>
-                    }
-
-                    {selectedPromotion && request && selectedPromotion.status == "ACTIVE" && (
-                        <Button variant='red' className='float-end' onClick={() => {
-                            setFieldChange({ fieldDeleted: selectedPromotion.code });
-                            setShowConfirmChangesModal(true);
-                            setAction('delete');
-                        }}>Desativar Promoção</Button>
                     )}
 
-                    {selectedPromotion && selectedPromotion.status == "ACTIVE" && (
-                        <Button className='float-end' variant='red' onClick={handleFormSubmit}>
-                            {request ? 'Atualizar Promoção' : 'Cadastrar Promoção'}
+                    {/* Botão para atualizar promoção */}
+                    {selectedPromotion && selectedPromotion.status === 'ACTIVE' && (
+                        <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'update')}>
+                            Atualizar Promoção
+                        </Button>
+                    )}
+
+                    {/* Botão para excluir promoção */}
+                    {selectedPromotion && (
+                        <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'delete')}>
+                            Desativar Promoção
                         </Button>
                     )}
                 </Modal.Footer>
             </Modal>
-
-            <ConfirmChanges
-                showConfirmChangesModal={showConfirmChangesModal}
-                setShowConfirmChangesModal={setShowConfirmChangesModal}
-                action={action}
-                handleConfirmChanges={handleConfirmChangesModal}
-                setUpdateTable={setUpdateTable}
-                field={fieldChange}
-            />
         </>
     )
 
@@ -166,7 +132,7 @@ export default function PromotionIndex() {
                     <h3 className='text-align-center mb-0'>Controle de Promoções</h3>
                     <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
                         setShowPromotionFormModal(true);
-                        setRequest(false);
+                        setSelectedPromotion({})
                     }}>
                         Cadastrar Promoção
                     </Button>
@@ -186,7 +152,8 @@ export default function PromotionIndex() {
                             {promotions.map((promotion) => (
                                 <tr key={promotion.promotionId} onDoubleClick={() => {
                                     setSelectedPromotion(promotion);
-                                    setRequest(true);
+                                    const { promotionId, status, ...prevValues } = promotion;
+                                    setPrevPromotionValues(prevValues);
                                     setShowPromotionFormModal(true);
                                 }}>
                                     <td>{promotion.code}</td>
@@ -202,6 +169,7 @@ export default function PromotionIndex() {
             </Card>
 
             {renderPromotionFormModal()}
+            {renderConfirmChangesModal()}
         </>
     );
 }

@@ -15,7 +15,7 @@ const AuthServices = () => {
                 email: emailLogin,
                 password: passwordLogin
             });
-                handleLogin(response.data.token);
+            handleLogin(response.data.token);
         } catch (error) {
             handleAPIError(error, setErrorMessages);
 
@@ -25,12 +25,15 @@ const AuthServices = () => {
     const userRoleAuthorization = async (userData, request) => {
         try {
             const response = await ConnectionAPI.get(`auth/${userData.email}`);
-            return response.status;
+
+            if (response && response.status >= 200 && response.status < 300) {
+                return { success: true };
+            }
         } catch (error) {
             if (request) {
                 navigate('/');
             }
-
+            return { success: false };
         }
 
     }

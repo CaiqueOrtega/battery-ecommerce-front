@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import NavbarComponent from '../../components/layout/navbar/Navbar';
 import { BatteryContext } from '../../context/BatteryProvider';
 import BatteryCard from '../../components/common/BatteryCard';
@@ -6,7 +6,15 @@ import { Row, Col } from 'react-bootstrap';
 import { RotatingLines } from 'react-loader-spinner';
 
 function HomePage() {
-  const { batteries, isContextLoaded } = useContext(BatteryContext);
+  const { batteries, setShouldLoadBatteryData } = useContext(BatteryContext);
+
+  useEffect(() => {
+    if (!Object.keys(batteries).length) {
+      console.log('teste')
+      setShouldLoadBatteryData(true);
+    }
+  }, []);
+
 
   const renderBatteries = () => (
     <div className="ms-5">
