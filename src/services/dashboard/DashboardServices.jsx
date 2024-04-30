@@ -22,7 +22,6 @@ function CommonDashboardServices(
             }, {});
             setCurrentValues(updatedValues);
         }
-
     }, [showFormModal]);
 
 
@@ -123,7 +122,7 @@ function userDashBoardServices(currentValues, setPrevValues, serviceRequests, se
             setErrorMessages({ role: 'O usuário já possuí o cargo selecionado' })
             return;
         }else{
-            showConfirmChangesModal(true);
+            setShowConfirmChangesModal(true);
         }
 
         setPrevValues(currentValues.role);

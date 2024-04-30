@@ -24,33 +24,27 @@ const AlertError = ({ errorMessages }) => (
 function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrevItemValues, selectedItem, showModal, setShowModal, serviceRequests, selectedOption }) {
     const { errorMessages, setErrorMessages, handleAPIError } = ErrorServices();
     const formRef = useRef(null);
+    
 
 
 
-    const renderCommunActionModalFooter = () => {
-        const { handleSubmit, renderConfirmChangesModal } = CommonDashboardServices(
-            itemValues, setItemValues,
-            prevItemValues, setPrevItemValues,
-            showModal, setShowModal,
-            selectedItem,
-            serviceRequests,
-            formRef,
-            errorMessages, setErrorMessages, handleAPIError
-        );
-
-        if (selectedItem && selectedItem.status === 'INACTIVE') {
-            return (
+    const renderCommunActionModalFooter  = (
+        <>
+            {CommonDashboardServices(
+                itemValues, setItemValues,
+                prevItemValues, setPrevItemValues,
+                showModal, setShowModal,
+                selectedItem,
+                serviceRequests,
+                formRef,
+                errorMessages, setErrorMessages, handleAPIError
+            ).renderConfirmChangesModal()}
+            {selectedItem && selectedItem.status === 'INACTIVE' ? (
+                <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'reactivate')}>
+                    Reativar {selectedOption}
+                </Button>
+            ) : selectedItem && selectedItem.status === 'ACTIVE' ? (
                 <>
-                    {renderConfirmChangesModal()}
-                    <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'reactivate')}>
-                        Reativar {selectedOption}
-                    </Button>
-                </>
-            );
-        } else if (selectedItem && selectedItem.status === 'ACTIVE') {
-            return (
-                <>
-                    {renderConfirmChangesModal()}
                     <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'delete')}>
                         Desativar {selectedOption}
                     </Button>
@@ -58,15 +52,14 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
                         Atualizar {selectedOption}
                     </Button>
                 </>
-            );
-        } else {
-            return (
+            ) : (
                 <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'create')}>
                     Cadastrar {selectedOption}
                 </Button>
-            );
-        }
-    };
+            )}
+        </>
+    );
+    
 
     const renderUserActionModalFooter = () => {
         const { handleSubmit, renderConfirmChangesModal } = userDashBoardServices(
@@ -241,8 +234,8 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
 
     const getFooterContent = () => {
         const option = optionMap[selectedOption];
-        if (selectedOption && optionMap[selectedOption] && typeof optionMap[selectedOption].modalFooterContent === 'function') {
-            return option ? option.modalFooterContent() : null;
+        if (selectedOption && optionMap[selectedOption]) {
+            return option ? option.modalFooterContent : null;
         }
     };
 

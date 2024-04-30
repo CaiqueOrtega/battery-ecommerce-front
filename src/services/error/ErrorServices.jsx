@@ -6,10 +6,8 @@ const ErrorServices = () => {
     const handleAPIError = (error) => {
 
         if (error.response.data.field) {
-            console.log("Joao2", error.response.data.field)
 
             const { field, message } = error.response.data;
-            console.log("Joao 3", field, message)
 
             setErrorMessages({ [field]: message });
             
@@ -20,7 +18,7 @@ const ErrorServices = () => {
         }
     }
     
-    return { errorMessages, setErrorMessages, handleAPIError }
+        return { errorMessages, setErrorMessages, handleAPIError } 
 };
 
 export default ErrorServices
