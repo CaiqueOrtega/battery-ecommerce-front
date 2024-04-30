@@ -108,9 +108,9 @@ function CommonDashboardServices(
     };
 
     
-    renderConfirmChangesModal(showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, confirmChangesModalData);
+    <RenderConfirmChangesModal showConfirmChangesModal={showConfirmChangesModal} setShowConfirmChangesModal={setShowConfirmChangesModal} handleConfirmChangesModal={handleConfirmChangesModal} confirmChangesModalData={confirmChangesModalData}/>
 
-    return { handleSubmit, renderConfirmChangesModal };
+    return { handleSubmit, RenderConfirmChangesModal };
 }
 
 
@@ -141,13 +141,13 @@ function userDashBoardServices(currentValues, setPrevValues, serviceRequests, se
     }
 
 
-    renderConfirmChangesModal(showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, { title: 'Editar', message: 'Tem certeza que deseja editar os dados?' } )
+    <RenderConfirmChangesModal showConfirmChangesModal={showConfirmChangesModal} setShowConfirmChangesModal={setShowConfirmChangesModal} handleConfirmChangesModal={handleConfirmChangesModal} confirmChangesModalData={confirmChangesModalData}/>
 
-    return {handleSubmit, renderConfirmChangesModal}
+    return {handleSubmit, RenderConfirmChangesModal}
 }
 
 
-const renderConfirmChangesModal = (showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, confirmChangesModalData) => (
+const RenderConfirmChangesModal = (showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, confirmChangesModalData) => (
     <ConfirmChangesModal
         showConfirmChangesModal={showConfirmChangesModal}
         setShowConfirmChangesModal={setShowConfirmChangesModal}

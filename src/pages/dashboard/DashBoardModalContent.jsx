@@ -28,37 +28,41 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
 
 
 
-    const renderCommunActionModalFooter  = (
+    const commonDashboardServicesResult = CommonDashboardServices(
+        itemValues, setItemValues,
+        prevItemValues, setPrevItemValues,
+        showModal, setShowModal,
+        selectedItem,
+        serviceRequests,
+        formRef,
+        errorMessages, setErrorMessages, handleAPIError
+    );
+    
+    const renderCommunActionModalFooter = (
         <>
-            {CommonDashboardServices(
-                itemValues, setItemValues,
-                prevItemValues, setPrevItemValues,
-                showModal, setShowModal,
-                selectedItem,
-                serviceRequests,
-                formRef,
-                errorMessages, setErrorMessages, handleAPIError
-            ).renderConfirmChangesModal()}
+            {commonDashboardServicesResult.renderConfirmChangesModal()}
             {selectedItem && selectedItem.status === 'INACTIVE' ? (
-                <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'reactivate')}>
+                <Button variant='red' className='float-end' onClick={(e) => commonDashboardServicesResult.handleSubmit(e, 'reactivate')}>
                     Reativar {selectedOption}
                 </Button>
             ) : selectedItem && selectedItem.status === 'ACTIVE' ? (
                 <>
-                    <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'delete')}>
+                    <Button variant='red' className='float-end' onClick={(e) => commonDashboardServicesResult.handleSubmit(e, 'delete')}>
                         Desativar {selectedOption}
                     </Button>
-                    <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'update')}>
+                    <Button className='float-end' variant='red' onClick={(e) => commonDashboardServicesResult.handleSubmit(e, 'update')}>
                         Atualizar {selectedOption}
                     </Button>
                 </>
             ) : (
-                <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'create')}>
+                <Button className='float-end' variant='red' onClick={(e) => commonDashboardServicesResult.handleSubmit(e, 'create')}>
                     Cadastrar {selectedOption}
                 </Button>
             )}
         </>
     );
+    
+    
     
 
     const renderUserActionModalFooter = () => {
@@ -192,8 +196,6 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
         Usuários: {
             renderHTML: (
                 <>
-                     {console.log('se', selectedItem)}
-
                     {selectedItem && (
                         <>
                        
