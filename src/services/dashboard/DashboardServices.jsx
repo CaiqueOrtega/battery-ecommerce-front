@@ -14,15 +14,14 @@ function CommonDashboardServices(
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
 
     useEffect(() => {
-        if (showFormModal) {
-            setErrorMessages({});
-            const updatedValues = Object.keys(currentValues).reduce((acc, key) => {
-                acc[key] = selectedData ? selectedData[key] || '' : '';
-                return acc;
-            }, {});
-            setCurrentValues(updatedValues);
-        }
+        setErrorMessages({});
+        const updatedValues = Object.keys(currentValues).reduce((acc, key) => {
+            acc[key] = selectedData ? selectedData[key] || '' : '';
+            return acc;
+        }, {});
 
+
+        setCurrentValues(updatedValues);
     }, [showFormModal]);
 
 
@@ -50,14 +49,14 @@ function CommonDashboardServices(
 
 
     const handleCreate = async () => {
-        const response = await serviceRequestsFunctions.createFunction(currentValues);
-        if (response.success) {
-            Object.keys(currentValues).forEach(key => {
-                currentValues[key] = '';
-            });
-        } else {
-            handleAPIError(response);
-        }
+            const response = await serviceRequestsFunctions.createFunction(currentValues);
+            if (response.success) {
+                Object.keys(currentValues).forEach(key => {
+                    currentValues[key] = '';
+                });
+            } else {
+                handleAPIError(response); 
+            }
     };
 
 
@@ -67,7 +66,16 @@ function CommonDashboardServices(
             setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
             setPrevValues({});
             setShowConfirmChangesModal(true);
+<<<<<<< HEAD
         } 
+=======
+            console.log('TESTE,', showConfirmChangesModal)
+        } else {
+            
+            console.log('TEM ERRO', errorMessages);
+
+        }
+>>>>>>> parent of 86bb167 (fix: errorMessages)
     };
 
 
@@ -98,8 +106,8 @@ function CommonDashboardServices(
 
             if (isEqual) {
                 setErrorMessages(prevErrors => ({
-                    ...prevErrors, general: 'Os dados não foram alterados.'
-                }));
+                   ...prevErrors, general: 'Os dados não foram alterados.'
+                 }));
             }
 
             setPrevValues(currentValues);

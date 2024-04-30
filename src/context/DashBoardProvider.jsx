@@ -14,7 +14,6 @@ function DashBoardProvider({ children }) {
     const [updateContent, setUpdateContent] = useState('');
     const [updateTable, setUpdateTable] = useState(false);
     const { batteries, setShouldLoadBatteryData } = useContext(BatteryContext);
-    const [isContextLoaded, setIsContextLoaded] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -37,7 +36,6 @@ function DashBoardProvider({ children }) {
                     setShouldLoadBatteryData(true);
                 }
             }
-            setIsContextLoaded(true);
         };
 
         fetchData();
@@ -45,10 +43,6 @@ function DashBoardProvider({ children }) {
     }, [content, updateTable]);
 
 
-
-    if (!isContextLoaded ) {
-        return <div>Carregando...</div>;
-    }
 
     return (
         <DashBoardContext.Provider value={{ promotions, users, setContent, setUpdateContent, setUpdateTable, batteries }}>

@@ -7,7 +7,7 @@ import BatteryCard from '../../components/common/BatteryCard';
 import ErrorServices from '../../services/error/ErrorServices';
 
 const AlertError = ({ errorMessages }) => (
-    errorMessages.general && (
+    errorMessages.general ? (
         <div className={`msg alert ${errorMessages.general ? 'alert-danger' : 'alert-success'} mb-0 d-flex align-items-center mb-3`}>
             {errorMessages.success
                 ? (<CheckIcon />)
@@ -18,7 +18,7 @@ const AlertError = ({ errorMessages }) => (
                 {errorMessages.general ? errorMessages.general : errorMessages.success}
             </span>
         </div>
-    )
+    ) : null
 );
 
 function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrevItemValues, selectedItem, showModal, setShowModal, serviceRequests, selectedOption }) {
@@ -245,6 +245,7 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
     const renderModalFooter = getFooterContent();
 
 
+<<<<<<< HEAD
 
     return (
         <>
@@ -260,6 +261,69 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
                     {renderModalFooter}
                 </Modal.Footer>
             </Modal>
+=======
+export const RenderPromotionFormModal = ({ promotionValues, setPromotionValues, formRef, error }) => {
+    return (
+        <Row>
+            <Col>
+                <alertError />
+                <Form ref={formRef}>
+                    <Form.Label className='w-100'>Código da Promoção</Form.Label>
+                    <FormGroupWithIcon
+                        icon={<BarCode className='position-absolute ms-3 color-gray' />}
+                        type='text'
+                        placeholder='Código da Promoção(Ex: cupom10)'
+                        mb={'mb-4'}
+                        value={promotionValues.code}
+                        onChange={(e) => setPromotionValues({ ...promotionValues, code: e.target.value })}
+                    />
+                    <Form.Label className='w-100'>Porcentagem da Promoção</Form.Label>
+                    <FormGroupWithIcon
+                        icon={<PercentIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                        type='numbsetSelectedBatteryer'
+                        placeholder='Porcentagem da Promoção(Ex: 10)'
+                        mb={'mb-4'}
+                        value={promotionValues.percentage}
+                        onChange={(e) => setPromotionValues({ ...promotionValues, percentage: e.target.value })}
+                    />
+                    <Form.Label className='w-100'>Data Validade</Form.Label>
+                    <FormGroupWithIcon
+                        icon={<FailDate className='position-absolute ms-3' currentColor='#a3a29f' />}
+                        type='text'
+                        placeholder='Data Validade da Promoção (Ex: dd/MM/yyyy)'
+                        mb={'mb-4'}
+                        value={promotionValues.expirationDate}
+                        onChange={(e) => setPromotionValues({ ...promotionValues, expirationDate: e.target.value })}
+                    />
+                </Form>
+            </Col>
+        </Row>
+    )
+}
+
+export const RenderUserModal = ({ selectedUser }) => {
+
+    return (
+        <>
+            <div className="my-3 ">
+                <hr />
+                <h6> <span className='fw-bold'>Nome do usuário: </span>{selectedUser.name}</h6>
+                <h6> <span className='fw-bold'>Email: </span>{selectedUser.email}</h6>
+                <h6> <span className='fw-bold'>Cargo: </span>{selectedUser.role}</h6>
+                <hr />
+            </div>
+
+            <InputGroup hasValidation>
+                <Form.Select className={`rounded-start`} >
+                    <option hidden>Selecione o cargo que deseja...</option>
+                    <option disabled value={selectedUser.role}>{selectedUser.role === 'ADMIN' ? 'Adiministrador' : 'Usuário'}</option>
+                    {selectedUser.role === 'ADMIN'
+                        ? (<option value="USER">Usuário</option>)
+                        : (<option value="ADMIN">Adiministrador</option>)}
+
+                </Form.Select>
+            </InputGroup>
+>>>>>>> parent of 86bb167 (fix: errorMessages)
         </>
     );
 }

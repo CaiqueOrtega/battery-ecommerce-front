@@ -2,6 +2,10 @@ import React from "react";
 import { Table } from 'react-bootstrap';
 
 function DashBoardTable({ data, columnName, onRowDoubleClick }) {
+<<<<<<< HEAD
+=======
+
+>>>>>>> parent of 86bb167 (fix: errorMessages)
     if (!data || data.length === 0 || !columnName || columnName.length === 0) {
         return <div>Nenhum dado disponível.</div>;
     }

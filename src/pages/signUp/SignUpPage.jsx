@@ -91,7 +91,6 @@ function SignUpForm() {
 
 
                 <FormGroupWithIcon
-                    mask={'999.999.999-99'}
                     bgBorder={true}
                     value={document}
                     onChange={(e) => setDocument(e.target.value)} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
