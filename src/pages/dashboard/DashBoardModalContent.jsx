@@ -24,7 +24,7 @@ const AlertError = ({ errorMessages }) => (
 function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrevItemValues, selectedItem, showModal, setShowModal, serviceRequests, selectedOption }) {
     const { errorMessages, setErrorMessages, handleAPIError } = ErrorServices();
     const formRef = useRef(null);
-    
+
 
 
 
@@ -236,8 +236,8 @@ function RenderModalContent({ itemValues, setItemValues, prevItemValues, setPrev
 
     const getFooterContent = () => {
         const option = optionMap[selectedOption];
-        if (selectedOption && optionMap[selectedOption]) {
-            return option ? option.modalFooterContent : null;
+        if (selectedOption && optionMap[selectedOption] && typeof optionMap[selectedOption].modalFooterContent === 'function') {
+            return option ? option.modalFooterContent() : null;
         }
     };
 
