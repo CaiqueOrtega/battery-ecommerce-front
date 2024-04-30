@@ -1,13 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Card, Table, Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { AlertIcon } from "../../../assets/icons/IconsSet";
-import { DashBoardContext } from "../../../context/DashBoardProvider";
+import { UserContext } from "../../../context/UsersProvider";
 import UserService from "../../../services/users/UsersServices";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import { AuthContext } from '../../../context/AuthProvider';
 
 function UserIndex() {
-    const { users, setUpdateTable } = useContext(DashBoardContext)
+    const { users, setUpdateTable } = useContext(UserContext)
     const { userData } = useContext(AuthContext);
 
     const [showUserModal, setShowUserModal] = useState(false);
@@ -88,6 +88,11 @@ function UserIndex() {
                     setShowConfirmChangesModal={setShowConfirmChangesModal}
                     action={'userRoleChange'}
                     handleConfirmChanges={handleConfirmChangesModal}
+<<<<<<< HEAD
+=======
+                    setUpdateTable={setUpdateTable}
+                    field={fieldChange}
+>>>>>>> parent of 71bb5c8 (feat: Add logic to dynamically render data, tabble and modals)
                 />
             </>
 

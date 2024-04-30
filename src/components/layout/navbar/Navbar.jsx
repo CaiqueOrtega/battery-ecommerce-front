@@ -19,10 +19,12 @@ function VerifyAuth({ children }) {
 
       const response = await userRoleAuthorization(userData);
       console.log(response);
-      if (response.success) {
+      if (response == 200) {
         setAuth(false);
       }
+
     }
+
     fetchData();
 
   }, [userData, isContextLoaded]);
