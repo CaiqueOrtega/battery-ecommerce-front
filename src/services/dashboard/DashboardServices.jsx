@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import ConfirmChangesModal from '../../components/common/ConfirmChangesModal';
 
-function DashboardServices(
+function CommonDashboardServices(
     currentValues, setCurrentValues,
     prevValues, setPrevValues,
     showFormModal, setShowFormModal,
@@ -11,7 +11,7 @@ function DashboardServices(
 
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [action, setAction] = useState('');
-    const [confrimChangesModalData, setConfrimChangesModalData] = useState({});
+    const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
 
     useEffect(() => {
         if (showFormModal) {
@@ -38,7 +38,7 @@ function DashboardServices(
                 handler: () => {
                     setAction('delete');
                     setShowConfirmChangesModal(true);
-                    setConfrimChangesModalData({ title: 'Deletar', message: 'Deseja realmente deletar?' });
+                    setConfirmChangesModalData({ title: 'Deletar', message: 'Deseja realmente deletar?' });
                 },
             },
         };
@@ -63,23 +63,16 @@ function DashboardServices(
 
     const handleUpdate = async () => {
         if (errorMessages.general || Object.keys(errorMessages).length === 0) {
-            console.log('NAO TEM ERRO', errorMessages);
             setAction('update');
-            setConfrimChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
+            setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
             setPrevValues({});
             setShowConfirmChangesModal(true);
-            console.log('TESTE,', showConfirmChangesModal)
-        } else {
-
-            console.log('TEM ERRO', errorMessages);
-
-        }
+        } 
     };
 
 
     const handleConfirmChangesModal = async () => {
         let response;
-        console.log(selectedData);
         const entityId = Object.values(selectedData)[0];
 
         if (action === 'update') {
@@ -104,7 +97,6 @@ function DashboardServices(
             const isEqual = Array.from(keys).every(key => prevValues[key] === currentValues[key]);
 
             if (isEqual) {
-                console.log('os dados nao foram alterafdos teste')
                 setErrorMessages(prevErrors => ({
                     ...prevErrors, general: 'Os dados não foram alterados.'
                 }));
@@ -116,18 +108,54 @@ function DashboardServices(
         }
     };
 
-
-    const renderConfirmChangesModal = () => (
-        <ConfirmChangesModal
-            showConfirmChangesModal={showConfirmChangesModal}
-            setShowConfirmChangesModal={setShowConfirmChangesModal}
-            action={action}
-            handleConfirmChanges={handleConfirmChangesModal}
-            confrimChangesModalData={confrimChangesModalData}
-        />
-    )
+    
+    renderConfirmChangesModal(showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, confirmChangesModalData);
 
     return { handleSubmit, renderConfirmChangesModal };
 }
 
-export default DashboardServices;
+
+function userDashBoardServices(currentValues, setPrevValues, serviceRequests, setShowModal, setErrorMessages, handleAPIError){
+    const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
+
+    const handleSubmit = () =>{
+        if (prevSelectedValues.role === currentValues.role) {
+            setErrorMessages({ role: 'O usuário já possuí o cargo selecionado' })
+            return;
+        }else{
+            showConfirmChangesModal(true);
+        }
+
+        setPrevValues(currentValues.role);
+    }
+
+    
+    const handleConfirmChangesModal = async () => {
+        const response = await serviceRequests.changeRole(currentValues.userId, currentValues.role);
+        if (response.success) {
+            setShowConfirmChangesModal(false);
+            setShowModal(false);
+        }else{
+            handleAPIError(response);
+            setShowConfirmChangesModal(false);
+        }
+    }
+
+
+    renderConfirmChangesModal(showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, { title: 'Editar', message: 'Tem certeza que deseja editar os dados?' } )
+
+    return {handleSubmit, renderConfirmChangesModal}
+}
+
+
+const renderConfirmChangesModal = (showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChangesModal, confirmChangesModalData) => (
+    <ConfirmChangesModal
+        showConfirmChangesModal={showConfirmChangesModal}
+        setShowConfirmChangesModal={setShowConfirmChangesModal}
+        handleConfirmChanges={handleConfirmChangesModal}
+        confirmChangesModalData={confirmChangesModalData}
+    />
+)
+
+
+export { CommonDashboardServices, userDashBoardServices};

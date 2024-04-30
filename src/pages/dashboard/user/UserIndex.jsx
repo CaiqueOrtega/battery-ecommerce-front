@@ -88,7 +88,6 @@ function UserIndex() {
                     setShowConfirmChangesModal={setShowConfirmChangesModal}
                     action={'userRoleChange'}
                     handleConfirmChanges={handleConfirmChangesModal}
-                    field={fieldChange}
                 />
             </>
 

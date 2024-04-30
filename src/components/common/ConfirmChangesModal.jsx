@@ -1,7 +1,7 @@
 import { Modal, Button } from 'react-bootstrap';
 import { useState } from 'react';
 
-function ConfirmChangesModal({ showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChanges, confrimChangesModalData }) {
+function ConfirmChangesModal({ showConfirmChangesModal, setShowConfirmChangesModal, handleConfirmChanges, confirmChangesModalData }) {
     const [confirmClicked, setConfirmClicked] = useState(false);
 
 
@@ -10,7 +10,7 @@ function ConfirmChangesModal({ showConfirmChangesModal, setShowConfirmChangesMod
         setConfirmClicked(true);
     };
 
-    if (!confrimChangesModalData) return null;
+    if (!confirmChangesModalData) return null;
 
     return (
 
@@ -24,12 +24,12 @@ function ConfirmChangesModal({ showConfirmChangesModal, setShowConfirmChangesMod
         >
             <Modal.Header closeButton>
                 <Modal.Title>
-                    {confrimChangesModalData.title}
+                    {confirmChangesModalData.title}
                 </Modal.Title>
             </Modal.Header>
             
             <Modal.Body>
-                {confrimChangesModalData.message}
+                {confirmChangesModalData.message}
             </Modal.Body>
 
             <Modal.Footer>
