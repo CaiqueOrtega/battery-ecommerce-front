@@ -10,6 +10,7 @@ import { AuthContext } from '../../context/AuthProvider'
 import ModalLogout from '../../components/common/ModalLogout';
 import AuthServices from '../../services/auth/AuthServices';
 import { Link } from 'react-router-dom';
+import { DashBoardContext } from '../../context/DashBoardProvider';
 
 function VerifyAuth({ children }) {
     const { isLoggedIn, userData, isContextLoaded } = useContext(AuthContext);
@@ -18,12 +19,9 @@ function VerifyAuth({ children }) {
 
     useEffect(() => {
         async function fetchData() {
-
             const response = await userRoleAuthorization(userData, true);
             setLoading(true);
-
         }
-
         fetchData();
 
     }, [userData, isContextLoaded]);
@@ -34,7 +32,14 @@ function VerifyAuth({ children }) {
 
 function DashboardPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [sidebarSelectedOption, setSidebarSelectedOption] = useState("Controle Baterias");
+    const { setRenderOptionData, promotions, batteries, users } = useContext(DashBoardContext);
+    const [sidebarSelectedOption, setSidebarSelectedOption] = useState(sessionStorage.getItem('selectedOption') || 'Baterias');
+
+    useEffect(() => {
+        setRenderOptionData(sidebarSelectedOption);
+        sessionStorage.setItem('selectedOption', sidebarSelectedOption);
+    }, [sidebarSelectedOption]);
+
 
     return (
         <VerifyAuth>
@@ -43,13 +48,14 @@ function DashboardPage() {
                 <Row className='g-0 flex-grow-1 overflow-hidden'>
                     <Collapse in={sidebarOpen} className='d-lg-block'>
                         <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2 bg-white'>
-                            <SidebarContent onItemClick={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
+                            <SidebarContent setSelectedOption={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
                         </Col>
                     </Collapse>
 
 
                     <Col className='d-flex h-100 overflow-auto px-5 py-4'>
-                        <MainContent sidebarSelectedOption={sidebarSelectedOption} />
+                        <MainContent sidebarSelectedOption={sidebarSelectedOption}
+                            batteries={batteries} users={users} promotions={promotions} />
                     </Col>
                 </Row>
             </div>
@@ -142,9 +148,9 @@ function UserDropdown() {
 
 }
 
-function SidebarContent({ onItemClick, selectedOption }) {
+function SidebarContent({ setSelectedOption, selectedOption }) {
     const sidebarItems = [
-        { icon: <AtomIcon />, text: 'Controle Baterias' },
+        { icon: <AtomIcon />, text: 'Baterias' },
         { icon: <UserIconCropped />, text: 'Usuários' },
         { icon: <PromotionIcon />, text: 'Promoções' },
         { icon: <StatisticsIcon />, text: 'Vendas' },
@@ -158,26 +164,28 @@ function SidebarContent({ onItemClick, selectedOption }) {
                     key={index}
                     type="button"
                     className={`py-2 list-group-item-action ${selectedOption === item.text ? 'active' : ''}`}
-                    onClick={() => onItemClick(item.text)}
+                    onClick={() => setSelectedOption(item.text)}
                 >
                     <i className='me-2 color-red'>{item.icon}</i> {item.text}
                 </ListGroup.Item>
             ))}
         </ListGroup>
     );
-}   
+}
 
-function MainContent({ sidebarSelectedOption }) {
+function MainContent({ sidebarSelectedOption, batteries, users, promotions }) {
     let content = null;
+
     switch (sidebarSelectedOption) {
-        case "Controle Baterias":
-            content = <BatteryIndex />;
+        case "Baterias":
+            content = <BatteryIndex batteries={batteries} />;
             break;
         case 'Usuários':
-            content = <UserIndex />
+
+            content = <UserIndex users={users} />
             break;
         case 'Promoções':
-            content = <PromotionIndex />
+            content = <PromotionIndex promotions={promotions} />
             break;
         default:
             content = null;

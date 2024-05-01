@@ -9,8 +9,8 @@ import BatteryInfo from './pages/dashboard/battery/BatteryInfo';
 import MyAccont from './pages/settings/Settings';
 import { AuthProvider } from './context/AuthProvider';
 import { BatteryProvider } from './context/BatteryProvider';
-import { UserProvider } from './context/UsersProvider';
-import { PromotionProvider } from './context/PromotionProvider';
+import { DashBoardProvider } from './context/DashBoardProvider';
+
 
 function App() {
 
@@ -21,20 +21,17 @@ function App() {
           <Route path="/" element={<BatteryProvider><HomePage /></BatteryProvider>} />
           <Route path="/paineldecontrole" element={
             <BatteryProvider>
-              <UserProvider>
-                <PromotionProvider>
+                <DashBoardProvider>
                   <DashboardPage />
-                </PromotionProvider>
-              </UserProvider>
-            </BatteryProvider>
-          } />
+                </DashBoardProvider>
+            </BatteryProvider>} />
           <Route path="/bateria" element={<BatteryProvider><BatteryInfo /></BatteryProvider>} />
           <Route path="/entrar" element={<LoginPage />} />
           <Route path="/cadastrar" element={<SignUpPage />} />
-          <Route path="/configuracoes" element={<MyAccont/>}/>
+          <Route path="/configuracoes" element={<MyAccont />} />
         </Routes>
       </AuthProvider>
-    </Router>
+    </Router >
   );
 }
 

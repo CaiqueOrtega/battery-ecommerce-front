@@ -23,9 +23,11 @@ const UserService = () => {
     }
   }
 
-  const changeRole = async (userId, selectedRole) => {
+  const changeRole = async (userId, selectedRole, loggedUserId) => {
     try {
-      await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`);
+      await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`, {
+        loggedUserId: loggedUserId
+      });
 
       return { success: true }
     } catch (error) {

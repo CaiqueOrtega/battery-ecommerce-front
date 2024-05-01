@@ -1,13 +1,12 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { Card, Table, Modal, Row, Col, Form, Button, ModalBody } from "react-bootstrap";
-import { PromotionContext } from "../../../context/PromotionProvider";
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
 import { BarCode, CheckIcon, PercentIcon, FailDate } from '../../../assets/icons/IconsSet';
 import PromotionService from "../../../services/promotion/PromotionService";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 
-export default function PromotionIndex() {
-    const { promotions, setUpdateTable } = useContext(PromotionContext)
+
+export default function PromotionIndex({ promotions }) {
     const [selectedPromotion, setSelectedPromotion] = useState(null);
 
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
@@ -23,7 +22,6 @@ export default function PromotionIndex() {
     });
 
     const formRef = useRef(null);
-    const [fieldChange, setFieldChange] = useState({});
     const { setErrorMessages, errorMessages, updatePromotion, deletePromotion, createPromotion, reactivePromotion } = PromotionService()
 
     useEffect(() => {
@@ -133,7 +131,6 @@ export default function PromotionIndex() {
 
                     {selectedPromotion && request && selectedPromotion.status == "ACTIVE" && (
                         <Button variant='red' className='float-end' onClick={() => {
-                            setFieldChange({ fieldDeleted: selectedPromotion.code });
                             setShowConfirmChangesModal(true);
                             setAction('delete');
                         }}>Desativar Promoção</Button>
@@ -150,10 +147,7 @@ export default function PromotionIndex() {
             <ConfirmChanges
                 showConfirmChangesModal={showConfirmChangesModal}
                 setShowConfirmChangesModal={setShowConfirmChangesModal}
-                action={action}
                 handleConfirmChanges={handleConfirmChangesModal}
-                setUpdateTable={setUpdateTable}
-                field={fieldChange}
             />
         </>
     )

@@ -2,7 +2,7 @@ import { FormControl, Form, InputGroup } from "react-bootstrap";
 import { useEffect, useState, useRef } from 'react';
 import { AlertIcon } from "../../assets/icons/IconsSet";
 
-const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, bgBorder }) => {
+const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, bgBorder, disable }) => {
     const inputRef = useRef(null);
     const [isFocused, setIsFocused] = useState(false);
 
@@ -33,6 +33,7 @@ const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedb
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     required
+                    disabled ={disable}
                 />
                 {icon}
             </div>
