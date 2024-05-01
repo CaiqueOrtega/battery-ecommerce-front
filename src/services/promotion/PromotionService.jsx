@@ -49,17 +49,16 @@ const PromotionService = () => {
         }
     }
 
-    const reactivePromotion = async (promotionId, promotion) => {
-        console.log(promotionValues);
+    const reactivePromotion = async (promotionId, promotionExpirationDate) => {
+    console.log('TESTE', promotionId)
+    console.log('TESTA', promotionExpirationDate)
         try {
-            const response = await ConnectionAPI.put(`promotion/reactive/${promotionId}`, {
-                expirationDate: promotion.expirationDate,
-                percentage: promotion.percentage,
-                code: promotion.code
-            })
+            const response = await ConnectionAPI.put(`promotion/reactive/${promotionId}`, {  
+                expirationDate: promotionExpirationDate
+             })
             return { success: true };
         } catch (error) {
-            handleAPIError(error)
+            handleAPIError(error);
         }
     }
 

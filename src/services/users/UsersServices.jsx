@@ -1,8 +1,10 @@
 import React, { useContext, useState } from "react";
 import ConnectionAPI from "../ConnectionAPI";
+import ErrorServices from "../error/ErrorServices"
 
 const UserService = () => {
-  const [errorMessages, setErrorMessages] = useState({});
+  const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
+
 
   const getUserByEmail = async (email) => {
 
@@ -28,10 +30,9 @@ const UserService = () => {
       await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`, {
         loggedUserId: loggedUserId
       });
-
       return { success: true }
     } catch (error) {
-      return error;
+      handleAPIError(error);
     }
   }
 

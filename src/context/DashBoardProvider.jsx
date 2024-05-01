@@ -26,7 +26,7 @@ function DashBoardProvider({ children }) {
                     const promotionsData = await getPromotions();
                     setPromotions(promotionsData);
                 } else if (renderOptionData === 'Baterias' && !batteries.length) {
-                    setGetDataBatteries(prevState => !prevState);
+                    setGetDataBatteries(true);
                 }
                 setIsContextLoaded(true);
             } catch (error) {

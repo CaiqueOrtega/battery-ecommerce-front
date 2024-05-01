@@ -10,20 +10,23 @@ function BatteryProvider({ children }) {
     const [getDataBatteries, setGetDataBatteries] = useState(false);
 
     const fetchBatteries = async () => {
-            try {
-                const batteryData = await getBatteries();
-                console.log(batteryData)
-                console.log('Pegou os dados de bateria')
-                setBatteries(batteryData);
-                setIsContextLoaded(true);
-            } catch (error) {
-                console.log(error);
-            }
-    };
-    
 
-    useEffect( () => {
-         fetchBatteries();
+        try {
+            const batteryData = await getBatteries();
+            console.log(batteryData)
+            console.log('Pegou os dados de bateria')
+            setBatteries(batteryData);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
+
+    useEffect(() => {
+        if (getDataBatteries) {
+            fetchBatteries();
+        }
+        setIsContextLoaded(true);
     }, [getDataBatteries])
 
     return isContextLoaded ? (

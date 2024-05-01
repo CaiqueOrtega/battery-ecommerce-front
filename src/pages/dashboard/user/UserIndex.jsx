@@ -2,23 +2,18 @@ import React, { useContext, useState } from "react";
 import { Card, Table, Modal, Button, Form, InputGroup } from "react-bootstrap";
 import { AlertIcon } from "../../../assets/icons/IconsSet";
 import UserService from "../../../services/users/UsersServices";
-import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
+import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal";
 import { AuthContext } from '../../../context/AuthProvider';
 
 function UserIndex({ users }) {
     const { userData } = useContext(AuthContext);
-
     const [showUserModal, setShowUserModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
-
-    const [selectedRole, setSelectedRole] = useState('');
     const [selectedUser, setSelectedUser] = useState(null)
-
-    const [prevSelectedRole, setPrevSelectedRole] = useState('');
-    const [fieldChange, setFieldChange] = useState({});
+    const [selectedRole, setSelectedRole] = useState({});
+    const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
 
     const { changeRole, errorMessages, setErrorMessages } = UserService()
-
 
     const handleConfirmChangesModal = async () => {
         const response = await changeRole(selectedUser.userId, selectedRole, userData.userId);
@@ -30,7 +25,8 @@ function UserIndex({ users }) {
         }
     }
 
-    const renderUserAdminModal = () => {
+    const renderUserModal = () => {
+
         if (!selectedUser) return null;
 
         return (
@@ -53,39 +49,38 @@ function UserIndex({ users }) {
                             <Form.Select className={`${errorMessages.role && 'is-invalid'} rounded-start`} defaultValue={selectedRole.role} value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
                                 <option hidden>Selecione o cargo que deseja...</option>
                                 <option disabled value={selectedUser.role}>{selectedUser.role === 'ADMIN' ? 'Adiministrador' : 'Usuário'}</option>
-                                {selectedUser.role === 'ADMIN'
-                                    ? (<option value="USER">Usuário</option>)
-                                    : (<option value="ADMIN">Adiministrador</option>)}
+                                <option value={selectedUser.role === 'ADMIN' ? 'USER' : 'ADMIN'}>{selectedUser.role === 'ADMIN' ? 'Usuário' : 'Administrador'}</option>
                             </Form.Select>
                             <Form.Control.Feedback type="invalid" className="ms-1">
-                                <AlertIcon size="14" currentColor={"currentcolor"} /> {errorMessages ? errorMessages.role : null}
+                                {errorMessages && errorMessages.role && <AlertIcon size="14" currentColor={"currentcolor"} />} {errorMessages ? errorMessages.role : null}
                             </Form.Control.Feedback>
                         </InputGroup>
+
                     </Modal.Body>
 
                     <Modal.Footer>
                         <Button className='float-end' variant='red' onClick={() => {
 
-                            if (prevSelectedRole === selectedRole) {
+                            if (selectedUser.role == selectedRole) {
                                 setErrorMessages({ role: 'O usuário já possuí o cargo selecionado' })
                                 return;
                             }
 
-                            setPrevSelectedRole(selectedRole);
-
-                            setFieldChange({ role: selectedUser.role, roleChange: selectedRole })
+                            console.log('teste')
+                            setConfirmChangesModalData({ title: 'Alterar Permissão', message: 'Deseja realmente Alterar a permissão desse usuário?' });
                             setShowConfirmChangesModal(true);
+                            console.log(showConfirmChangesModal)
                         }}>
                             Confirmar
                         </Button>
                     </Modal.Footer>
                 </Modal>
 
-                <ConfirmChanges
+                <ConfirmChangesModal
                     showConfirmChangesModal={showConfirmChangesModal}
                     setShowConfirmChangesModal={setShowConfirmChangesModal}
-                    action={'userRoleChange'}
                     handleConfirmChanges={handleConfirmChangesModal}
+                    confirmChangesModalData={confirmChangesModalData}
                 />
             </>
 
@@ -112,13 +107,12 @@ function UserIndex({ users }) {
                         <tbody>
                             {users.map((user) => (
                                 <tr key={user.userId} onDoubleClick={() => {
-                                    if(userData && userData.userId === user.userId){
+                                    if (userData && userData.userId === user.userId) {
                                         return;
                                     }
                                     setErrorMessages({});
                                     setShowUserModal(true);
                                     setSelectedUser(user);
-                                    setPrevSelectedRole(user.role);
                                 }}>
                                     <td>{user.name}</td>
                                     <td>{user.email}</td>
@@ -130,7 +124,8 @@ function UserIndex({ users }) {
                     </Table>
                 </Card.Body>
             </Card>
-            {renderUserAdminModal()}
+
+            {renderUserModal()}
         </>
     )
 }

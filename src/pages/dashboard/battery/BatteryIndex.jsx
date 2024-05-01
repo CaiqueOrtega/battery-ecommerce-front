@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from 'react';
 import BatteryServices from '../../../services/battery/BatteryServices';
 import BatteryCard from '../../../components/common/BatteryCard';
 import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
+import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
 
 function BatteryIndex({ batteries }) {
     const [selectedBattery, setSelectedBattery] = useState(null);
@@ -50,9 +51,10 @@ function BatteryIndex({ batteries }) {
             create: {
                 handler: async () => {
                     const response = await createBattery(batteryValues);
-                    const updatedBatteryValues = {};
-    
+                
                     if (response) {
+                        setErrorMessages({})
+                        const updatedBatteryValues = {};
                         Object.keys(batteryValues).forEach(key => {
                             updatedBatteryValues[key] = '';
                         });
@@ -150,19 +152,7 @@ function BatteryIndex({ batteries }) {
                             </Col>
                             <Col>
 
-                                {errorMessages.general || errorMessages.success ? (
-                                    <div className={`msg alert ${errorMessages.general ? 'alert-danger' : 'alert-success'} mb-0 d-flex align-items-center mb-3`}>
-                                        {errorMessages.success
-                                            ? (<CheckIcon />)
-                                            : (<AlertIcon size={"16"} currentColor={"#69282f"} />)
-                                        }
-
-                                        <span className='ms-2'>
-                                            {errorMessages.general ? errorMessages.general : errorMessages.success}
-                                        </span>
-                                    </div>
-                                ) : null}
-
+                            <AlertErrorOrSuccess errorMessages={errorMessages}/>
 
                                 <Form ref={formRef}>
                                     <Row>
