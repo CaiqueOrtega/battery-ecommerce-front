@@ -5,8 +5,8 @@
   }
 
  .list-group-item.active {
-     background-color: #e70f00;
-     border: #f11100;
+     background-color: #c00d0d;
+     border: #c00d0d;
      border-radius: 5px;
      box-shadow: 0 2px 5px 0 rgb(0 0 0 / 16%), 0 2px 10px 0 rgb(0 0 0 / 12%);
  }
@@ -15,4 +15,40 @@
   #sidebarDashboard {
     width: 240px !important;
   }
+}
+
+.page-link {
+  color: grey; 
+}
+.page-link:hover {
+  color: #c00d0d; 
+}
+.page-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(204, 0, 0, 0.37); 
+  color: #c00d0d;
+}
+.active > .page-link,
+.page-link.active {
+  background-color: #c00d0d !important; 
+  border-color: #c00d0d !important;
+  
+}
+.active > .page-link:focus,
+.page-link.active:focus {
+  box-shadow: 0 0 0 0.2rem rgba(204, 0, 0, 0.5); 
+  border-radius: 0.25rem;  
+  color: white !important;
+}
+
+.active > .page-link:hover,
+.page-link.active:hover {
+  color: white; 
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  background-color: sua-cor-aqui !important;
+}
+
+.table-cell-pointer {
+  cursor: pointer;
 }

@@ -16,14 +16,15 @@ const BatteryServices = () => {
 
     const createBattery = async (batteryValues) => {
         try {
-            await ConnectionAPI.post('battery', {
+            const response = await ConnectionAPI.post('battery', {
                 name: batteryValues.name,
                 description: batteryValues.description,
                 value: batteryValues.value,
                 quantity: batteryValues.quantity,
                 code: batteryValues.code
             });
-            return true
+            console.log('respponse Teste', response.data)
+            return response.data;
         } catch (error) {
             handleAPIError(error);
         }

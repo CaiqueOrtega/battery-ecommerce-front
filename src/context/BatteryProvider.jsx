@@ -30,7 +30,7 @@ function BatteryProvider({ children }) {
     }, [getDataBatteries])
 
     return isContextLoaded ? (
-        <BatteryContext.Provider value={{ batteries, setGetDataBatteries }}>
+        <BatteryContext.Provider value={{ batteries, setBatteries ,setGetDataBatteries }}>
             {children}
         </BatteryContext.Provider>
     ) : null;

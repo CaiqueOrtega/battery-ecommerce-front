@@ -15,6 +15,8 @@ const PromotionService = () => {
     }
 
     const updatePromotion = async (promotionId, promotion) => {
+        console.log("ID", promotionId)
+        console.log("Promotion", promotion)
         try {
             const response = await ConnectionAPI.patch(`promotion/${promotionId}`, {
                 expirationDate: promotion.expirationDate,
@@ -38,20 +40,18 @@ const PromotionService = () => {
 
     const createPromotion = async (promotion) => {
         try {
-            await ConnectionAPI.post('promotion', {
+           const response =  await ConnectionAPI.post('promotion', {
                 expirationDate: promotion.expirationDate,
                 percentage: promotion.percentage,
                 code: promotion.code
             })
-            return { success: true };
+            return response.data;
         } catch (error) {
             handleAPIError(error)
         }
     }
 
     const reactivePromotion = async (promotionId, promotionExpirationDate) => {
-    console.log('TESTE', promotionId)
-    console.log('TESTA', promotionExpirationDate)
         try {
             const response = await ConnectionAPI.put(`promotion/reactive/${promotionId}`, {  
                 expirationDate: promotionExpirationDate

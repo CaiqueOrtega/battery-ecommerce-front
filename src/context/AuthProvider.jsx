@@ -3,6 +3,7 @@ import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
 import UserService from "../services/users/UsersServices";
+import AuthServices from "../services/auth/AuthServices";
 
 const AuthContext = createContext({});
 
@@ -31,8 +32,10 @@ function AuthProvider({ children }) {
           } else {
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             const user = await getUserByEmail(decodedToken.sub);
-            setUserData(user);
-            setIsLoggedIn(true);
+            if(user.status !== 'INACTIVE'){
+              setUserData(user);
+              setIsLoggedIn(true);
+            }
           }
         } catch (error) {
           console.log("Erro durante a leitura do token", error);
@@ -66,9 +69,28 @@ function AuthProvider({ children }) {
   }
 
 
+  const VerifyAuth = ({ children }) => {
+    console.log('teste')
+    const { userRoleAuthorization } = AuthServices();
+    const [response, setResponse] = useState(null);
+
+    useEffect(() => {
+      console.log(userData);
+      async function fetchData() {
+        const response = await userRoleAuthorization(userData, true);
+        setResponse(response);
+      }
+      fetchData();
+    }, [userData, isContextLoaded, isLoggedIn]);
+
+    console.log(response)
+    return response ? children : null;
+  }
+
+
 
   return isContextLoaded ? (
-    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin }}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin, VerifyAuth }}>
       {children}
     </AuthContext.Provider>
   ) : null;

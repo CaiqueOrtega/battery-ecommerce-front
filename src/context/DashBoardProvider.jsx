@@ -2,24 +2,25 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import PromotionService from "../services/promotion/PromotionService";
 import UserService from "../services/users/UsersServices";
 import { BatteryContext } from "./BatteryProvider";
+import { AuthContext } from "./AuthProvider";
 
 const DashBoardContext = createContext({});
 
 function DashBoardProvider({ children }) {
     const { getPromotions } = PromotionService();
     const { getUsers } = UserService();
-    const { batteries, setGetDataBatteries } = useContext(BatteryContext);
+    const { VerifyAuth } = useContext(AuthContext);
+    const { batteries, setBatteries, setGetDataBatteries } = useContext(BatteryContext);
 
     const [users, setUsers] = useState([]);
     const [promotions, setPromotions] = useState([]);
     const [renderOptionData, setRenderOptionData] = useState('');
     const [isContextLoaded, setIsContextLoaded] = useState(false);
-    const [updateData, setUpdateData] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                if (renderOptionData === 'Usuários' && !users.length ) {
+                if (renderOptionData === 'Usuários' && !users.length) {
                     const usersData = await getUsers();
                     setUsers(usersData);
                 } else if (renderOptionData === 'Promoções' && !promotions.length) {
@@ -38,9 +39,11 @@ function DashBoardProvider({ children }) {
 
 
     return isContextLoaded ? (
-        <DashBoardContext.Provider value={{ promotions, users, batteries, setRenderOptionData }}>
-            {children}
-        </DashBoardContext.Provider>
+        <VerifyAuth>
+            <DashBoardContext.Provider value={{ promotions, setPromotions, users, setUsers, batteries, setBatteries, setRenderOptionData }}>
+                {children}
+            </DashBoardContext.Provider>
+        </VerifyAuth>
     ) : null;
 }
 

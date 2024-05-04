@@ -54,7 +54,7 @@ function NavbarComponent({ setNavbarContent }) {
   const renderCart = () => (
     <Dropdown as={NavItem} className="dropdown-no-carret  text-white hover-color-red">
       <Dropdown.Toggle as={NavLink} className='me-3'>
-        <CartIcon />
+        <CartIcon strokeWidth={'0.2'} size={30}/>
       </Dropdown.Toggle>
       <Dropdown.Menu className="dropdown-menu-size rounded-4 shadow border-0 dropdown-menu-end  mt-2 py-5 px-4">
         <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
@@ -89,7 +89,7 @@ function NavbarComponent({ setNavbarContent }) {
   );
 
   return (
-    <Navbar expand="lg" className="bg-yellow shadow mb-5" variant="dark">
+    <Navbar expand="lg" className="bg-yellow shadow" variant="dark">
       <Row className="d-flex flex-fill g-0 px-2 px-md-4 align-items-center justify-content-between">
         <Col className='col-auto order-first ms-md-3'>
           <Navbar.Brand className='m-0'>

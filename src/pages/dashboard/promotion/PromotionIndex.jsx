@@ -6,10 +6,16 @@ import PromotionService from "../../../services/promotion/PromotionService";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
 
-export default function PromotionIndex({ promotions }) {
+import Pagination from '../../../components/common/PaginationTable';
+
+
+export default function PromotionIndex({ promotions, setPromotions }) {
     const [selectedPromotion, setSelectedPromotion] = useState(null);
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+
     const [action, setAction] = useState('');
     const [disableFormControl, setDisableFormControl] = useState(false);
     const [prevPromotionValues, setPrevPromotionValues] = useState({});
@@ -44,8 +50,6 @@ export default function PromotionIndex({ promotions }) {
     const handleSubmit = async (e, action) => {
         e.preventDefault();
 
-        const isValid = action !== 'delete' && action !== 'reactive' ? formRef.current.reportValidity() && !isEquals(prevPromotionValues, promotionValues) : true;
-
         const actionHandlers = {
             create: {
                 handler: async () => {
@@ -58,17 +62,18 @@ export default function PromotionIndex({ promotions }) {
                             updatedPromotionValues[key] = '';
                         });
                         setPromotionValues(updatedPromotionValues);
+                        setPromotions([...promotions, response]);
+
                     }
+
                 }
             },
             update: {
                 handler: () => {
-                    if (errorMessages.general || Object.keys(errorMessages).length === 0) {
-                        setAction('update');
-                        setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
-                        setPrevPromotionValues({});
-                        setShowConfirmChangesModal(true);
-                    }
+                    setAction('update');
+                    setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
+                    setPrevPromotionValues({});
+                    setShowConfirmChangesModal(true);
                 }
             },
             delete: {
@@ -86,6 +91,9 @@ export default function PromotionIndex({ promotions }) {
                 }
             }
         };
+
+        const isValid = action !== 'delete' && action !== 'reactive' ? formRef.current.reportValidity() && !isEquals(prevPromotionValues, promotionValues) : true;
+
 
         if (isValid) {
             await actionHandlers[action].handler();
@@ -106,7 +114,24 @@ export default function PromotionIndex({ promotions }) {
         console.log(response);
 
         if (response) {
-            setShowPromotionFormModal(false);
+            const updatedPromotion = promotions.map(promotion => {
+                if (promotion.promotionId === selectedPromotion.promotionId) {
+                    if (action === 'delete') {
+                        setShowPromotionFormModal(false);
+                        return { ...promotion, status: 'INACTIVE' }
+                    } else if (action === 'reactive') {
+                        setSelectedPromotion({ ...selectedPromotion, status: 'ACTIVE' })
+                        setDisableFormControl(false);
+                        return { ...promotion, status: 'ACTIVE' };
+                    } else {
+                        setShowPromotionFormModal(false);
+                        return { ...promotion, ...promotionValues };
+                    }
+                }
+                return promotion;
+            })
+
+            setPromotions(updatedPromotion);
             setShowConfirmChangesModal(false);
         } else {
             setShowConfirmChangesModal(false);
@@ -145,7 +170,7 @@ export default function PromotionIndex({ promotions }) {
                 <Modal.Body>
                     <Row>
                         <Col>
-                        <AlertErrorOrSuccess errorMessages={errorMessages}/>
+                            <AlertErrorOrSuccess errorMessages={errorMessages} />
                             <Form ref={formRef}>
                                 <Form.Label className='w-100'>Código da Promoção</Form.Label>
                                 <FormGroupWithIcon
@@ -219,6 +244,11 @@ export default function PromotionIndex({ promotions }) {
     )
 
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = promotions.slice(indexOfFirstItem, indexOfLastItem);
+
+
     return (
         <>
             <Card className='shadow rounded-3 mb-5'>
@@ -243,7 +273,7 @@ export default function PromotionIndex({ promotions }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {promotions.map((promotion) => (
+                            {currentItems.map((promotion) => (
                                 <tr key={promotion.promotionId} onDoubleClick={() => {
                                     setSelectedPromotion(promotion);
                                     const { promotionId, status, startDate, ...prevValues } = promotion;
@@ -259,6 +289,13 @@ export default function PromotionIndex({ promotions }) {
                             ))}
                         </tbody>
                     </Table>
+
+                    <Pagination
+                        totalItems={promotions.length} 
+                        itemsPerPage={itemsPerPage} 
+                        currentPage={currentPage} 
+                        onPageChange={setCurrentPage} 
+                    />
                 </Card.Body>
             </Card>
 

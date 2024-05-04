@@ -15,7 +15,7 @@ const AuthServices = () => {
                 email: emailLogin,
                 password: passwordLogin
             });
-                handleLogin(response.data.token);
+            handleLogin(response.data.token);
         } catch (error) {
             handleAPIError(error, setErrorMessages);
 
@@ -52,7 +52,7 @@ const AuthServices = () => {
         }
     };
 
-    
+
     const handleAPIError = (error, setErrorMessages) => {
         if (error.response && error.response.data) {
             if (error.response.data.field) {
@@ -66,7 +66,10 @@ const AuthServices = () => {
         }
     };
 
-    return { errorMessages, setErrorMessages, login, signUp, userRoleAuthorization };
+
+
+
+    return { errorMessages, setErrorMessages, login, signUp, userRoleAuthorization};
 };
 
 export default AuthServices;

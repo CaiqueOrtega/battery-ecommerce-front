@@ -4,14 +4,18 @@ import { AlertIcon } from "../../../assets/icons/IconsSet";
 import UserService from "../../../services/users/UsersServices";
 import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal";
 import { AuthContext } from '../../../context/AuthProvider';
+import Pagination from "../../../components/common/PaginationTable";
 
-function UserIndex({ users }) {
+function UserIndex({ users, setUsers }) {
     const { userData } = useContext(AuthContext);
     const [showUserModal, setShowUserModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedRole, setSelectedRole] = useState({});
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+
 
     const { changeRole, errorMessages, setErrorMessages } = UserService()
 
@@ -19,9 +23,17 @@ function UserIndex({ users }) {
         const response = await changeRole(selectedUser.userId, selectedRole, userData.userId);
 
         if (response.success) {
+            const updatedUsers = users.map(users => {
+                if (users.userId === selectedUser.userId) {
+                        return { ...users, role: selectedRole };
+                }
+                return users;
+            })
+
+            setUsers(updatedUsers);
+
             setShowConfirmChangesModal(false);
             setShowUserModal(false);
-            setUpdateTable(prevValue => !prevValue);
         }
     }
 
@@ -88,6 +100,11 @@ function UserIndex({ users }) {
     }
 
 
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+
+
     return (
         <>
             <Card className='shadow rounded-3 mb-5'>
@@ -122,6 +139,13 @@ function UserIndex({ users }) {
                             ))}
                         </tbody>
                     </Table>
+
+                    <Pagination
+                        totalItems={users.length}
+                        itemsPerPage={itemsPerPage}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                    />
                 </Card.Body>
             </Card>
 

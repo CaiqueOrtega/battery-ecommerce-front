@@ -1,13 +1,15 @@
-import { Form, Row, Col, Button, Modal, Table, Card } from 'react-bootstrap';
-import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import { AtomIcon, TextBodyIcon, DolarIcon, StockIcon, CheckIcon, AlertIcon } from '../../../assets/icons/IconsSet';
-import { useState, useEffect, useRef } from 'react';
-import BatteryServices from '../../../services/battery/BatteryServices';
+import { useEffect, useRef, useState } from 'react';
+import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
+import { AtomIcon, BarCode, DolarIcon, DoubleArrowIcon, StockIcon, TextBodyIcon } from '../../../assets/icons/IconsSet';
+import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
 import BatteryCard from '../../../components/common/BatteryCard';
 import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
-import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
+import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
+import Pagination from '../../../components/common/PaginationTable';
+import SortButton from '../../../components/common/SortButton';
+import BatteryServices from '../../../services/battery/BatteryServices';
 
-function BatteryIndex({ batteries }) {
+function BatteryIndex({ batteries, setBatteries }) {
     const [selectedBattery, setSelectedBattery] = useState(null);
     const [showBatteryFormModal, setShowBatteryFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
@@ -20,6 +22,7 @@ function BatteryIndex({ batteries }) {
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
 
     const formRef = useRef(null);
+    const [successMessage, setSuccessMessage] = useState();
     const { createBattery, updateBattery, deleteBattery, reactiveBattery, errorMessages, setErrorMessages } = BatteryServices();
 
 
@@ -31,6 +34,7 @@ function BatteryIndex({ batteries }) {
             : setDisableFormControl(false)
 
         setErrorMessages({});
+        setSuccessMessage('');
         setBatteryValues({
             name: selectedBattery.name || '',
             description: selectedBattery.description || '',
@@ -41,17 +45,14 @@ function BatteryIndex({ batteries }) {
     }, [showBatteryFormModal]);
 
 
-
     const handleSubmit = async (e, action) => {
         e.preventDefault();
-    
-        const isValid = action !== 'delete' && action !== 'reactive' ? formRef.current.reportValidity() && !isEquals(prevBatteryValues, batteryValues) : true;
-    
+
         const actionHandlers = {
             create: {
                 handler: async () => {
                     const response = await createBattery(batteryValues);
-                
+
                     if (response) {
                         setErrorMessages({})
                         const updatedBatteryValues = {};
@@ -59,17 +60,19 @@ function BatteryIndex({ batteries }) {
                             updatedBatteryValues[key] = '';
                         });
                         setBatteryValues(updatedBatteryValues);
+                        setSuccessMessage('Bateria Cadastrada com Sucesso!');
+                        setBatteries([...batteries, response]);
+                        console.log(successMessage)
                     }
                 }
             },
             update: {
                 handler: () => {
-                    if (errorMessages.general || Object.keys(errorMessages).length === 0) {
-                        setAction('update');
-                        setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
-                        setPrevBatteryValues({});
-                        setShowConfirmChangesModal(true);
-                    }
+                    console.log(errorMessages)
+                    setAction('update');
+                    setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
+                    setPrevBatteryValues({});
+                    setShowConfirmChangesModal(true);
                 }
             },
             delete: {
@@ -87,235 +90,300 @@ function BatteryIndex({ batteries }) {
                 }
             }
         };
-    
+
+        const isValid = action !== 'delete' && action !== 'reactive' ? formRef.current.reportValidity() && !isEquals(prevBatteryValues, batteryValues) : true;
+
         if (isValid) {
             await actionHandlers[action].handler();
         }
     };
-    
-        const handleConfirmChangesModal = async () => {
-            let response;
-            if (action === 'update') {
-                response = await updateBattery(selectedBattery.batteryId, batteryValues);
-            } else if (action === 'delete') {
-                response = await deleteBattery(selectedBattery.batteryId);
-            } else if (action === 'reactive') {
-                response = await reactiveBattery(selectedBattery.batteryId);
-            }
 
-            console.log(response);
+    const handleConfirmChangesModal = async () => {
+        let response;
+        if (action === 'update') {
+            response = await updateBattery(selectedBattery.batteryId, batteryValues);
+        } else if (action === 'delete') {
+            response = await deleteBattery(selectedBattery.batteryId);
+        } else if (action === 'reactive') {
+            response = await reactiveBattery(selectedBattery.batteryId);
+        }
 
-            if (response) {
-                setShowBatteryFormModal(false);
-                setShowConfirmChangesModal(false);
-            } else {
-                setShowConfirmChangesModal(false);
-                setPrevBatteryValues(batteryValues);
-            }
-        };
-
-        const isEquals = (prevBatteryValues, batteryValues) => {
-            console.log(prevBatteryValues)
-            console.log(batteryValues)
-
-            if (prevBatteryValues) {
-                const keys = new Set([...Object.keys(prevBatteryValues), ...Object.keys(batteryValues)]);
-                const isEqual = Array.from(keys).every(key => prevBatteryValues[key] === batteryValues[key]);
-
-                if (isEqual) {
-                    setErrorMessages(prevErrors => ({
-                        ...prevErrors, general: 'Os dados não foram alterados.'
-                    }));
+        if (response) {
+            const updatedBatteries = batteries.map(battery => {
+                if (battery.batteryId === selectedBattery.batteryId) {
+                    if (action === 'delete') {
+                        setShowBatteryFormModal(false);
+                        return { ...battery, status: 'INACTIVE' }
+                    } else if (action === 'reactive') {
+                        setSelectedBattery({ ...selectedBattery, status: 'ACTIVE' })
+                        setDisableFormControl(false);
+                        setSuccessMessage('Bateria Reativada Com Sucesso!');
+                        return { ...battery, status: 'ACTIVE' };
+                    } else {
+                        setShowBatteryFormModal(false);
+                        return { ...battery, ...batteryValues };
+                    }
                 }
-                setPrevBatteryValues(batteryValues);
+                return battery;
+            })
 
-                return isEqual;
+            setBatteries(updatedBatteries);
+            setShowConfirmChangesModal(false);
+            console.log(successMessage)
+        } else {
+            setShowConfirmChangesModal(false);
+            setPrevBatteryValues(batteryValues);
+        }
+    };
+
+    const isEquals = (prevBatteryValues, batteryValues) => {
+        console.log(prevBatteryValues)
+        console.log(batteryValues)
+
+        if (prevBatteryValues) {
+            const keys = new Set([...Object.keys(prevBatteryValues), ...Object.keys(batteryValues)]);
+            const isEqual = Array.from(keys).every(key => prevBatteryValues[key] === batteryValues[key]);
+
+            if (isEqual) {
+                setErrorMessages(prevErrors => ({
+                    ...prevErrors, general: 'Os dados não foram alterados.'
+                }));
             }
-        };
+            setPrevBatteryValues(batteryValues);
 
-        const renderBatteryFormModal = () => (
-            <>
-                <Modal size="lg" show={showBatteryFormModal} onHide={() => setShowBatteryFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
-                    <Modal.Header className='bg-red text-white'>
-                        <Modal.Title>{selectedBattery ? 'Editar Produto' : 'Cadastrar Produto'}</Modal.Title>
-                        <button className='btn-close btn-close-white' onClick={() => setShowBatteryFormModal(false)} />
-                    </Modal.Header>
-                    <Modal.Body>
-                        <Row>
-                            <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
-                                <BatteryCard
-                                    batteryName={batteryValues.name}
-                                    batteryDescription={batteryValues.description}
-                                    batteryPrice={batteryValues.value}
-                                    batteryQuantity={batteryValues.quantity}
-                                />
-                            </Col>
-                            <Col>
+            return isEqual;
+        }
+    };
 
-                            <AlertErrorOrSuccess errorMessages={errorMessages}/>
+    const renderBatteryFormModal = () => (
+        <>
+            <Modal size="lg" show={showBatteryFormModal} onHide={() => setShowBatteryFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
+                <Modal.Header className='bg-red text-white'>
+                    <Modal.Title>{selectedBattery ? 'Editar Produto' : 'Cadastrar Produto'}</Modal.Title>
+                    <button className='btn-close btn-close-white' onClick={() => setShowBatteryFormModal(false)} />
+                </Modal.Header>
+                <Modal.Body>
+                    <Row>
+                        <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
+                            <BatteryCard
+                                batteryName={batteryValues.name}
+                                batteryDescription={batteryValues.description}
+                                batteryPrice={batteryValues.value}
+                                batteryQuantity={batteryValues.quantity}
+                            />
+                        </Col>
+                        <Col>
 
-                                <Form ref={formRef}>
-                                    <Row>
-                                        <Col md={8}>
-                                            <Form.Label className='w-100'>Nome do Produto</Form.Label>
-                                            <FormGroupWithIcon
-                                                icon={<AtomIcon className='position-absolute ms-3 color-gray' />}
-                                                type='text'
-                                                placeholder='Nome do Produto(Ex: Bateria123)'
-                                                mb={'mb-4'}
-                                                value={batteryValues.name}
-                                                onChange={(e) => setBatteryValues({ ...batteryValues, name: e.target.value })}
-                                                feedback={errorMessages.name}
-                                                disable={disableFormControl}
-                                            />
-                                        </Col>
+                            <AlertErrorOrSuccess errorMessages={errorMessages} successMessage={successMessage} />
 
-                                        <Col md={4}>
-                                            <Form.Label className='w-100'>Código</Form.Label>
-                                            <FormGroupWithIcon
-                                                icon={<AtomIcon className='position-absolute ms-3 color-gray' />}
-                                                type='text'
-                                                placeholder='Código'
-                                                mb={'mb-4'}
-                                                value={batteryValues.code}
-                                                onChange={(e) => setBatteryValues({ ...batteryValues, code: e.target.value })}
-                                                feedback={errorMessages.code}
-                                                disable={disableFormControl}
-                                            />
-                                        </Col>
+                            <Form ref={formRef}>
+                                <Row>
+                                    <Col md={8}>
+                                        <Form.Label className='w-100'>Nome do Produto</Form.Label>
+                                        <FormGroupWithIcon
+                                            icon={<AtomIcon className='position-absolute ms-3 color-gray' />}
+                                            type='text'
+                                            placeholder='Nome do Produto(Ex: Bateria123)'
+                                            mb={'mb-4'}
+                                            value={batteryValues.name}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, name: e.target.value })}
+                                            feedback={errorMessages.name}
+                                            disable={disableFormControl}
+                                        />
+                                    </Col>
 
-                                        <Col md={12}>
-                                            <Form.Label className='w-100'>Descrição do Produto</Form.Label>
-                                            <FormGroupWithIcon
-                                                icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                                type='text'
-                                                placeholder='Descrição do produto(Ex: )'
-                                                mb={'mb-4'}
-                                                value={batteryValues.description}
-                                                onChange={(e) => setBatteryValues({ ...batteryValues, description: e.target.value })}
-                                                feedback={errorMessages.description}
-                                                disable={disableFormControl}
-                                            />
-                                        </Col>
+                                    <Col md={4}>
+                                        <Form.Label className='w-100'>Código</Form.Label>
+                                        <FormGroupWithIcon
+                                            icon={<BarCode className='position-absolute ms-3 color-gray' />}
+                                            type='text'
+                                            placeholder='Código'
+                                            mb={'mb-4'}
+                                            value={batteryValues.code}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, code: e.target.value })}
+                                            feedback={errorMessages.code}
+                                            disable={disableFormControl}
+                                        />
+                                    </Col>
 
-                                        <Col md={6}>
-                                            <Form.Label className='w-100'>Preço</Form.Label>
-                                            <FormGroupWithIcon
-                                                icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                                type='text'
-                                                placeholder='Preço do produto (Ex: R$ 00,00 )'
-                                                mb={'mb-4'}
-                                                value={batteryValues.value}
-                                                onChange={(e) => setBatteryValues({ ...batteryValues, value: e.target.value })}
-                                                feedback={errorMessages.value}
-                                                disable={disableFormControl}
-                                            />
-                                        </Col>
+                                    <Col md={12}>
+                                        <Form.Label className='w-100'>Descrição do Produto</Form.Label>
+                                        <FormGroupWithIcon
+                                            icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                                            type='text'
+                                            placeholder='Descrição do produto(Ex: )'
+                                            mb={'mb-4'}
+                                            value={batteryValues.description}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, description: e.target.value })}
+                                            feedback={errorMessages.description}
+                                            disable={disableFormControl}
+                                        />
+                                    </Col>
 
-                                        <Col md={6}>
-                                            <Form.Label className='w-100'>Quantidade</Form.Label>
-                                            <FormGroupWithIcon
-                                                icon={<StockIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                                type='number'
-                                                placeholder='Quantidade em estoque'
-                                                mb={'mb-4'}
-                                                value={batteryValues.quantity}
-                                                onChange={(e) => setBatteryValues({ ...batteryValues, quantity: e.target.value })}
-                                                feedback={errorMessages.quantity}
-                                                disable={disableFormControl}
-                                            />
-                                        </Col>
+                                    <Col md={6}>
+                                        <Form.Label className='w-100'>Preço</Form.Label>
+                                        <FormGroupWithIcon
+                                            icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                                            type='text'
+                                            placeholder='Preço do produto (Ex: R$ 00,00 )'
+                                            mb={'mb-4'}
+                                            value={batteryValues.value}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, value: e.target.value })}
+                                            feedback={errorMessages.value}
+                                            disable={disableFormControl}
+                                        />
+                                    </Col>
 
-                                        <Form.Label >Imagens</Form.Label>
-                                        <Form.Control type='file' accept='.png' multiple disabled={disableFormControl}/>
-                                    </Row>
-                                </Form>
-                            </Col>
-                        </Row>
-                    </Modal.Body>
+                                    <Col md={6}>
+                                        <Form.Label className='w-100'>Quantidade</Form.Label>
+                                        <FormGroupWithIcon
+                                            icon={<StockIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                                            type='number'
+                                            placeholder='Quantidade em estoque'
+                                            mb={'mb-4'}
+                                            value={batteryValues.quantity}
+                                            onChange={(e) => setBatteryValues({ ...batteryValues, quantity: e.target.value })}
+                                            feedback={errorMessages.quantity}
+                                            disable={disableFormControl}
+                                        />
+                                    </Col>
 
-                    <Modal.Footer>
+                                    <Form.Label >Imagens</Form.Label>
+                                    <Form.Control type='file' accept='.png' multiple disabled={disableFormControl} />
+                                </Row>
+                            </Form>
+                        </Col>
+                    </Row>
+                </Modal.Body>
 
-                        {selectedBattery && selectedBattery.status === 'INACTIVE' && (
-                            <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'reactive')}>
-                                Reativar Bateria</Button>
-                        )}
+                <Modal.Footer>
 
-                        {selectedBattery && selectedBattery.status !== 'INACTIVE' && (
-                            <>
-                                <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'delete')}>
-                                    Desativar Bateria</Button>
+                    {selectedBattery && selectedBattery.status === 'INACTIVE' && (
+                        <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'reactive')}>
+                            Reativar Bateria</Button>
+                    )}
 
-                                <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'update')}>
-                                    Atualizar Bateria
-                                </Button>
-                            </>
-                        )}
+                    {selectedBattery && selectedBattery.status !== 'INACTIVE' && (
+                        <>
+                            <Button variant='red' className='float-end' onClick={(e) => handleSubmit(e, 'delete')}>
+                                Desativar Bateria</Button>
 
-                        {!selectedBattery && (
-                            <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'create')}>
-                                Cadastrar Bateria
+                            <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'update')}>
+                                Atualizar Bateria
                             </Button>
-                        )}
-                    </Modal.Footer>
-                </Modal>
+                        </>
+                    )}
 
-                <ConfirmChangesModal
-                    showConfirmChangesModal={showConfirmChangesModal}
-                    setShowConfirmChangesModal={setShowConfirmChangesModal}
-                    handleConfirmChanges={handleConfirmChangesModal}
-                    confirmChangesModalData={confirmChangesModalData}
-                />
-            </>
-        )
-        return (
-            <>
-                <Card className='shadow rounded-3 mb-5'>
-                    <Card.Header className='py-3 d-flex'>
-                        <h3 className='text-align-center mb-0'>Controle de Baterias</h3>
-                        <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
-                            setSelectedBattery('')
-                            setShowBatteryFormModal(true);
-                        }}>
+                    {!selectedBattery && (
+                        <Button className='float-end' variant='red' onClick={(e) => handleSubmit(e, 'create')}>
                             Cadastrar Bateria
                         </Button>
-                    </Card.Header>
-                    <Card.Body>
-                        <Table responsive hover bordered>
-                            <thead>
-                                <tr>
-                                    <th className='bg-table-header'>Código</th>
-                                    <th className='bg-table-header'>Nome</th>
-                                    <th className='bg-table-header'>Descrição</th>
-                                    <th className='bg-table-header'>Preço</th>
-                                    <th className='bg-table-header'>Quantidade</th>
-                                    <th className='bg-table-header'>Situação</th>
+                    )}
+                </Modal.Footer>
+            </Modal>
+
+            <ConfirmChangesModal
+                showConfirmChangesModal={showConfirmChangesModal}
+                setShowConfirmChangesModal={setShowConfirmChangesModal}
+                handleConfirmChanges={handleConfirmChangesModal}
+                confirmChangesModalData={confirmChangesModalData}
+            />
+        </>
+    )
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentItems = batteries.slice(indexOfFirstItem, indexOfLastItem);
+    const [activeField, setActiveField] = useState(null);
+
+    return (
+        <>
+            <Card className='shadow rounded-3 mb-5'>
+                <Card.Header className='py-3 d-flex'>
+                    <h3 className='text-align-center mb-0'>Controle de Baterias</h3>
+                    <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
+                        setSelectedBattery('')
+                        setShowBatteryFormModal(true);
+                    }}>
+                        Cadastrar Bateria
+                    </Button>
+                </Card.Header>
+                <Card.Body>
+                    <Table responsive hover bordered >
+                        <thead>
+                            <tr className='border-2'>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Código
+                                        <SortButton field="code" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Nome
+                                        <SortButton field="name" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Descrição
+                                        <SortButton field="description" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Preço
+                                        <SortButton field="value" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Quantidade
+                                        <SortButton field="quantity" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Situação
+                                        <SortButton field="status" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+                            {currentItems.map((battery) => (
+                                <tr key={battery.batteryId} onDoubleClick={() => {
+                                    setSelectedBattery(battery);
+                                    const { batteryId, status, ...prevValues } = battery;
+                                    setPrevBatteryValues(prevValues);
+                                    setShowBatteryFormModal(true);
+                                }}>
+                                    <td className='table-cell-pointer'>{battery.code}</td>
+                                    <td className='table-cell-pointer'>{battery.name}</td>
+                                    <td className='table-cell-pointer'>{battery.description}</td>
+                                    <td className='table-cell-pointer text-end'>{battery.value}</td>
+                                    <td className='table-cell-pointer text-end'>{battery.quantity}</td>
+                                    <td className='table-cell-pointer text-end'>{battery.status}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {batteries.map((battery) => (
-                                    <tr key={battery.batteryId} onDoubleClick={() => {
-                                        setSelectedBattery(battery);
-                                        const { batteryId, status, ...prevValues } = battery;
-                                        setPrevBatteryValues(prevValues);
-                                        setShowBatteryFormModal(true);
-                                    }}>
-                                        <td>{battery.code}</td>
-                                        <td>{battery.name}</td>
-                                        <td>{battery.description}</td>
-                                        <td className='text-end'>{battery.value}</td>
-                                        <td className='text-end'>{battery.quantity}</td>
-                                        <td className='text-end'>{battery.status}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </Table>
-                    </Card.Body>
-                </Card>
+                            ))}
+                        </tbody>
+                    </Table>
 
-                {renderBatteryFormModal()}
-            </>
-        );
-    }
+                    <Pagination
+                        totalItems={batteries.length}
+                        itemsPerPage={itemsPerPage}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                    />
+                </Card.Body>
+            </Card>
 
-    export default BatteryIndex;
+            {renderBatteryFormModal()}
+        </>
+    );
+}
+
+export default BatteryIndex;

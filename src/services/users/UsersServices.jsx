@@ -27,9 +27,16 @@ const UserService = () => {
 
   const changeRole = async (userId, selectedRole, loggedUserId) => {
     try {
-      await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}`, {
-        loggedUserId: loggedUserId
-      });
+      await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}/${loggedUserId}`);
+      return { success: true }
+    } catch (error) {
+      handleAPIError(error);
+    }
+  }
+
+  const desactiveAccont = async (userId) => {
+    try {
+      await ConnectionAPI.delete(`users/${userId}`);
       return { success: true }
     } catch (error) {
       handleAPIError(error);
@@ -37,7 +44,7 @@ const UserService = () => {
   }
 
 
-  return { getUserByEmail, getUsers, changeRole, errorMessages, setErrorMessages }
+  return { getUserByEmail, getUsers, changeRole, desactiveAccont, errorMessages, setErrorMessages }
 };
 
 export default UserService;

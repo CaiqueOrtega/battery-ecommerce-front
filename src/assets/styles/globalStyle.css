@@ -35,10 +35,11 @@ body {
 
 .btn-yellow{
     background-color: #ffd900;
-    color: white !important;
+    color: #555353;
 }.btn-yellow:hover{
     transition: 0.3s !important;
     background-color: #f11100 !important;
+    color: white !important;
 }
 
 .btn-red{
