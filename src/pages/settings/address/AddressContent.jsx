@@ -1,9 +1,11 @@
 import { AddIcon } from "../../../assets/icons/IconsSet"
+import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
 
-function AdreassContent() {
+function AdressContent() {
     console.log('teste')
 
     return (
+        
         <div className="d-flex justify-content-between">
             <h4>Meus Endereços</h4>
 
@@ -16,4 +18,4 @@ function AdreassContent() {
     );
 }
 
-export default AdreassContent
+export default AdressContent

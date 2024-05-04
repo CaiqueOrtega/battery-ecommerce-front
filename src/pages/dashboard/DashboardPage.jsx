@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useMemo } from 'react';
 import { Collapse, Navbar, Row, Col, Form, InputGroup, Dropdown, NavItem, NavLink, ListGroup } from 'react-bootstrap';
 import { SearchIcon, CaretUpIcon, ExitIcon, BellIcon, UndrawProfile, AtomIcon, UserIconCropped, StatisticsIcon, DeliveryIcon, PromotionIcon, HomeIcon, GearIcon } from '../../assets/icons/IconsSet';
 import BatteryIndex from './battery/BatteryIndex';
@@ -8,7 +8,6 @@ import logo from '../../assets/images/logo.png';
 import './dashboard.css';
 import { AuthContext } from '../../context/AuthProvider'
 import ModalLogout from '../../components/common/ModalLogout';
-import AuthServices from '../../services/auth/AuthServices';
 import { Link } from 'react-router-dom';
 import { DashBoardContext } from '../../context/DashBoardProvider';
 
@@ -26,48 +25,38 @@ function DashboardPage() {
 
 
 
-    const mainContent = () => {
-        let content = null;
-
+    const mainContent = useMemo(() => {
         switch (sidebarSelectedOption) {
             case "Baterias":
-                content = <BatteryIndex batteries={batteries} setBatteries={setBatteries} />;
-                break;
+                return <BatteryIndex batteries={batteries} setBatteries={setBatteries} />;
             case 'Usuários':
-
-                content = <UserIndex users={users} setUsers={setUsers} />
-                break;
+                return <UserIndex users={users} setUsers={setUsers} />;
             case 'Promoções':
-                content = <PromotionIndex promotions={promotions} setPromotions={setPromotions} />
-                break;
+                return <PromotionIndex promotions={promotions} setPromotions={setPromotions} />;
             default:
-                content = null;
+                return null;
         }
-
-        return (
-            <main className='flex-fill '>
-                {content}
-            </main>
-        );
-    }
+    }, [sidebarSelectedOption, batteries, users, promotions]);
 
 
     return (
-            <div className="d-flex flex-column vh-100 bg-main">
-                <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
-                <Row className='g-0 flex-grow-1 overflow-hidden'>
-                    <Collapse in={sidebarOpen} className='d-lg-block'>
-                        <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2 bg-white'>
-                            <SidebarContent setSelectedOption={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
-                        </Col>
-                    </Collapse>
-
-
-                    <Col className='d-flex h-100 overflow-auto px-5 py-4'>
-                        {mainContent()}
+        <div className="d-flex flex-column vh-100 bg-main">
+            <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+            <Row className='g-0 flex-grow-1 overflow-hidden'>
+                <Collapse in={sidebarOpen} className='d-lg-block'>
+                    <Col xs={12} lg={2} id='sidebarDashboard' className='shadow py-lg-5 px-2 bg-white'>
+                        <SidebarContent setSelectedOption={setSidebarSelectedOption} selectedOption={sidebarSelectedOption} />
                     </Col>
-                </Row>
-            </div>
+                </Collapse>
+
+
+                <Col className='d-flex h-100 overflow-auto px-5 py-4'>
+                    <main className='flex-fill '>
+                        {mainContent}
+                    </main>
+                </Col>
+            </Row>
+        </div>
     );
 
 }

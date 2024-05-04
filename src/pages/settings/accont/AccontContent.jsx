@@ -43,7 +43,7 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
                         return;
                     }
 
-                    handleConfirm(e, 'desactive' )
+                    handleConfirm(e, 'desactive')
                 }
                 }>Confirmar</Button>
             </Modal.Footer>
@@ -71,71 +71,67 @@ function AccontContent({ userData }) {
 
     return (
         <>
-            <div className="px-md-5 py-3 h-100">
-                <div>
-                    <h4>Dados da Conta</h4>
-                    <span className="text-muted">Atualize suas informações pessoais aqui para garantir uma experiência personalizada.
-                        Mantenha seus detalhes precisos e atualizados. Se precisar de ajuda,
-                        estamos à disposição.</span>
-                </div>
+            <header>
+                <h4>Dados da Conta</h4>
+                <span className="text-muted">Atualize suas informações pessoais aqui para garantir uma experiência personalizada.
+                    Mantenha seus detalhes precisos e atualizados.</span>
+            </header>
 
-                <Form className="mt-4">
-                    <Row>
-                        <Col md={12}>
-                            <Form.Label>Nome completo</Form.Label>
-                            <FormGroupWithIcon
-                                icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                type='text'
-                                placeholder=''
-                                value={userData.name}
-                                mb={'mb-3'}
-                                disable={disableFormControl}
-                            />
-
-                        </Col>
-
-                        <Form.Label>Email</Form.Label>
+            <Form className="mt-4">
+                <Row>
+                    <Col md={12}>
+                        <Form.Label>Nome completo</Form.Label>
                         <FormGroupWithIcon
                             icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                             type='text'
                             placeholder=''
-                            value={userData.email}
+                            value={userData.name}
                             mb={'mb-3'}
                             disable={disableFormControl}
                         />
 
-                        <Col md={7}>
-                            <Form.Label>CPF</Form.Label>
-                            <FormGroupWithIcon
-                                icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                type='text'
-                                placeholder=''
-                                value={userData.document}
-                                disable={disableFormControl}
-                                mb={'mb-3'}
-                            />
-                        </Col>
+                    </Col>
 
-                        <Col md={5}>
-                            <Form.Label>Telefone</Form.Label>
-                            <FormGroupWithIcon
-                                icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                                type='text'
-                                placeholder=''
-                            />
-                        </Col>
+                    <Form.Label>Email</Form.Label>
+                    <FormGroupWithIcon
+                        icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                        type='text'
+                        placeholder=''
+                        value={userData.email}
+                        mb={'mb-3'}
+                        disable={disableFormControl}
+                    />
 
-                    </Row>
-                </Form>
+                    <Col md={7}>
+                        <Form.Label>CPF</Form.Label>
+                        <FormGroupWithIcon
+                            icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                            type='text'
+                            placeholder=''
+                            value={userData.document}
+                            disable={disableFormControl}
+                            mb={'mb-3'}
+                        />
+                    </Col>
 
+                    <Col md={5}>
+                        <Form.Label>Telefone</Form.Label>
+                        <FormGroupWithIcon
+                            icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                            type='text'
+                            placeholder=''
+                        />
+                    </Col>
 
-                <div className="d-flex justify-content-end mt-4 pt-2">
-                    <Button variant="yellow ms-md-3" >Atualizar Dados</Button>
-                    <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccontModal(true)}>Desativar Conta</Button>
+                </Row>
+            </Form>
 
-                </div>
+            <div className=" d-flex justify-content-end flex-column flex-md-row mt-5">
+                <Button variant="yellow ms-md-3" >Atualizar Dados</Button>
+                <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccontModal(true)}>Desativar Conta</Button>
 
             </div>
+
 
             <ConfirmDesactiveAccontModal showModal={showConfirmDesactiveAccontModal} setShowModal={setShowConfirmDesactiveAccontModal}
                 userData={userData} handleConfirm={handleConfirm}
