@@ -118,7 +118,31 @@ function Settings() {
                         <Col md={4} className="mt-4 mt-md-0">
                             <OptionsCards handleCardClick={(optionCard) => {
                                 setSelectedOption(optionCard)
-                                setMobileVisibleCard(true);
+                                function SignUpPage() {
+                                    return (
+                                        <div className="vh-100 bg-main">
+                                            <Container className='h-100 d-flex align-items-center justify-content-center'>
+                                                <Card className='shadow' style={{ width: '45rem' }}>
+                                                    <Row className='g-0'>
+                                                        <Col md={7} className='p-md-4  px-3 py-4'>
+                                                            <Card.Body>
+                                                                <div className="d-flex align-items-center pb-4">
+                                                                    <h4 className='mb-0'><SingUpIcon currentColor='c00d0d' /> Registre sua conta</h4>
+                                                                    <img className="d-md-none mb-3 ms-auto" src={logo} alt="Logo Baterias Jupiter" width="100px" />
+                                                                </div>
+                                                                <SignUpForm />
+                                                            </Card.Body>
+                                                        </Col>
+                                
+                                                        <Col md={5} className='d-none d-md-flex align-items-center bg-yellow rounded-end'>
+                                                            <img src={logoBgWhite} alt="Logo Baterias jupiter" width='100%' />
+                                                        </Col>
+                                                    </Row>
+                                                </Card>
+                                            </Container>
+                                        </div>
+                                    );
+                                }             setMobileVisibleCard(true);
                                 }} userDataName={userData.name} />
                         </Col>
                     </Row>

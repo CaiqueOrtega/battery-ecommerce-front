@@ -1,49 +1,10 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { Card, Form, Row, Col, Button, Container } from 'react-bootstrap';
-import { LockIcon, EnvelopeIcon, LoginIcon, AlertIcon } from '../../assets/icons/IconsSet';
-import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import logoBgWhite from '../../assets/images/logoBgWhite.png';
-import logo from '../../assets/images/logo.png';
+import React, { useState, useEffect } from 'react';
+import {Form, Button} from 'react-bootstrap';
+import { LockIcon, EnvelopeIcon, AlertIcon } from '../../../assets/icons/IconsSet.jsx';
+import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon.jsx';
 import { useLocation } from "react-router-dom";
-import { AuthContext } from '../../context/AuthProvider.jsx'
-import AuthServices from '../../services/auth/AuthServices';
-import { AuthProvider } from '../../context/AuthProvider.jsx';
+import AuthServices from '../../../services/auth/AuthServices.jsx';
 
-function LoginPage() {
-  
-  const { isLoggedIn, navigate } = useContext(AuthContext);
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/');
-    }
-  }, [ isLoggedIn ]);
-
-
-    return (
-      <div className='vh-100 bg-main'>
-        <Container className='h-100 d-flex align-items-center justify-content-center'>
-          <Card className='shadow' style={{ width: '45rem' }}>
-            <Row className='g-0'>
-              <Col md={7} className='px-md-4 py-md-5 px-3 py-4'>
-                <Card.Body>
-                  <div className="d-flex align-items-center mb-3">
-                    <h4><LoginIcon currentColor='c00d0d' /> Acesse sua conta</h4>
-                    <img className="d-md-none ms-auto mb-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
-                  </div>
-                  <LoginForm navigate={navigate}/>
-                </Card.Body>
-              </Col>
-              <Col md={5} className='d-none d-md-flex align-items-center bg-yellow rounded-end'>
-                <img src={logoBgWhite} alt="Logo Baterias jupiter" width='100%' />
-              </Col>
-            </Row>
-          </Card>
-        </Container>
-      </div>
-    );
-
-}
 
 
 function LoginForm({ navigate }) {
@@ -112,4 +73,4 @@ function LoginForm({ navigate }) {
   );
 }
 
-export default LoginPage;
+export default LoginForm;
