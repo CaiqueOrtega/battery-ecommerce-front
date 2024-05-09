@@ -52,6 +52,20 @@ const AuthServices = () => {
         }
     };
 
+    const verifyDataRegister = async (singUpFormData) => {
+        try {
+            await ConnectionAPI.post('auth/verify', {
+                email: singUpFormData.email,
+                name: singUpFormData.name,
+                document: singUpFormData.document,
+            });
+
+            return true;
+        } catch (error) {
+            handleAPIError(error, setErrorMessages);
+        }
+    };
+
 
     const handleAPIError = (error, setErrorMessages) => {
         if (error.response && error.response.data) {
@@ -69,7 +83,7 @@ const AuthServices = () => {
 
 
 
-    return { errorMessages, setErrorMessages, login, signUp, userRoleAuthorization};
+    return { errorMessages, setErrorMessages, login, signUp, verifyDataRegister, userRoleAuthorization };
 };
 
 export default AuthServices;

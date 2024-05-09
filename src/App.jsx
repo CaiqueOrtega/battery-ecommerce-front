@@ -22,7 +22,7 @@ function App() {
                   <DashboardPage />
                 </DashBoardProvider>
             </BatteryProvider>} />
-            <Route path="/autenticacao" element={<AuthenticationPage />} />
+            <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
           <Route path="/configuracoes" element={<MyAccont />} />
         </Routes>
       </AuthProvider>

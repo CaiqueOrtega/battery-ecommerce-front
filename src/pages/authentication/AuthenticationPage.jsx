@@ -1,18 +1,21 @@
-import { AuthContext } from '../../context/AuthProvider.jsx';
 import React, { useContext, useEffect, useState } from 'react';
-import logoBgWhite from '../../assets/images/logoBgWhite.png';
-import logo from '../../assets/images/logo.png';
 import { Card, Row, Col, Button, Container } from 'react-bootstrap';
+import { useParams } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthProvider.jsx';
 import SignUpForm from './signUp/SignUpForm.jsx';
 import LoginForm from './login/LoginForm.jsx';
+import { SingUpIcon, LoginIcon, AtomIcon } from '../../assets/icons/IconsSet.jsx';
+import logoBgWhite from '../../assets/images/logoBgWhite.png';
+import logo from '../../assets/images/logo.png';
 import './authentication.css';
-import { SingUpIcon, LoginIcon } from '../../assets/icons/IconsSet.jsx';
 
-function AuthenticationPage({ initialSide }) {
+function AuthenticationPage() {
+    const { action } = useParams();
     const { isLoggedIn, navigate } = useContext(AuthContext);
-    const [showLoginForm, setShowLoginForm] = useState(true);
-    const [showSignUpForm, setShowSignUpForm] = useState(false);
+    const [showLoginForm, setShowLoginForm] = useState(action === 'entrar');
+    const [showSignUpForm, setShowSignUpForm] = useState(action === 'cadastrar');
     const [animateImageColumn, setAnimateImageColumn] = useState(null);
+    const [applyRightZero, setApplyRightZero] = useState(action === 'entrar');
 
     useEffect(() => {
         if (isLoggedIn) {
@@ -20,29 +23,39 @@ function AuthenticationPage({ initialSide }) {
         }
     }, [isLoggedIn]);
 
-    const handleToggleForm = () => {
-        setAnimateImageColumn(!animateImageColumn);
 
-        animateImageColumn ? setShowLoginForm(true) : setShowSignUpForm(true);
+
+    const handleToggleForm = () => {
+        const newAction = action === 'entrar' ? 'cadastrar' : 'entrar';
+        setApplyRightZero(false);
+
+        navigate(`/autenticacao/${newAction}`);
+        setAnimateImageColumn(newAction);
+      
+        newAction === 'entrar' ?  setShowLoginForm(true) : setShowSignUpForm(true);
+    
+        const timeoutDuration = window.innerWidth < 768 ? 300 : 400;
 
         setTimeout(() => {
-            if (animateImageColumn) {
-                setShowSignUpForm(false);
+            if (newAction === 'entrar') {
+                setShowSignUpForm(false)
             } else {
-                setShowLoginForm(false);;
+                setShowLoginForm(false)
             }
-        }, 500);
+        }, timeoutDuration);
     };
+
+
 
     return (
         <div className='vh-100 bg-main'>
-            <Container className='h-100 d-flex align-items-center justify-content-center'>
-                <Card className='shadow rounded-4' style={{ width: '50rem', height: '33.5rem' }}>
+            <Container className='h-100 d-flex align-items-center justify-content-center container-authentication '>
+                <Card className='shadow rounded-4 card-authentication'>
+                    
                     <Row className='g-0 h-100'>
-                        <Col md={6} className='d-flex align-items-center'>
-
+                        <Col md={6} className='d-flex align-items-md-center align-items-start position-relative col-form'>
                             {showLoginForm && (
-                                <Card.Body className='px-md-5  px-3 py-4'>
+                                <Card.Body className='px-5 py-4'>
                                     <div className="d-flex align-items-center mb-3">
                                         <h4><LoginIcon currentColor='c00d0d' /> Acesse sua conta</h4>
                                         <img className="d-md-none ms-auto mb-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
@@ -50,32 +63,37 @@ function AuthenticationPage({ initialSide }) {
                                     <LoginForm />
                                 </Card.Body>
                             )}
-
                         </Col>
-                        <Col md={6} className='d-md-flex d-none  align-items-center'>
-
-                            <div className={`position-absolute h-100 z-3  d-flex flex-column bg-yellow rounded-end-4  ${animateImageColumn !== null ? animateImageColumn ? 'animate-image-column-left' : 'animate-image-column-right ' : ''}`}>
 
 
-                                <div className="d-flex flex-column align-items-center justify-content-center mt-4 pt-5 flex-fill">
-                                    <img src={logoBgWhite} alt="Logo Baterias jupiter" width='100%' />
-                                </div>
-
-                                <div className="d-flex flex-column align-items-center pb-4">
-                                    <span className='fw-bold text-white fs-5 mb-2'>{animateImageColumn ? 'Ainda não tem uma Conta?' : 'Já possui uma Conta?'}</span>
-                                    <Button variant='outline-light border-2 fw-bold' onClick={handleToggleForm}>{showLoginForm ? 'Registre-se' : 'Faça login'}</Button>
-                                </div>
-                            </div>
-
+                        <Col md={6} className='d-flex align-items-md-center align-items-end  position-relative col-form'>
                             {showSignUpForm && (
-                                <Card.Body className='mx-1 px-4 py-md-5 px-3 py-4' >
+                                <Card.Body className='px-5 py-md-5 py-4'>
                                     <div className="d-flex align-items-center">
                                         <h4> <SingUpIcon currentColor='c00d0d' /> Registre uma conta</h4>
-                                        <img className="d-md-none ms-auto mb-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
+                                        <img className="d-md-none ms-auto mb-md-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
                                     </div>
                                     <SignUpForm />
                                 </Card.Body>
                             )}
+                        </Col>
+
+                        <Col md={6} className={`col-image position-absolute d-flex flex-column bg-yellow
+                         ${animateImageColumn !== null ? animateImageColumn === 'entrar' ? 'animate-image-column-left' : 'animate-image-column-right' : ''}
+                         ${applyRightZero ? 'end-0 bottom-0' : ''}`}>
+                        
+                        
+
+                            <div className="d-flex align-items-center justify-content-center flex-fill">
+                                <img className='d-md-block d-none' src={logoBgWhite} alt="Logo Baterias jupiter" width='100%' />
+                                <AtomIcon className={'d-md-none text-white'} size={100}/>
+                            </div>
+                            <div className="d-flex flex-column align-items-center pb-5">
+                                <span className='fw-bold text-white fs-5 mb-2'>{action === 'entrar' ? 'Ainda não tem uma Conta?' : 'Já possui uma Conta?'}</span>
+                                <Button variant='outline-light border-2 fw-bold ' onClick={handleToggleForm}>
+                                    {showSignUpForm  ? 'Registre-se' : 'Faça login'}
+                                </Button>
+                            </div>
                         </Col>
 
 
@@ -85,6 +103,5 @@ function AuthenticationPage({ initialSide }) {
         </div>
     );
 }
-
 
 export default AuthenticationPage;

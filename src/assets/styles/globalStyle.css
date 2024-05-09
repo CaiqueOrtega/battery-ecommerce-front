@@ -34,8 +34,8 @@ body {
 }
 
 .btn-yellow{
-    background-color: #ffd900;
-    color: #555353;
+    background-color: #fec117;
+    color: #ffffff;
 }.btn-yellow:hover{
     transition: 0.3s !important;
     background-color: #f11100 !important;

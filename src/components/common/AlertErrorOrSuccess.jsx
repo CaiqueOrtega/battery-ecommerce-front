@@ -2,8 +2,6 @@ import React from 'react';
 import { AlertIcon, CheckIcon } from '../../assets/icons/IconsSet';
 
 const AlertErrorOrSuccess = ({ errorMessages, successMessage }) => {
-    { console.log(successMessage) }
-
     return (
         errorMessages.general || successMessage ? (
             <div className={`msg alert ${errorMessages.general ? 'alert-danger' : 'alert-success'} mb-0 d-flex align-items-center mb-3`}>

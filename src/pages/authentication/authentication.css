@@ -4,33 +4,157 @@
     }
 
     to {
-        transform: translateX(-100%);
+        transform: translateX(100%);
     }
 }
 
 @keyframes slideRight {
     from {
-        transform: translateX(-100%);
+        transform: translateX(100%);
     }
+
     to {
         transform: translateX(0);
     }
 }
 
-.animate-image-column-left {
-    animation: slideLeft 0.7s forwards;
-    border-top-left-radius: 1em ;
-    border-bottom-left-radius: 1em;
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
 }
 
-.animate-image-column-right {
-    animation: slideRight 0.7s forwards;
-    border-top-right-radius: 1em ;
-    border-bottom-right-radius: 1em ;
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
+@keyframes slideDown {
+    from {
+        transform: translateY(0);
+    }
+
+    to {
+        transform: translateY(150%);
+    }
+}
+
+/* Estilos para telas maiores*/
+@media (min-width: 767px) {
+    .animate-image-column-left {
+        animation: slideLeft 0.7s forwards;
+    }
+
+    .animate-image-column-right {
+        animation: slideRight 0.7s forwards;
+    }
+
+    .card-authentication {
+        width: 55rem;
+        height: 35.5rem;
+    }
+
+    .col-image {
+        height: 100%;
+    }
+}
+
+/* Estilos para telas menores  */
+@media (max-width: 760px) {
+    .animate-image-column-right,
+    .animate-image-column-left {
+        animation: slideUp 0.7s forwards;
+        clip-path: circle(85% at 50% 0%);
+    }
+
+    .animate-image-column-left {
+        animation: slideDown 0.7s forwards;
+        clip-path: circle(85% at 50% 100%);
+    }
+
+    .card-authentication {
+        width: 100% !important;
+        border-radius: 0 !important;
+        left: 0 !important;
+        
+    }
+
+    .col-image {
+        height: 20em;
+    }
+
+    .col-form{
+        height: 25em;
+    }
+}
+
+@media(max-width: 500px){
+    .container-authentication {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !;
+    }
+}
+
+
+
+/* animação formulário cadastro */
+
+.fadeInRight {
+    animation: fadeInRight 0.5s forwards;
+}
+.fadeOutLeft {
+    animation: fadeOutLeft 0.5s forwards;
+}
+.fadeInLeft {
+    animation: fadeInLeft 0.5s forwards;
+}
+.fadeOutRight {
+    animation: fadeOutRight 0.5s forwards;
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
 }
 
 
