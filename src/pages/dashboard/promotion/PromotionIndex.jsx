@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Card, Table, Modal, Row, Col, Form, Button, ModalBody } from "react-bootstrap";
+import { Card, Table, Modal, Row, Col, Form, Button } from "react-bootstrap";
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import { BarCode, PercentIcon, FailDate } from '../../../assets/icons/IconsSet';
+import { BarCode, PercentIcon, FailDate, PdfIcon } from '../../../assets/icons/IconsSet';
 import PromotionService from "../../../services/promotion/PromotionService";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
-
+import ModalPdf from '../../../services/pdf/Report'
 import Pagination from '../../../components/common/PaginationTable';
 
 
@@ -15,6 +15,8 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+    const [showsModalPDF, setShowModalPDF] = useState(false);
+
 
     const [action, setAction] = useState('');
     const [disableFormControl, setDisableFormControl] = useState(false);
@@ -240,6 +242,9 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                 handleConfirmChanges={handleConfirmChangesModal}
                 confirmChangesModalData={confirmChangesModalData}
             />
+
+            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={promotions} type={'promotion'} />
+
         </>
     )
 
@@ -254,12 +259,17 @@ export default function PromotionIndex({ promotions, setPromotions }) {
             <Card className='shadow rounded-3 mb-5'>
                 <Card.Header className='py-3 d-flex'>
                     <h3 className='text-align-center mb-0'>Controle de Promoções</h3>
-                    <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
-                        setSelectedPromotion('');
-                        setShowPromotionFormModal(true);
-                    }}>
-                        Cadastrar Promoção
-                    </Button>
+                    <div className='d-flex ms-auto '>
+
+                        <a type='button' className='btn btn-outline-danger' onClick={() => setShowModalPDF(true)}><PdfIcon /></a>
+
+                        <Button className='ms-3 btn btn-red bg-red border-0' onClick={() => {
+                            setSelectedPromotion('');
+                            setShowPromotionFormModal(true);
+                        }}>
+                            Cadastrar Promoção
+                        </Button>
+                    </div>
                 </Card.Header>
                 <Card.Body>
                     <Table responsive hover bordered>
@@ -291,10 +301,10 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                     </Table>
 
                     <Pagination
-                        totalItems={promotions.length} 
-                        itemsPerPage={itemsPerPage} 
-                        currentPage={currentPage} 
-                        onPageChange={setCurrentPage} 
+                        totalItems={promotions.length}
+                        itemsPerPage={itemsPerPage}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
                     />
                 </Card.Body>
             </Card>

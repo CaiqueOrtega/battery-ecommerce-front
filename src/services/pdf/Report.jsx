@@ -110,7 +110,47 @@ const styles = StyleSheet.create({
 });
 
 // Component, de tabela
-const Tablea = ({ data }) => (
+const TablePromotion = ({ data }) => (
+    <View style={styles.table}>
+        <View style={styles.tableRow}>
+            <View style={styles.tableColHeader}><Text>Código</Text></View>
+            <View style={styles.tableColHeader}><Text>Porcentagem</Text></View>
+            <View style={styles.tableColHeader}><Text>Data Início</Text></View>
+            <View style={styles.tableColHeader}><Text>Data Validade</Text></View>
+            <View style={styles.tableColHeader}><Text>Status</Text></View>
+        </View>
+        {data.map((row, index) => (
+            <View style={styles.tableRow} key={index}>
+                <View style={styles.tableCol}><Text>{row.code}</Text></View>
+                <View style={styles.tableCol}><Text>{row.percentage}</Text></View>
+                <View style={styles.tableCol}><Text>{row.startDate}</Text></View>
+                <View style={styles.tableCol}><Text>{row.expirationDate}</Text></View>
+                <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+            </View>
+        ))}
+    </View>
+);
+
+const TableBattery = ({ data }) => (
+    <View style={styles.table}>
+        <View style={styles.tableRow}>
+            <View style={styles.tableColHeader}><Text>Código</Text></View>
+            <View style={styles.tableColHeader}><Text>Nome</Text></View>
+            <View style={styles.tableColHeader}><Text>Valor</Text></View>
+            <View style={styles.tableColHeader}><Text>Status</Text></View>
+        </View>
+        {data.map((row, index) => (
+            <View style={styles.tableRow} key={index}>
+                <View style={styles.tableCol}><Text>{row.code}</Text></View>
+                <View style={styles.tableCol}><Text>{row.name}</Text></View>
+                <View style={styles.tableCol}><Text>{row.value}</Text></View>
+                <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+            </View>
+        ))}
+    </View>
+);
+
+const TableUser = ({ data }) => (
     <View style={styles.table}>
         <View style={styles.tableRow}>
             <View style={styles.tableColHeader}><Text>Código</Text></View>
@@ -131,7 +171,7 @@ const Tablea = ({ data }) => (
 
 
 
-const MyDocument = ({ data, user }) => {
+const MyDocument = ({ data, user, type }) => {
     // Definir o número de itens por página para a primeira e as seguintes
     const ITEMS_PER_PAGE_FIRST = 18;
     const ITEMS_PER_PAGE_NEXT = 35;
@@ -147,15 +187,15 @@ const MyDocument = ({ data, user }) => {
             // Se não for a primeira página, calcular o índice da página com base no número de itens por página seguinte
             chunkIndex = ITEMS_PER_PAGE_FIRST + Math.floor((index - ITEMS_PER_PAGE_FIRST) / ITEMS_PER_PAGE_NEXT);
         }
-        
+
         // Criar uma nova parte se não existir
         if (!chunks[chunkIndex]) {
             chunks[chunkIndex] = [];
         }
-        
+
         // Adicionar o item à parte correspondente
         chunks[chunkIndex].push(item);
-        
+
         return chunks;
     }, []);
 
@@ -197,7 +237,14 @@ const MyDocument = ({ data, user }) => {
                             </View>
                         )}
                         {/* Parte da tabela */}
-                        <Tablea data={chunk} />
+                        {type === 'battery' ? (
+                            <TableBattery data={chunk} />
+                        ) : type === 'promotion' ? (
+                            <TablePromotion data={chunk}/>
+                        ) : type === 'user' ? (
+                            <TableUser data={chunk}/>
+                        ) : null}
+
                         {/* Rodapé da página */}
                         <View style={styles.pageCounter}>
                             <Text>{date}</Text>
@@ -212,22 +259,22 @@ const MyDocument = ({ data, user }) => {
     );
 };
 
-  
-  
 
 
 
 
-const ReportGenerator = ({ data, userData }) => {
+
+
+const ReportGenerator = ({ data, userData, type }) => {
     const pdfViewer = (
         <PDFViewer width="100%" height="370em">
-            <MyDocument data={data} user={userData} />
+            <MyDocument data={data} user={userData} type={type}/>
 
         </PDFViewer>
     );
 
     const pdfButtonLink = (
-        <PDFDownloadLink className='btn btn-red' document={<MyDocument data={data} user={userData} />} fileName="relatorio.pdf" style={styles.buttom}>
+        <PDFDownloadLink className='btn btn-red' document={<MyDocument data={data} user={userData} type={type} />} fileName="relatorio.pdf" style={styles.buttom}>
             {({ blob, url, loading, error }) =>
                 loading ? 'Gerando PDF...' : 'Baixar PDF'
             }
@@ -237,9 +284,9 @@ const ReportGenerator = ({ data, userData }) => {
     return { pdfViewer, pdfButtonLink };
 };
 
-function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems }) {
+function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { userData } = useContext(AuthContext);
-    const { pdfViewer, pdfButtonLink } = ReportGenerator({ data: currentItems, userData });
+    const { pdfViewer, pdfButtonLink } = ReportGenerator({ data: currentItems, userData, type });
 
     return (
         <>
