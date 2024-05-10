@@ -13,8 +13,6 @@ function UserIndex({ users, setUsers }) {
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedRole, setSelectedRole] = useState({});
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
 
 
     const { changeRole, errorMessages, setErrorMessages } = UserService()
@@ -99,7 +97,8 @@ function UserIndex({ users, setUsers }) {
         )
     }
 
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
@@ -122,7 +121,7 @@ function UserIndex({ users, setUsers }) {
                             </tr>
                         </thead>
                         <tbody>
-                            {users.map((user) => (
+                            {currentItems.map((user) => (
                                 <tr key={user.userId} onDoubleClick={() => {
                                     if (userData && userData.userId === user.userId) {
                                         return;

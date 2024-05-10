@@ -2,8 +2,9 @@ import { useContext } from 'react';
 import NavbarComponent from '../../components/layout/navbar/Navbar';
 import { BatteryContext } from '../../context/BatteryProvider';
 import BatteryCard from '../../components/common/BatteryCard';
-import { Row, Col } from 'react-bootstrap';
-import { RotatingLines } from 'react-loader-spinner';
+import { Row, Col, Container } from 'react-bootstrap';
+import ControlledCarousel from './carousel/Carousel';
+
 
 function HomePage() {
   const { batteries, isContextLoaded } = useContext(BatteryContext);
@@ -28,6 +29,9 @@ function HomePage() {
   return (
     <div >
       <NavbarComponent setNavbarContent={true} />
+      <Container className='mt-4'>
+        <ControlledCarousel />
+      </Container>
 
       {renderBatteries()}
     </div>
