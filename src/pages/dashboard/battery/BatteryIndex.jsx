@@ -290,7 +290,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                 confirmChangesModalData={confirmChangesModalData}
             />
 
-            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries}/>
+            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'}/>
         </>
     )
     const [currentPage, setCurrentPage] = useState(1);
