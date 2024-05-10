@@ -35,18 +35,18 @@ const AuthServices = () => {
 
     }
 
-    const signUp = async (emailSignUp, nameSignUp, documentSignUp, passwordSignUp, confirmPassword) => {
+    const signUp = async (singUpData) => {
         try {
 
             const response = await ConnectionAPI.post('auth/register', {
-                email: emailSignUp,
-                password: passwordSignUp,
-                name: nameSignUp,
-                document: documentSignUp,
-                confirmPassword: confirmPassword
+                email: singUpData.email,
+                password: singUpData.password,
+                name: singUpData.name,
+                document: singUpData.document,
+                confirmPassword: singUpData.confirmPassword
             });
 
-            navigate("/entrar", { state: { email: emailSignUp } });
+            return true;
         } catch (error) {
             handleAPIError(error, setErrorMessages);
         }
@@ -63,6 +63,7 @@ const AuthServices = () => {
             return true;
         } catch (error) {
             handleAPIError(error, setErrorMessages);
+            return false;
         }
     };
 

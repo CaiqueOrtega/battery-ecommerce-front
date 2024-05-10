@@ -5,43 +5,80 @@ import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
 import AuthServices from '../../../services/auth/AuthServices';
 import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
 
-function SignUpForm() {
+function SignUpForm({ handleToggleForm }) {
     const [singUpFormData, setSingUpFormData] = useState({ name: '', email: '', document: '', password: '', confirmPassword: '' })
     const [prevFormData, setPrevFormData] = useState({});
-    const [stepsForm, setStepsForm] = useState(true);
-    const [showConfirmation, setShowConfirmation] = useState(false);
-    const [showInitialForm, setShowInitialForm] = useState(true);
+    const [stepsForm, setStepsForm] = useState('inicial');
+    const [animateForm, setAnimateForm] = useState(null);
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
 
 
     const { signUp, verifyDataRegister, errorMessages, setErrorMessages } = AuthServices();
 
-    const isEqualsData = () => {
-        if (prevFormData) {
-            const keys = new Set([...Object.keys(prevFormData), ...Object.keys(singUpFormData)]);
-            const isEqual = Array.from(keys).every(key => prevFormData[key] === singUpFormData[key]);
-
-            if (isEqual) {
-                setErrorMessages(prevErrors => ({
-                    ...prevErrors, general: 'Os dados não foram alterados.'
-                }));
-            }
-
-            setPrevFormData(singUpFormData);
-
-            return isEqual;
-        }
-    }
 
     const handleVerifyInicialData = async (e) => {
         e.preventDefault();
 
-        if (!isEqualsData()) {
-            const response = await verifyDataRegister(singUpFormData);
+        const keys = new Set([...Object.keys(prevFormData), ...Object.keys(singUpFormData)]);
+        const isEqual = Array.from(keys).every(key => prevFormData[key] === singUpFormData[key]);
 
-            if (response) setStepsForm(false);
+        if (stepsForm === 'inicial') {
+            if (formSubmitted && isEqual) {
+                // Se formSubmitted for true e os dados foram iguais, avançamos para a próxima etapa
+                setAnimateForm(true);
+                setStepsForm('confirmation');
+                return;
+            }
+
+            if (!isEqual) {
+                // Se os dados foram alterados
+                const response = await verifyDataRegister(singUpFormData);
+                setPrevFormData(singUpFormData);
+                setFormSubmitted(false);
+
+                if (response) {
+                    // Se a requisição for bem-sucedida, avançamos para a próxima etapa
+                    setErrorMessages({});
+                    setAnimateForm(true);
+                    setStepsForm('confirmation');
+                }
+            } else {
+                // Se os dados não foram alterados
+                setErrorMessages(prevErrors => ({
+                    ...prevErrors, general: 'Os dados não foram alterados'
+                }));
+            }
+        } if (stepsForm === 'confirmation') {
+            if (!isEqual) {
+                const response = await signUp(singUpFormData);
+                setPrevFormData(singUpFormData);
+            
+                if (response) {
+                    const singUpEmail = singUpFormData.email;
+                    handleToggleForm({singUpEmail});
+                }
+
+            }else {
+                // Se os dados não foram alterados
+                setErrorMessages(prevErrors => ({
+                    ...prevErrors, general: 'Os dados não foram alterados'
+                }));
+            }
         }
+
+
     };
+
+
+
+
+    const handleGoBack = () => {
+        setFormSubmitted(true);
+        setStepsForm('inicial');
+        setErrorMessages({})
+    };
+
 
     return (
         <div>
@@ -49,8 +86,8 @@ function SignUpForm() {
 
             <Form className="pt-4 " onSubmit={(e) => handleVerifyInicialData(e)}>
 
-                {showConfirmation && (
-                    <div className={stepsForm ? "fadeOutRight" : "fadeInLeft"}>
+                {stepsForm === 'inicial' && (
+                    <div className={animateForm ? "fadeInLeft" : ""}>
                         <Form.Label className='mt-md-3 w-100' htmlFor='emailLogin'>Endereço de E-mail</Form.Label>
                         <FormGroupWithIcon
                             bgBorder={true}
@@ -84,34 +121,46 @@ function SignUpForm() {
                     </div>
                 )}
 
-                {showInitialForm && (
-                    <div className={!stepsForm ? "fadeOutRight" : "fadeInLeft"}>
-                        <FormGroupWithIcon
-                            bgBorder={true}
-                            value={singUpFormData.password}
-                            onChange={(e) => setSingUpFormData({ ...singUpFormData, password: e.target.value })}
-                            icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                            type='password' placeholder='Senha' mb={'mb-3'}
-                            feedback={errorMessages.password}
+                {stepsForm === 'confirmation' && (
+                    <>
+                        <div className={animateForm ? "fadeInRight" : ""}>
 
-                        />
+                            <Form.Label className=' w-100' htmlFor='emailLogin'>Senha</Form.Label>
+                            <FormGroupWithIcon
+                                bgBorder={true}
+                                bgBosetprevValuesrder={true}
+                                value={singUpFormData.password}
+                                onChange={(e) => setSingUpFormData({ ...singUpFormData, password: e.target.value })}
+                                icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                                type='password' placeholder='Senha' mb={'mb-3'}
+                                feedback={errorMessages.password}
 
-                        <FormGroupWithIcon
-                            bgBorder={true}
-                            value={singUpFormData.confirmPassword}
-                            onChange={(e) => setSingUpFormData({ ...singUpFormData, confirmPassword: e.target.value })}
-                            icon={<KeyIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                            type='password' placeholder='Confirme sua senha' mb={'mb-3'}
-                            feedback={errorMessages.confirmPassword}
+                            />
 
-                        />
-                    </div>
+                            <Form.Label className=' w-100' htmlFor='emailLogin'>Confirme sua Senha</Form.Label>
+                            <FormGroupWithIcon
+                                bgBorder={true}
+                                value={singUpFormData.confirmPassword}
+                                onChange={(e) => setSingUpFormData({ ...singUpFormData, confirmPassword: e.target.value })}
+                                icon={<KeyIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                                type='password' placeholder='Confirme sua senha' mb={'mb-3'}
+                                feedback={errorMessages.confirmPassword}
 
+                            />
+                        </div>
+
+                    </>
                 )}
 
 
 
                 <div className='d-flex justify-content-center mt-4 pt-3'>
+                    {stepsForm === 'confirmation' && (
+                        <Button variant='secondary me-5' className='flex-grow-1' onClick={handleGoBack}>
+                            Voltar
+                        </Button>
+                    )}
+
                     <Button variant='red' className='flex-grow-1' type='submit'>Avançar</Button>
                 </div>
             </Form>

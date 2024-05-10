@@ -35,7 +35,7 @@
     }
 
     to {
-        transform: translateY(150%);
+        transform: translateY(174%);
     }
 }
 
@@ -43,10 +43,20 @@
 @media (min-width: 767px) {
     .animate-image-column-left {
         animation: slideLeft 0.7s forwards;
+
+        border-top-right-radius: 2em ;
+        border-bottom-right-radius: 2em ;
+        border-top-left-radius: 0 !important;
+        border-bottom-left-radius: 0 !important;
     }
 
     .animate-image-column-right {
         animation: slideRight 0.7s forwards;
+
+        border-top-left-radius: 2em ;
+        border-bottom-left-radius: 2em;
+        border-top-right-radius: 0 !important;
+        border-bottom-right-radius: 0 !important;
     }
 
     .card-authentication {
@@ -76,11 +86,13 @@
         width: 100% !important;
         border-radius: 0 !important;
         left: 0 !important;
-        
+        overflow-y: auto; 
+        height: 100%;
     }
 
     .col-image {
         height: 20em;
+        
     }
 
     .col-form{
@@ -103,14 +115,9 @@
 .fadeInRight {
     animation: fadeInRight 0.5s forwards;
 }
-.fadeOutLeft {
-    animation: fadeOutLeft 0.5s forwards;
-}
+
 .fadeInLeft {
     animation: fadeInLeft 0.5s forwards;
-}
-.fadeOutRight {
-    animation: fadeOutRight 0.5s forwards;
 }
 
 @keyframes fadeInRight {
@@ -124,16 +131,6 @@
     }
 }
 
-@keyframes fadeOutLeft {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(-100%);
-    }
-}
 
 @keyframes fadeInLeft {
     from {
@@ -146,15 +143,5 @@
     }
 }
 
-@keyframes fadeOutRight {
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-    to {
-        opacity: 0;
-        transform: translateX(100%);
-    }
-}
 
 

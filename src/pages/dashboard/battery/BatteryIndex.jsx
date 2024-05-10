@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
-import { AtomIcon, BarCode, DolarIcon, DoubleArrowIcon, StockIcon, TextBodyIcon } from '../../../assets/icons/IconsSet';
+import { AtomIcon, BarCode, DolarIcon, StockIcon, TextBodyIcon, PdfIcon } from '../../../assets/icons/IconsSet';
 import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
 import BatteryCard from '../../../components/common/BatteryCard';
 import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
@@ -8,6 +8,7 @@ import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
 import Pagination from '../../../components/common/PaginationTable';
 import SortButton from '../../../components/common/SortButton';
 import BatteryServices from '../../../services/battery/BatteryServices';
+import ModalPdf from '../../../services/pdf/Report'
 
 function BatteryIndex({ batteries, setBatteries }) {
     const [selectedBattery, setSelectedBattery] = useState(null);
@@ -15,7 +16,7 @@ function BatteryIndex({ batteries, setBatteries }) {
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [action, setAction] = useState('');
     const [disableFormControl, setDisableFormControl] = useState(false);
-
+    const [showsModalPDF, setShowModalPDF] = useState(false);
 
     const [batteryValues, setBatteryValues] = useState({ name: '', description: '', value: '', quantity: '', code: '' });
     const [prevBatteryValues, setPrevBatteryValues] = useState({});
@@ -288,6 +289,8 @@ function BatteryIndex({ batteries, setBatteries }) {
                 handleConfirmChanges={handleConfirmChangesModal}
                 confirmChangesModalData={confirmChangesModalData}
             />
+
+            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries}/>
         </>
     )
     const [currentPage, setCurrentPage] = useState(1);
@@ -302,12 +305,17 @@ function BatteryIndex({ batteries, setBatteries }) {
             <Card className='shadow rounded-3 mb-5'>
                 <Card.Header className='py-3 d-flex'>
                     <h3 className='text-align-center mb-0'>Controle de Baterias</h3>
-                    <Button className='ms-auto btn btn-red bg-red border-0' onClick={() => {
-                        setSelectedBattery('')
-                        setShowBatteryFormModal(true);
-                    }}>
-                        Cadastrar Bateria
-                    </Button>
+                    <div className='d-flex ms-auto '>
+                    <a type='button' className='btn btn-outline-danger' onClick={()=> setShowModalPDF(true)}><PdfIcon /></a>
+                    
+                        
+                        <Button className='ms-3 btn btn-red bg-red border-0' onClick={() => {
+                            setSelectedBattery('')
+                            setShowBatteryFormModal(true);
+                        }}>
+                            Cadastrar Bateria
+                        </Button>
+                    </div>
                 </Card.Header>
                 <Card.Body>
                     <Table responsive hover bordered >

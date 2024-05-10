@@ -7,7 +7,7 @@ import AuthServices from '../../../services/auth/AuthServices.jsx';
 
 
 
-function LoginForm({ navigate }) {
+function LoginForm({ emailSingUp }) {
   const [emailLogin, setEmailLogin] = useState('');
   const [passwordLogin, setPasswordLogin] = useState('');
   const location = useLocation();
@@ -28,10 +28,10 @@ function LoginForm({ navigate }) {
 
 
   useEffect(() => {
-    if (location.state && location.state.email) {
-      setEmailLogin(location.state.email);
+    if (emailSingUp ) {
+      setEmailLogin(emailSingUp);
     }
-  }, [location.state]);
+  }, [emailSingUp]);
 
   return (
     <>
