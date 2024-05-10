@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
         border: 0.8,
         borderRight: 0,
         borderBottom: 0,
-        marginTop: 30
+        marginTop: 30,
     },
     tableRow: {
         flexDirection: "row"
@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     },
     logo: {
         width: 100,
-
     },
     columnImage: {
         borderRight: 1,
@@ -100,6 +99,14 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 2
     },
+    pageCounter: {
+        position: "absolute",
+        bottom: 20,
+        left: 10,
+        right: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+    }
 });
 
 // Component, de tabela
@@ -124,54 +131,78 @@ const Tablea = ({ data }) => (
 
 
 
-// Componente de relatório
-const MyDocument = ({ data, user }) => (
-    <Document>
-        <Page size="A4" style={styles.page}>
-
+const MyDocument = ({ data, user }) => {
+    const ITEMS_PER_PAGE = 18; // Defina quantos itens da tabela devem ser exibidos em cada página
+    const date = new Date().toLocaleString(); // Obtenha a data atual
+  
+    // Divida os dados em partes que cabem em cada página
+    const chunks = data.reduce((chunks, item, index) => {
+      const chunkIndex = Math.floor(index / ITEMS_PER_PAGE);
+      if (!chunks[chunkIndex]) {
+        chunks[chunkIndex] = [];
+      }
+      chunks[chunkIndex].push(item);
+      return chunks;
+    }, []);
+  
+    return (
+      <Document>
+        {chunks.map((chunk, pageIndex) => (
+          <Page key={pageIndex} size="A4" style={styles.page}>
             <View style={styles.section}>
-
-                <View style={styles.header}>
+              {/* Cabeçalho */}
+              {pageIndex === 0 && (
+                <View>
+                  <View style={styles.header}>
                     <View style={styles.columnImage}>
-                        <Image source={logo} style={styles.logo} />
+                      <Image source={logo} style={styles.logo} />
                     </View>
-
                     <View style={styles.columnText}>
-                        <Text>Relatório de Baterias</Text>
+                      <Text>Relatório de Baterias</Text>
                     </View>
-                </View>
-
-                <View style={styles.subtitle}>
+                  </View>
+                  {/* Subtítulo do relatório */}
+                  <View style={styles.subtitle}>
                     <Text>
-                        Este relatório oferece uma análise detalhada e abrangente das baterias registradas para fins de comercialização,
-                        proporcionando uma visão minuciosa sobre os produtos atualmente em nosso estoque.
-                        Priorizando a oferta de baterias de excelência em qualidade e desempenho,
-                        seu propósito é fornecer uma compreensão completa dos diversos modelos disponíveis, seus preços,
-                        quantidades em estoque e outras especificações pertinentes.
+                      Este relatório oferece uma análise detalhada e abrangente das baterias registradas para fins de comercialização,
+                      proporcionando uma visão minuciosa sobre os produtos atualmente em nosso estoque.
+                      Priorizando a oferta de baterias de excelência em qualidade e desempenho,
+                      seu propósito é fornecer uma compreensão completa dos diversos modelos disponíveis, seus preços,
+                      quantidades em estoque e outras especificações pertinentes.
                     </Text>
-                </View>
-
-                <View style={styles.divisor}>
+                  </View>
+                  {/* Informações do usuário solicitante */}
+                  <View style={styles.divisor}>
                     <Text>Usuário Solicitante</Text>
-                </View>
-
-
-                <View style={styles.userInfo}>
+                  </View>
+                  <View style={styles.userInfo}>
                     <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
                     <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
                     <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                  </View>
                 </View>
-
-
-
-                <Tablea data={data} />
+              )}
+  
+              {/* Parte da tabela */}
+              <Tablea data={chunk} />
+  
+              {/* Rodapé da página */}
+              <View style={styles.pageCounter}>
+                <Text>{date}</Text>
                 <Text render={({ pageNumber, totalPages }) => (
-                    `${pageNumber} / ${totalPages}`
+                  `${pageNumber} / ${totalPages}`
                 )} fixed />
+              </View>
             </View>
-        </Page>
-    </Document>
-);
+          </Page>
+        ))}
+      </Document>
+    );
+  };
+  
+  
+
+
 
 
 const ReportGenerator = ({ data, userData }) => {
@@ -206,7 +237,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems }) {
                     </Modal.Title>
                 </Modal.Header>
 
-                <Modal.Body style={{height: 400}}> 
+                <Modal.Body style={{ height: 400 }}>
                     <Row>
                         <Col md={6}>
                             {pdfViewer}
