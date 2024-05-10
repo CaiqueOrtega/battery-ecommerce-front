@@ -23,6 +23,9 @@ function DashboardPage() {
         sessionStorage.setItem('selectedOption', sidebarSelectedOption);
     }, [sidebarSelectedOption]);
 
+    useEffect(() => {
+        document.title = "Painel de Controle"
+    }, [])
 
 
     const mainContent = useMemo(() => {

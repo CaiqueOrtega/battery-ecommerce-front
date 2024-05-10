@@ -105,7 +105,8 @@ const styles = StyleSheet.create({
         left: 10,
         right: 10,
         flexDirection: 'row',
-        justifyContent: 'space-between'
+        justifyContent: 'space-between',
+        fontSize: 10
     }
 });
 
@@ -153,16 +154,16 @@ const TableBattery = ({ data }) => (
 const TableUser = ({ data }) => (
     <View style={styles.table}>
         <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}><Text>Código</Text></View>
             <View style={styles.tableColHeader}><Text>Nome</Text></View>
-            <View style={styles.tableColHeader}><Text>Valor</Text></View>
+            <View style={styles.tableColHeader}><Text>Email</Text></View>
+            <View style={styles.tableColHeader}><Text>Cargo</Text></View>
             <View style={styles.tableColHeader}><Text>Status</Text></View>
         </View>
         {data.map((row, index) => (
             <View style={styles.tableRow} key={index}>
-                <View style={styles.tableCol}><Text>{row.code}</Text></View>
                 <View style={styles.tableCol}><Text>{row.name}</Text></View>
-                <View style={styles.tableCol}><Text>{row.value}</Text></View>
+                <View style={styles.tableCol}><Text>{row.email}</Text></View>
+                <View style={styles.tableCol}><Text>{row.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</Text></View>
                 <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
             </View>
         ))}
@@ -285,6 +286,8 @@ const ReportGenerator = ({ data, userData, type }) => {
 };
 
 function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
+    console.log('show', showsModalPDF)
+
     const { userData } = useContext(AuthContext);
     const { pdfViewer, pdfButtonLink } = ReportGenerator({ data: currentItems, userData, type });
 

@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import { Card, Table, Modal, Button, Form, InputGroup } from "react-bootstrap";
-import { AlertIcon } from "../../../assets/icons/IconsSet";
+import { AlertIcon, PdfIcon } from "../../../assets/icons/IconsSet";
 import UserService from "../../../services/users/UsersServices";
 import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal";
 import { AuthContext } from '../../../context/AuthProvider';
 import Pagination from "../../../components/common/PaginationTable";
+import ModalPdf from '../../../services/pdf/Report'
 
 function UserIndex({ users, setUsers }) {
     const { userData } = useContext(AuthContext);
@@ -13,7 +14,7 @@ function UserIndex({ users, setUsers }) {
     const [selectedUser, setSelectedUser] = useState(null)
     const [selectedRole, setSelectedRole] = useState({});
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
-
+    const [showsModalPDF, setShowModalPDF] = useState(false);
 
     const { changeRole, errorMessages, setErrorMessages } = UserService()
 
@@ -23,7 +24,7 @@ function UserIndex({ users, setUsers }) {
         if (response.success) {
             const updatedUsers = users.map(users => {
                 if (users.userId === selectedUser.userId) {
-                        return { ...users, role: selectedRole };
+                    return { ...users, role: selectedRole };
                 }
                 return users;
             })
@@ -92,6 +93,8 @@ function UserIndex({ users, setUsers }) {
                     handleConfirmChanges={handleConfirmChangesModal}
                     confirmChangesModalData={confirmChangesModalData}
                 />
+
+
             </>
 
         )
@@ -109,6 +112,8 @@ function UserIndex({ users, setUsers }) {
             <Card className='shadow rounded-3 mb-5'>
                 <Card.Header className='py-3 d-flex'>
                     <h3 className='text-align-center mb-0'>Controle de Usuários</h3>
+                    <a type='button' className='btn btn-outline-danger ms-auto' onClick={() => setShowModalPDF(true)}><PdfIcon /></a>
+
                 </Card.Header>
                 <Card.Body>
                     <Table responsive hover bordered>
@@ -147,6 +152,9 @@ function UserIndex({ users, setUsers }) {
                     />
                 </Card.Body>
             </Card>
+
+            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={users} type={'user'} />
+
 
             {renderUserModal()}
         </>

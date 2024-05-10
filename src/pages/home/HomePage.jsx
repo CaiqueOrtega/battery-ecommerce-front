@@ -1,13 +1,17 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import NavbarComponent from '../../components/layout/navbar/Navbar';
 import { BatteryContext } from '../../context/BatteryProvider';
 import BatteryCard from '../../components/common/BatteryCard';
-import { Row, Col, Container } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import ControlledCarousel from './carousel/Carousel';
-
+import './home.css'
 
 function HomePage() {
   const { batteries, isContextLoaded } = useContext(BatteryContext);
+
+  useEffect(() => {
+    document.title = "Página Inicial"
+  }, [])
 
   const renderBatteries = () => (
     <div className="ms-5">
@@ -27,11 +31,11 @@ function HomePage() {
   )
 
   return (
-    <div >
+    <div className='vh-100 bg-main'>
       <NavbarComponent setNavbarContent={true} />
-      <Container className='mt-4'>
-        <ControlledCarousel />
-      </Container>
+
+      <ControlledCarousel />
+
 
       {renderBatteries()}
     </div>

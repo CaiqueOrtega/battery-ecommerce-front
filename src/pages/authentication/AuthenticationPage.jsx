@@ -86,7 +86,7 @@ function AuthenticationPage() {
 
                         <Col md={6} className={`col-image position-absolute d-flex flex-column bg-yellow
                          ${animateImageColumn !== null ? animateImageColumn === 'entrar' ? 'animate-image-column-left' : 'animate-image-column-right' : ''}
-                         ${applyRightZero ? 'end-0 bottom-0 rounded-end-md-5' : 'rounded-start-md-5'}`}>
+                         ${applyRightZero ? 'end-0 bottom-0 rounded-md-end-5' : 'rounded-start-md-5'}`}>
 
 
 
