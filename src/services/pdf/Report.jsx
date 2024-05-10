@@ -132,73 +132,86 @@ const Tablea = ({ data }) => (
 
 
 const MyDocument = ({ data, user }) => {
-    const ITEMS_PER_PAGE = 18; // Defina quantos itens da tabela devem ser exibidos em cada página
-    const date = new Date().toLocaleString(); // Obtenha a data atual
-  
-    // Divida os dados em partes que cabem em cada página
+    // Definir o número de itens por página para a primeira e as seguintes
+    const ITEMS_PER_PAGE_FIRST = 18;
+    const ITEMS_PER_PAGE_NEXT = 35;
+    const date = new Date().toLocaleString();
+
+    // Dividir os dados em partes para as páginas
     const chunks = data.reduce((chunks, item, index) => {
-      const chunkIndex = Math.floor(index / ITEMS_PER_PAGE);
-      if (!chunks[chunkIndex]) {
-        chunks[chunkIndex] = [];
-      }
-      chunks[chunkIndex].push(item);
-      return chunks;
+        let chunkIndex;
+        // Verificar se estamos na primeira página ou não
+        if (index < ITEMS_PER_PAGE_FIRST) {
+            chunkIndex = 0;
+        } else {
+            // Se não for a primeira página, calcular o índice da página com base no número de itens por página seguinte
+            chunkIndex = ITEMS_PER_PAGE_FIRST + Math.floor((index - ITEMS_PER_PAGE_FIRST) / ITEMS_PER_PAGE_NEXT);
+        }
+        
+        // Criar uma nova parte se não existir
+        if (!chunks[chunkIndex]) {
+            chunks[chunkIndex] = [];
+        }
+        
+        // Adicionar o item à parte correspondente
+        chunks[chunkIndex].push(item);
+        
+        return chunks;
     }, []);
-  
+
     return (
-      <Document>
-        {chunks.map((chunk, pageIndex) => (
-          <Page key={pageIndex} size="A4" style={styles.page}>
-            <View style={styles.section}>
-              {/* Cabeçalho */}
-              {pageIndex === 0 && (
-                <View>
-                  <View style={styles.header}>
-                    <View style={styles.columnImage}>
-                      <Image source={logo} style={styles.logo} />
+        <Document>
+            {chunks.map((chunk, pageIndex) => (
+                <Page key={pageIndex} size="A4" style={styles.page}>
+                    <View style={styles.section}>
+                        {/* Cabeçalho (apenas na primeira página) */}
+                        {pageIndex === 0 && (
+                            <View>
+                                <View style={styles.header}>
+                                    <View style={styles.columnImage}>
+                                        <Image source={logo} style={styles.logo} />
+                                    </View>
+                                    <View style={styles.columnText}>
+                                        <Text>Relatório de Baterias</Text>
+                                    </View>
+                                </View>
+                                {/* Subtítulo do relatório */}
+                                <View style={styles.subtitle}>
+                                    <Text>
+                                        Este relatório oferece uma análise detalhada e abrangente das baterias registradas para fins de comercialização,
+                                        proporcionando uma visão minuciosa sobre os produtos atualmente em nosso estoque.
+                                        Priorizando a oferta de baterias de excelência em qualidade e desempenho,
+                                        seu propósito é fornecer uma compreensão completa dos diversos modelos disponíveis, seus preços,
+                                        quantidades em estoque e outras especificações pertinentes.
+                                    </Text>
+                                </View>
+                                {/* Informações do usuário solicitante */}
+                                <View style={styles.divisor}>
+                                    <Text>Usuário Solicitante</Text>
+                                </View>
+                                <View style={styles.userInfo}>
+                                    <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                                    <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                                    <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                                </View>
+                            </View>
+                        )}
+                        {/* Parte da tabela */}
+                        <Tablea data={chunk} />
+                        {/* Rodapé da página */}
+                        <View style={styles.pageCounter}>
+                            <Text>{date}</Text>
+                            <Text render={({ pageNumber, totalPages }) => (
+                                `${pageNumber} / ${totalPages}`
+                            )} fixed />
+                        </View>
                     </View>
-                    <View style={styles.columnText}>
-                      <Text>Relatório de Baterias</Text>
-                    </View>
-                  </View>
-                  {/* Subtítulo do relatório */}
-                  <View style={styles.subtitle}>
-                    <Text>
-                      Este relatório oferece uma análise detalhada e abrangente das baterias registradas para fins de comercialização,
-                      proporcionando uma visão minuciosa sobre os produtos atualmente em nosso estoque.
-                      Priorizando a oferta de baterias de excelência em qualidade e desempenho,
-                      seu propósito é fornecer uma compreensão completa dos diversos modelos disponíveis, seus preços,
-                      quantidades em estoque e outras especificações pertinentes.
-                    </Text>
-                  </View>
-                  {/* Informações do usuário solicitante */}
-                  <View style={styles.divisor}>
-                    <Text>Usuário Solicitante</Text>
-                  </View>
-                  <View style={styles.userInfo}>
-                    <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
-                    <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
-                    <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
-                  </View>
-                </View>
-              )}
-  
-              {/* Parte da tabela */}
-              <Tablea data={chunk} />
-  
-              {/* Rodapé da página */}
-              <View style={styles.pageCounter}>
-                <Text>{date}</Text>
-                <Text render={({ pageNumber, totalPages }) => (
-                  `${pageNumber} / ${totalPages}`
-                )} fixed />
-              </View>
-            </View>
-          </Page>
-        ))}
-      </Document>
+                </Page>
+            ))}
+        </Document>
     );
-  };
+};
+
   
   
 
