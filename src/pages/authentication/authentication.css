@@ -74,12 +74,14 @@
     .animate-image-column-right,
     .animate-image-column-left {
         animation: slideUp 0.7s forwards;
-        clip-path: circle(85% at 50% 0%);
+        clip-path: circle(85% at 50% 0%) !important;
+
     }
 
     .animate-image-column-left {
         animation: slideDown 0.7s forwards;
-        clip-path: circle(85% at 50% 100%);
+        clip-path: circle(85% at 50% 100%) !important;
+
     }
 
     .card-authentication {
@@ -92,11 +94,20 @@
 
     .col-image {
         height: 20em;
+        border-radius: 0 !important;
         
     }
 
     .col-form{
         height: 25em;
+    }
+
+    .clip-path-circle-bottom{
+        clip-path: circle(85% at 50% 0%);
+    }
+
+    .clip-path-circle-top{
+        clip-path: circle(85% at 50% 100%);
     }
 }
 

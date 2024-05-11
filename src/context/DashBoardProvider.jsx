@@ -1,17 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import PromotionService from "../services/promotion/PromotionService";
 import UserService from "../services/users/UsersServices";
-import { BatteryContext } from "./BatteryProvider";
 import { AuthContext } from "./AuthProvider";
-
+import BatteryServices from "../services/battery/BatteryServices";
 const DashBoardContext = createContext({});
 
 function DashBoardProvider({ children }) {
     const { getPromotions } = PromotionService();
     const { getUsers } = UserService();
+    const {getBatteriesAll} = BatteryServices();
     const { VerifyAuth } = useContext(AuthContext);
-    const { batteries, setBatteries, setGetDataBatteries } = useContext(BatteryContext);
-
+    const [batteries, setBatteries] = useState([]);
     const [users, setUsers] = useState([]);
     const [promotions, setPromotions] = useState([]);
     const [renderOptionData, setRenderOptionData] = useState('');
@@ -27,8 +26,10 @@ function DashBoardProvider({ children }) {
                     const promotionsData = await getPromotions();
                     setPromotions(promotionsData);
                 } else if (renderOptionData === 'Baterias' && !batteries.length) {
-                    setGetDataBatteries(true);
+                    const batteryData = await getBatteriesAll();
+                    setBatteries(batteryData);
                 }
+
                 setIsContextLoaded(true);
             } catch (error) {
                 console.log("Erro ao buscar dados:", error);

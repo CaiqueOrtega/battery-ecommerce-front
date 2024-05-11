@@ -3,8 +3,8 @@ import imagemExemploBateria from '../../assets/images/exemploImageRegister.png'
 
 function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick }) {
     return (
-        <Card className='shadow rounded-3 me-2' style={{ maxWidth: '14rem' }} onClick={onClick}>
-            <div className='p-3 rounded-3' style={{ background: "#fafafa" }}>
+        <Card className='shadow rounded-4 border-0' style={{ maxWidth: '14rem' }} onClick={onClick}>
+            <div className='p-3 rounded-3'>
                 <Card.Img className="img-fluid" variant="top" src={imagemExemploBateria} height={160} />
             </div>
             <Card.Body>

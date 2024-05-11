@@ -43,7 +43,7 @@ function DashboardPage() {
 
 
     return (
-        <div className="d-flex flex-column vh-100 bg-main">
+        <div className="d-flex flex-column vh-100">
             <NavbarContent toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
             <Row className='g-0 flex-grow-1 overflow-hidden'>
                 <Collapse in={sidebarOpen} className='d-lg-block'>

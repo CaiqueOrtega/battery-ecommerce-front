@@ -4,15 +4,27 @@ import ErrorServices from "../error/ErrorServices";
 const BatteryServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
 
-    const getBatteries = async () => {
+    const getBatteriesAll = async () => {
         try {
-            const response = await ConnectionAPI.get('battery')
-            console.log('Batata doce', response.data)
+            const response = await ConnectionAPI.get('battery/all')
             return response.data
         } catch (error) {
-            console.log('TESTE batterie')
+            console.log('erro get battry', error)
         }
     }
+
+
+    const getBatteriesActive = async () => {
+        try {
+            const response = await ConnectionAPI.get('battery')
+            return response.data
+        } catch (error) {
+            console.log('erro get battry', error)
+        }
+    }
+
+
+    
 
     const createBattery = async (batteryValues) => {
         try {
@@ -67,7 +79,7 @@ const BatteryServices = () => {
         }
     }
 
-    return { createBattery, getBatteries, updateBattery, deleteBattery, errorMessages, setErrorMessages, reactiveBattery }
+    return { createBattery, getBatteriesAll, getBatteriesActive, updateBattery, deleteBattery, errorMessages, setErrorMessages, reactiveBattery }
 }
 
 export default BatteryServices;
