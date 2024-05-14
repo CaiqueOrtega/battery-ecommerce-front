@@ -3,7 +3,7 @@ import NavbarComponent from '../../components/layout/navbar/Navbar';
 import { BatteryContext } from '../../context/BatteryProvider';
 import { BsArrowLeft, BsArrowRight } from '../../assets/icons/IconsSet';
 import BatteryCard from '../../components/common/BatteryCard';
-import { Row, Col, Container, Carousel } from 'react-bootstrap';
+import { Carousel, Container, Card } from 'react-bootstrap';
 import ControlledCarousel from './carousel/Carousel';
 import './home.css';
 
@@ -23,7 +23,7 @@ function HomePage() {
 
     for (let i = 0; i < batteriesActive.length; i += batteriesPerPage * 3) {
       const carouselItems = [];
-      
+
       for (let j = i; j < i + batteriesPerPage * 3 && j < batteriesActive.length; j += batteriesPerPage) {
         currentPageBatteries = batteriesActive.slice(j, j + batteriesPerPage).map(battery => (
           <div key={battery.batteryId} className="d-flex justify-content-center p-3 m-0">
@@ -52,8 +52,9 @@ function HomePage() {
           key={carouselIndex++}
           indicators={false}
           interval={null}
-          prevIcon={<BsArrowLeft />}
+          prevIcon={<BsArrowLeft /> }
           nextIcon={<BsArrowRight />}
+          controls={batteriesActive.length >= 6 ? true : false} 
         >
           {carouselItems}
         </Carousel>
@@ -67,7 +68,11 @@ function HomePage() {
     <>
       <NavbarComponent setNavbarContent={true} />
       <ControlledCarousel />
-      {renderBatteries()}
+
+      <Container className='mt-4'>
+
+          {renderBatteries()}
+    </Container >
     </>
   );
 }

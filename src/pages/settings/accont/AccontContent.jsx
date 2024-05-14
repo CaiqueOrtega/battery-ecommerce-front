@@ -1,5 +1,5 @@
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
-import { Form, Button, Col, Row, Container, Modal, InputGroup } from "react-bootstrap";
+import { Form, Button, Col, Row, Modal, InputGroup } from "react-bootstrap";
 import { DolarIcon, AlertIcon } from "../../../assets/icons/IconsSet";
 import { useState } from "react";
 import UserService from "../../../services/users/UsersServices";
@@ -53,7 +53,6 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
 }
 
 
-
 function AccontContent({ userData }) {
     const [disableFormControl, setDisableFormControl] = useState(true);
     const [showConfirmDesactiveAccontModal, setShowConfirmDesactiveAccontModal] = useState(false);
@@ -61,9 +60,9 @@ function AccontContent({ userData }) {
 
     const handleConfirm = async (e, action) => {
         e.preventDefault();
-        let response;
+    
         if (action === 'desactive') {
-            response = await desactiveAccont(userData.userId);
+             desactiveAccont(userData.userId);
         }
 
     }
@@ -102,7 +101,7 @@ function AccontContent({ userData }) {
                         disable={disableFormControl}
                     />
 
-                    <Col md={7}>
+                    <Col md={12}>
                         <Form.Label>CPF</Form.Label>
                         <FormGroupWithIcon
                             icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
@@ -111,15 +110,6 @@ function AccontContent({ userData }) {
                             value={userData.document}
                             disable={disableFormControl}
                             mb={'mb-3'}
-                        />
-                    </Col>
-
-                    <Col md={5}>
-                        <Form.Label>Telefone</Form.Label>
-                        <FormGroupWithIcon
-                            icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                            type='text'
-                            placeholder=''
                         />
                     </Col>
 

@@ -1,12 +1,13 @@
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import NavbarComponent from "../../components/layout/navbar/Navbar";
-import { Container, Row, Col, Card, Collapse } from "react-bootstrap";
+import { Container, Row, Col, Card } from "react-bootstrap";
 import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon } from "../../assets/icons/IconsSet";
 import { AuthContext } from "../../context/AuthProvider";
 import { useContext } from "react";
 import AccontContent from "./accont/AccontContent";
 import AdressContent from "./address/AddressContent";
 import './settings.css'
+
 
 const CardOption = ({ icon, title, description, onClick }) => (
     <Card className="border-0 shadow mb-2 card-option " onClick={onClick}>
@@ -30,18 +31,25 @@ const CardOption = ({ icon, title, description, onClick }) => (
 
 const OptionsCards = ({ handleCardClick, userDataName }) => (
     <>
-        <Card className="shadow mb-4" >
+        <Card className="shadow mb-4">
             <Card.Body className="d-flex align-items-center">
-                <div className="rounded-circle overflow-hidden bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center me-3" style={{ width: '4em', height: '4em' }}>
-                    <span style={{ fontSize: '2rem' }}>{userDataName ? userDataName.charAt(0).toUpperCase() : null}</span>
-                </div>
-                <div className="lh-sm">
-                    <span style={{ fontSize: '1.2rem' }}>Bem Vindo, {userDataName ? userDataName : null}</span>
-                    <br />
-                    <span className="text-muted small">Aqui você pode ver e alterar seus dados</span>
-                </div>
+                <Row >
+                    <Col xs={3} className="d-flex align-items-center justify-content-center p-0">
+                        <div className="rounded-circle  bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center initial-circle">
+                            <span className="initial-letter">{userDataName ? userDataName.charAt(0).toUpperCase() : null}</span>
+                        </div>
+                    </Col>
+                    <Col xs={9} className="ps-2 p-0">
+                        <div className="lh-sm">
+                            <span className="initial-welcome">Bem Vindo, {userDataName ? userDataName : null}</span>
+                            <br />
+                            <span className="text-muted small">Aqui você pode ver e alterar seus dados</span>
+                        </div>
+                    </Col>
+                </Row>
             </Card.Body>
         </Card>
+
 
         <CardOption
             icon={<UserIconCropped />}
@@ -96,60 +104,36 @@ function Settings() {
     }, [selectedOption]);
 
     return (
-        <div className="vh-100 margin-top-navbar">
-            <NavbarComponent setNavbarContent={false} />
-
-            <div className="h-100 d-md-flex align-items-center">
-                <Container >
-                    <Row className="flex-md-row-reverse" >
-
-                        <Col className={`d-md-block ${!mobileVisibleCard && 'd-none'} expanded-card testa`}>
-                            <Card className="shadow card-main">
-                                <Card.Body>
-                                    <Container className="px-md-5 py-md-2 h-100">
-                                        <a type="button" className="color-red d-md-none" onClick={() => setMobileVisibleCard(false)}>Voltar</a>
-                                        {getContent}
-                                    </Container>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-
-
-                        <Col md={4} className="mt-4 mt-md-0">
-                            <OptionsCards handleCardClick={(optionCard) => {
-                                setSelectedOption(optionCard)
-                                function SignUpPage() {
-                                    return (
-                                        <div className="vh-100 bg-main">
-                                            <Container className='h-100 d-flex align-items-center justify-content-center'>
-                                                <Card className='shadow' style={{ width: '45rem' }}>
-                                                    <Row className='g-0'>
-                                                        <Col md={7} className='p-md-4  px-3 py-4'>
-                                                            <Card.Body>
-                                                                <div className="d-flex align-items-center pb-4">
-                                                                    <h4 className='mb-0'><SingUpIcon currentColor='c00d0d' /> Registre sua conta</h4>
-                                                                    <img className="d-md-none mb-3 ms-auto" src={logo} alt="Logo Baterias Jupiter" width="100px" />
-                                                                </div>
-                                                                <SignUpForm />
-                                                            </Card.Body>
-                                                        </Col>
-                                
-                                                        <Col md={5} className='d-none d-md-flex align-items-center bg-yellow rounded-end'>
-                                                            <img src={logoBgWhite} alt="Logo Baterias jupiter" width='100%' />
-                                                        </Col>
-                                                    </Row>
-                                                </Card>
-                                            </Container>
-                                        </div>
-                                    );
-                                }             setMobileVisibleCard(true);
+        <>
+            <div className="d-flex flex-column vh-100">
+                <NavbarComponent setNavbarContent={false} />
+                <div className="flex-grow-1 d-flex align-items-center justify-content-center">
+                    <Container fluid={'lg'} className="h-sm-100 py-md-5">
+                        <Row className="h-sm-100">
+                            <Col md={4} className={`mt-4 mt-md-0 d-md-block ${mobileVisibleCard && 'd-none'}`}>
+                                <OptionsCards handleCardClick={(optionCard) => {
+                                    setSelectedOption(optionCard)
+                                    setMobileVisibleCard(true);
                                 }} userDataName={userData.name} />
-                        </Col>
-                    </Row>
-                </Container>
+                            </Col>
+
+                            <Col className={`d-md-block ${!mobileVisibleCard && 'd-none'} expanded-card`}>
+                                <Card className="shadow card-main h-sm-100">
+                                    <Card.Body>
+                                        <Container className="px-md-5 py-md-2">
+                                            <a type="button" className="color-red d-md-none" onClick={() => setMobileVisibleCard(false)}>Voltar</a>
+                                            {getContent}
+                                        </Container>
+                                    </Card.Body>
+                                </Card>
+                            </Col>
+                        </Row>
+                    </Container>
+                </div>
             </div>
-        </div>
+        </>
     );
+
 }
 
 export default Settings;

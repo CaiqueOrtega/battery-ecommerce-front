@@ -1,4 +1,3 @@
-import React from 'react';
 import { useState } from 'react';
 import Carousel from 'react-bootstrap/Carousel';
 import exampleCarousel1 from '../../../assets/images/carousel-images-examples-1.jpg';
@@ -13,7 +12,7 @@ function ControlledCarousel() {
   };
 
   return (
-    <div  className='position-relative' style={{ height: '20rem', overflow: 'hidden' }}>
+    <div  className='position-relative z-1' style={{ height: '20rem', overflow: 'hidden' }}>
       <Carousel activeIndex={index} onSelect={handleSelect}>
         <Carousel.Item>
           <img
