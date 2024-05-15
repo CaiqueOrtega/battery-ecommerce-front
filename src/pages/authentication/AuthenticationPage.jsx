@@ -97,7 +97,7 @@ function AuthenticationPage() {
                             <div className="d-flex flex-column align-items-center pb-5">
                                 <span className='fw-bold text-white fs-5 mb-2'>{action === 'entrar' ? 'Ainda não tem uma Conta?' : 'Já possui uma Conta?'}</span>
                                 <Button variant='outline-light border-2 fw-bold ' onClick={handleToggleForm}>
-                                    {showSignUpForm ? 'Registre-se' : 'Faça login'}
+                                    {showSignUpForm ? 'Faça login' : 'Registre-se'}
                                 </Button>
                             </div>
                         </Col>

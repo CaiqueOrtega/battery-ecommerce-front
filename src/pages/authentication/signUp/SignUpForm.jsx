@@ -147,6 +147,7 @@ function SignUpForm({ handleToggleForm }) {
                                 feedback={errorMessages.confirmPassword}
 
                             />
+                            <p className='fs-6 sw-light color-red text-justify text-start'>* Senha segura: Pelo menos 12 caracteres, incluindo 4 números e 1 caractere especial.</p>
                         </div>
 
                     </>

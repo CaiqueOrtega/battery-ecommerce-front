@@ -200,12 +200,26 @@ const MyDocument = ({ data, user, type }) => {
         return chunks;
     }, []);
 
+    const batterySubtitle = "Este relatório oferece uma análise detalhada e abrangente das baterias registradas para fins de comercialização, \
+    proporcionando uma visão minuciosa sobre os produtos atualmente em nosso estoque. \
+    Priorizando a oferta de baterias de excelência em qualidade e desempenho, \
+    seu propósito é fornecer uma compreensão completa dos diversos modelos disponíveis, seus preços, \
+    quantidades em estoque e outras especificações pertinentes."
+
+    const promotionSubtitle = "Este relatório oferece uma análise detalhada e abrangente das promoções cadastradas.\
+    Priorizando a apresentação de promoções de alta qualidade e valor agregado,\
+    seu propósito é fornecer uma compreensão completa das diversas ofertas disponíveis, \
+    seus descontos, períodos de validade, e outras informações relevantes."
+
+    const userSubtitle = "Este relatório oferece uma análise detalhada e abrangente dos usuários cadastrados em nossa plataforma, \
+    proporcionando uma visão minuciosa sobre os perfis ativos. Priorizando a identificação de usuários de destaque e seu comportamento na plataforma, \
+    seu propósito é fornecer uma compreensão completa dos diversos tipos de usuários."
+
     return (
         <Document>
             {chunks.map((chunk, pageIndex) => (
                 <Page key={pageIndex} size="A4" style={styles.page}>
                     <View style={styles.section}>
-                        {/* Cabeçalho (apenas na primeira página) */}
                         {pageIndex === 0 && (
                             <View>
                                 <View style={styles.header}>
@@ -213,20 +227,24 @@ const MyDocument = ({ data, user, type }) => {
                                         <Image source={logo} style={styles.logo} />
                                     </View>
                                     <View style={styles.columnText}>
-                                        <Text>Relatório de Baterias</Text>
+                                        {type === 'battery' ? (
+                                            <Text>Relatório de Baterias</Text>
+                                        ) : type === 'promotion' ? (
+                                            <Text>Relatótio de Promoções</Text>
+                                        ) : type === 'user' ? (
+                                            <Text>Relatório de Usuários</Text>
+                                        ) : null}
                                     </View>
                                 </View>
-                                {/* Subtítulo do relatório */}
                                 <View style={styles.subtitle}>
-                                    <Text>
-                                        Este relatório oferece uma análise detalhada e abrangente das baterias registradas para fins de comercialização,
-                                        proporcionando uma visão minuciosa sobre os produtos atualmente em nosso estoque.
-                                        Priorizando a oferta de baterias de excelência em qualidade e desempenho,
-                                        seu propósito é fornecer uma compreensão completa dos diversos modelos disponíveis, seus preços,
-                                        quantidades em estoque e outras especificações pertinentes.
-                                    </Text>
+                                    {type === 'battery' ? (
+                                        <Text>{batterySubtitle}</Text>
+                                    ) : type === 'promotion' ? (
+                                        <Text>{promotionSubtitle}</Text>
+                                    ) : type === 'user' ? (
+                                        <Text>{userSubtitle}</Text>
+                                    ) : null}
                                 </View>
-                                {/* Informações do usuário solicitante */}
                                 <View style={styles.divisor}>
                                     <Text>Usuário Solicitante</Text>
                                 </View>
@@ -241,12 +259,11 @@ const MyDocument = ({ data, user, type }) => {
                         {type === 'battery' ? (
                             <TableBattery data={chunk} />
                         ) : type === 'promotion' ? (
-                            <TablePromotion data={chunk}/>
+                            <TablePromotion data={chunk} />
                         ) : type === 'user' ? (
-                            <TableUser data={chunk}/>
+                            <TableUser data={chunk} />
                         ) : null}
 
-                        {/* Rodapé da página */}
                         <View style={styles.pageCounter}>
                             <Text>{date}</Text>
                             <Text render={({ pageNumber, totalPages }) => (
@@ -269,7 +286,7 @@ const MyDocument = ({ data, user, type }) => {
 const ReportGenerator = ({ data, userData, type }) => {
     const pdfViewer = (
         <PDFViewer width="100%" height="370em">
-            <MyDocument data={data} user={userData} type={type}/>
+            <MyDocument data={data} user={userData} type={type} />
 
         </PDFViewer>
     );
