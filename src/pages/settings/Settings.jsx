@@ -114,7 +114,7 @@ function Settings() {
                                 <OptionsCards handleCardClick={(optionCard) => {
                                     setSelectedOption(optionCard)
                                     setMobileVisibleCard(true);
-                                }} userDataName={userData.name} />
+                                }} userDataName={userData ? userData.name : ''} />
                             </Col>
 
                             <Col className={`d-md-block ${!mobileVisibleCard && 'd-none'} expanded-card`}>

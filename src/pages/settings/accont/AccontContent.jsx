@@ -1,12 +1,15 @@
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
 import { Form, Button, Col, Row, Modal, InputGroup } from "react-bootstrap";
-import { DolarIcon, AlertIcon } from "../../../assets/icons/IconsSet";
-import { useState } from "react";
+import { DolarIcon, AlertIcon, LockIcon } from "../../../assets/icons/IconsSet";
+import { useState, useEffect, useContext } from "react";
 import UserService from "../../../services/users/UsersServices";
+import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
+import { AuthContext } from "../../../context/AuthProvider";
 
 const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
-    const [verifyCPFValue, setVerifyCPFValue] = useState('')
-
+    const [verifyPassword, setVerifyPassword] = useState('')
+    const [verifyConfirmPassword, setVerifyConfirmPassword] = useState('')
+    const [successMessages, setSuccessMessages] = useState(null)
 
     return (
         <Modal centered show={showModal} onHide={() => setShowModal(false)} backdrop="static" keyboard={false}>
@@ -15,34 +18,34 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
                 <button className='btn-close btn-close-white' onClick={() => setShowModal(false)} />
             </Modal.Header>
             <Modal.Body className="mt-2">
+                <AlertErrorOrSuccess errorMessages={errorMessages} successMessage={successMessages} />
                 <InputGroup hasValidation>
-                    <Form.Label>Digite seu CPF para desativar a conta {userData.name ? userData.name : 'carregando...'} </Form.Label>
+                    <Form.Label>Digite sua senha para desativar a conta {userData ? userData.name : 'carregando...'} </Form.Label>
                     <FormGroupWithIcon
-                        icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                        icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                         type='text'
-                        placeholder='CPF'
+                        placeholder='Senha'
                         mb={'mb-3'}
-                        value={verifyCPFValue}
-                        onChange={(e) => setVerifyCPFValue(e.target.value)}
+                        value={verifyPassword}
+                        onChange={(e) => setVerifyPassword(e.target.value)}
                     />
-                    <Form.Control.Feedback type="invalid" className="ms-1">
-                        {errorMessages && errorMessages.documentVerify && <AlertIcon size="14" currentColor={"currentcolor"} />}
-                        {errorMessages ? errorMessages.documentVerify : null}
-                    </Form.Control.Feedback>
+                    <FormGroupWithIcon
+                        icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                        type='text'
+                        placeholder='Confirme sua senha'
+                        mb={'mb-3'}
+                        value={verifyConfirmPassword}
+                        onChange={(e) => setVerifyConfirmPassword(e.target.value)}
+                    />
                 </InputGroup>
 
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowModal(false)}>Fechar</Button>
                 <Button variant="red" onClick={(e) => {
-                    console.log('userData', userData.document)
-                    console.log('CPF', verifyCPFValue)
-                    if (userData.document !== verifyCPFValue) {
-                        console.log('teste')
-                        setErrorMessages({ documentVerify: 'CPF inválido' })
-                        return;
+                    if (verifyPassword !== verifyConfirmPassword) {
+                        setErrorMessages({ general: "Senhas incompatíveis" })
                     }
-
                     handleConfirm(e, 'desactive')
                 }
                 }>Confirmar</Button>
@@ -54,29 +57,65 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
 
 
 function AccontContent({ userData }) {
+    const [email, setEmail] = useState(userData ? userData.email : '')
+    const [name, setName] = useState(userData ? userData.name : '')
     const [disableFormControl, setDisableFormControl] = useState(true);
+    const [request, setRequest] = useState('view')
+    const [successMessage, setSuccessMessage] = useState(null)
     const [showConfirmDesactiveAccontModal, setShowConfirmDesactiveAccontModal] = useState(false);
-    const { desactiveAccont, errorMessages, setErrorMessages } = UserService();
+    const [showMainContent, setShowMainContent] = useState(false)
+    const { desactiveAccont, errorMessages, setErrorMessages, updateUser } = UserService();
+
+
 
     const handleConfirm = async (e, action) => {
         e.preventDefault();
-    
+
         if (action === 'desactive') {
-             desactiveAccont(userData.userId);
+            setShowMainContent(false)
+            desactiveAccont(userData.userId);
         }
 
     }
 
+    const handleClick = (e) => {
+        e.preventDefault();
+        setRequest(request === 'view' ? 'update' : 'view');
+        setSuccessMessage(null)
+    };
+
+    const handleUpdate = async (userId, name, email) => {
+        
+            const response = await updateUser(userId, name, email)
+            response ? (setRequest('view'), setSuccessMessage("Cadastro atualizado com sucesso!")) : setRequest('update')
+            setShowMainContent(true)
+
+            if (response) {
+                setShowMainContent(true)
+                setErrorMessages({})
+            }
+    }
+
+    useEffect(() => {
+        if (request === 'update') {
+            setDisableFormControl(false);
+        } else {
+            setDisableFormControl(true)
+        }
+    }, [request]);
+
 
     return (
         <>
-            <header>
+            <header className="mb-2">
                 <h4>Dados da Conta</h4>
                 <span className="text-muted">Atualize suas informações pessoais aqui para garantir uma experiência personalizada.
                     Mantenha seus detalhes precisos e atualizados.</span>
             </header>
 
-            <Form className="mt-4">
+            {showMainContent === true ? <AlertErrorOrSuccess successMessage={successMessage} errorMessages={errorMessages} /> : null}
+
+            <Form className="mt-3">
                 <Row>
                     <Col md={12}>
                         <Form.Label>Nome completo</Form.Label>
@@ -84,9 +123,11 @@ function AccontContent({ userData }) {
                             icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                             type='text'
                             placeholder=''
-                            value={userData.name}
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                             mb={'mb-3'}
                             disable={disableFormControl}
+                            feedback={errorMessages.name}
                         />
 
                     </Col>
@@ -94,11 +135,13 @@ function AccontContent({ userData }) {
                     <Form.Label>Email</Form.Label>
                     <FormGroupWithIcon
                         icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
-                        type='text'
+                        type='email'
                         placeholder=''
-                        value={userData.email}
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         mb={'mb-3'}
                         disable={disableFormControl}
+                        feedback={errorMessages.email}
                     />
 
                     <Col md={12}>
@@ -107,8 +150,8 @@ function AccontContent({ userData }) {
                             icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                             type='text'
                             placeholder=''
-                            value={userData.document}
-                            disable={disableFormControl}
+                            value={userData ? userData.document : ''}
+                            disable={true}
                             mb={'mb-3'}
                         />
                     </Col>
@@ -117,8 +160,13 @@ function AccontContent({ userData }) {
             </Form>
 
             <div className=" d-flex justify-content-end flex-column flex-md-row mt-5">
-                <Button variant="yellow ms-md-3" >Atualizar Dados</Button>
-                <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccontModal(true)}>Desativar Conta</Button>
+                {request == 'view' ? <Button variant="yellow ms-md-3" onClick={(e) => handleClick(e)}>Editar Dados</Button>
+                    : <Button variant="yellow ms-md-3" onClick={(e) => handleUpdate(userData.userId, name, email)}>Atualizar Dados</Button>
+                }
+
+                {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccontModal(true)}>Desativar Conta</Button>
+                    : <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setRequest('view')}>Cancelar</Button>
+                }
 
             </div>
 

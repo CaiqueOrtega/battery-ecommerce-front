@@ -16,6 +16,7 @@
 
 .card-main {
     height: 99%;
+    overflow-y: auto !important;
 }
 
 .initial-welcome {

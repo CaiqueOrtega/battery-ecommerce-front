@@ -32,7 +32,7 @@ function AuthProvider({ children }) {
           } else {
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             const user = await getUserByEmail(decodedToken.sub);
-            if(user.status !== 'INACTIVE'){
+            if (user.status !== 'INACTIVE') {
               setUserData(user);
               setIsLoggedIn(true);
             }
@@ -87,7 +87,11 @@ function AuthProvider({ children }) {
     return response ? children : null;
   }
 
-
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate('/');
+    }
+  }, [isLoggedIn]);
 
   return isContextLoaded ? (
     <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin, VerifyAuth }}>

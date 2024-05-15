@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import ConnectionAPI from "../ConnectionAPI";
 import ErrorServices from "../error/ErrorServices"
+import { AuthContext } from "../../context/AuthProvider";
 
 const UserService = () => {
   const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
-
+  const { logout } = useContext(AuthContext)
 
   const getUserByEmail = async (email) => {
 
@@ -34,17 +35,34 @@ const UserService = () => {
     }
   }
 
-  const desactiveAccont = async (userId) => {
+  const desactiveAccont = async (userId, password) => {
     try {
-      await ConnectionAPI.delete(`users/${userId}`);
+      await ConnectionAPI.delete(`users/${userId}`, {
+        password: password
+      });
+      logout()
       return { success: true }
     } catch (error) {
       handleAPIError(error);
     }
   }
 
+  const updateUser = async (userId, name, email) => {
+    
+    try{
+      await ConnectionAPI.patch(`users/${userId}`, {
+        name: name,
+        email: email
+      })
+      return { success: true }
+    } catch (error) {
+      handleAPIError(error)
+    }
+  }
 
-  return { getUserByEmail, getUsers, changeRole, desactiveAccont, errorMessages, setErrorMessages }
+
+
+  return { getUserByEmail, getUsers, changeRole, desactiveAccont, errorMessages, setErrorMessages, updateUser }
 };
 
 export default UserService;
