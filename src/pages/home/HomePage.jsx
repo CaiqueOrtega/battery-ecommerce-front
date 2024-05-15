@@ -6,15 +6,22 @@ import BatteryCard from '../../components/common/BatteryCard';
 import { Carousel, Container, Card } from 'react-bootstrap';
 import ControlledCarousel from './carousel/Carousel';
 import './home.css';
+import { useNavigate } from 'react-router-dom';
 
 function HomePage() {
   const { batteriesActive, setGetBatteryActive } = useContext(BatteryContext);
   const [batteriesPerPage, setBatteriesPerPage] = useState(5);
-
+  const navigate = useNavigate(); 
+  
   useEffect(() => {
     document.title = "Página Inicial";
     setGetBatteryActive(prevState => !prevState);
   }, []);
+
+
+  const handleBatteryClick = (batteryData) => {
+    navigate('/bateria', { state: batteryData });
+  };
 
   const renderBatteries = () => {
     const carousels = [];
@@ -32,6 +39,7 @@ function HomePage() {
               batteryDescription={battery.description}
               batteryPrice={battery.value}
               batteryQuantity={battery.quantity}
+              onClick={() => handleBatteryClick(battery)}
             />
           </div>
         ));

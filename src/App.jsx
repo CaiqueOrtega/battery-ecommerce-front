@@ -8,6 +8,7 @@ import { AuthProvider } from './context/AuthProvider';
 import { BatteryProvider } from './context/BatteryProvider';
 import { DashBoardProvider } from './context/DashBoardProvider';
 import AuthenticationPage from './pages/authentication/AuthenticationPage';
+import BatteryPurchasePage from './pages/batteryPurchase/BatteryPurchasePage';
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
                 </DashBoardProvider>
             </BatteryProvider>} />
             <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
+            <Route path='/bateria' element={<BatteryProvider><BatteryPurchasePage /></BatteryProvider>}/>
           <Route path="/configuracoes" element={<MyAccont />} />
         </Routes>
       </AuthProvider>
