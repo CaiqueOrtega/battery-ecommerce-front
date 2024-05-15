@@ -5,7 +5,6 @@ const ErrorServices = () => {
 
     const handleAPIError = (error) => {
 
-        console.log(error)
 
         if (error.response.data.field) {
 

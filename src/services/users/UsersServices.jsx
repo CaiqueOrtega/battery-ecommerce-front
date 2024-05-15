@@ -26,7 +26,7 @@ const UserService = () => {
     }
   }
 
-  const changeRole = async (userId, selectedRole, loggedUserId) => {
+  const changeRole = async (userId, selectedRole, loggedUserId) => {  
     try {
       await ConnectionAPI.put(`users/changeRole/${userId}/${selectedRole}/${loggedUserId}`);
       return { success: true }
@@ -37,13 +37,11 @@ const UserService = () => {
 
   const desactiveAccont = async (userId, password) => {
     try {
-      await ConnectionAPI.delete(`users/${userId}`, {
-        password: password
-      });
+      await ConnectionAPI.delete(`users/${userId}/${password}`);
       logout()
       return { success: true }
     } catch (error) {
-      handleAPIError(error);
+      handleAPIError(error)
     }
   }
 

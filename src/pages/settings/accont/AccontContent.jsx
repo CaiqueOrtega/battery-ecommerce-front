@@ -9,6 +9,7 @@ import { AuthContext } from "../../../context/AuthProvider";
 const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
     const [verifyPassword, setVerifyPassword] = useState('')
     const [verifyConfirmPassword, setVerifyConfirmPassword] = useState('')
+    const [prevValues, setPrevValues] = useState({password: null, confirmPassword: null})
     const [successMessages, setSuccessMessages] = useState(null)
 
     return (
@@ -42,11 +43,23 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowModal(false)}>Fechar</Button>
-                <Button variant="red" onClick={(e) => {
+                <Button variant="red" onClick={async (e) => {
+                    console.log('entrou', prevValues)
+                    if (prevValues.password == verifyPassword && prevValues.confirmPassword == verifyConfirmPassword){
+                        setErrorMessages({general: "Os dados não foram alterados"})
+                        console.log('errormessages', errorMessages)
+                        return
+                    }
                     if (verifyPassword !== verifyConfirmPassword) {
                         setErrorMessages({ general: "Senhas incompatíveis" })
+                        return
                     }
-                    handleConfirm(e, 'desactive')
+                    
+                        const response = await handleConfirm(e, 'desactive', verifyPassword)
+                    if (!response){
+                        setPrevValues({password: verifyPassword, confirmPassword: verifyConfirmPassword})
+                    }
+
                 }
                 }>Confirmar</Button>
             </Modal.Footer>
@@ -59,6 +72,7 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
 function AccontContent({ userData }) {
     const [email, setEmail] = useState(userData ? userData.email : '')
     const [name, setName] = useState(userData ? userData.name : '')
+    const [prevValues, setPrevValues] = useState(userData ? {name: userData.name, email: userData.email} : {})
     const [disableFormControl, setDisableFormControl] = useState(true);
     const [request, setRequest] = useState('view')
     const [successMessage, setSuccessMessage] = useState(null)
@@ -68,15 +82,20 @@ function AccontContent({ userData }) {
 
 
 
-    const handleConfirm = async (e, action) => {
+    const handleConfirm = async (e, action, password) => {
         e.preventDefault();
-
+    
         if (action === 'desactive') {
-            setShowMainContent(false)
-            desactiveAccont(userData.userId);
+            setShowMainContent(false);
+            const response = await desactiveAccont(userData.userId, password);
+            if (response) {
+                return true;
+            } else {
+                return false;
+            }
         }
-
-    }
+    };
+    
 
     const handleClick = (e) => {
         e.preventDefault();
@@ -85,12 +104,18 @@ function AccontContent({ userData }) {
     };
 
     const handleUpdate = async (userId, name, email) => {
+            if (prevValues.name == name && prevValues.email == email){
+                setShowMainContent(true)
+                setErrorMessages({general: "Dados não foram alterados"})
+                return
+            }
         
             const response = await updateUser(userId, name, email)
             response ? (setRequest('view'), setSuccessMessage("Cadastro atualizado com sucesso!")) : setRequest('update')
             setShowMainContent(true)
 
             if (response) {
+                setPrevValues({name: name, email: email})
                 setShowMainContent(true)
                 setErrorMessages({})
             }
