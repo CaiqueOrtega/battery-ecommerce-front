@@ -7,12 +7,13 @@ import { Carousel, Container, Card } from 'react-bootstrap';
 import ControlledCarousel from './carousel/Carousel';
 import './home.css';
 import { useNavigate } from 'react-router-dom';
+import Footer from './footer/Footer';
 
 function HomePage() {
   const { batteriesActive, setGetBatteryActive } = useContext(BatteryContext);
   const [batteriesPerPage, setBatteriesPerPage] = useState(5);
-  const navigate = useNavigate(); 
-  
+  const navigate = useNavigate();
+
   useEffect(() => {
     document.title = "Página Inicial";
     setGetBatteryActive(prevState => !prevState);
@@ -60,9 +61,9 @@ function HomePage() {
           key={carouselIndex++}
           indicators={false}
           interval={null}
-          prevIcon={<BsArrowLeft /> }
+          prevIcon={<BsArrowLeft />}
           nextIcon={<BsArrowRight />}
-          controls={batteriesActive.length >= 6 ? true : false} 
+          controls={batteriesActive.length >= 6 ? true : false}
         >
           {carouselItems}
         </Carousel>
@@ -78,9 +79,10 @@ function HomePage() {
       <ControlledCarousel />
 
       <Container className='mt-4'>
+        {renderBatteries()}
+      </Container >
 
-          {renderBatteries()}
-    </Container >
+      <Footer/>
     </>
   );
 }
