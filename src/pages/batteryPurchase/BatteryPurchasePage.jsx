@@ -1,24 +1,34 @@
-import { useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Card, Container, Row, Col, Button, FormControl } from 'react-bootstrap';
 import NavbarComponent from '../../components/layout/navbar/Navbar';
 import ImageGallery from './imageGallery';
 import './batteryPurchasePage.css';
 import { MotocycleIcon } from '../../assets/icons/IconsSet';
+import CartServices from '../../services/cart/CartServices';
+import { CartContext } from '../../context/CartProvider';
 
 function BatteryPurchasePage() {
     const location = useLocation();
     const batteryData = location.state;
     const [quantity, setQuantity] = useState(1);
+    const { addBattery } = CartServices()
+    const { cart, setCart } = useContext(CartContext)
+
+    const handleAddBattery = async () => {
+            const response = await addBattery(cart.cartId, batteryData.batteryId, quantity)
+            console.log('response', response)
+            setCart(response)
+    }
 
     return (
         <div className="vh-100">
             <NavbarComponent setNavbarContent={true} />
 
             <div className='h-100 w-100 p-5 d-flex align-items-center justify-content-center'>
-                <Card className='border-0 shadow h-100 p-2 ' >
+                <Card className='border-0 shadow h-100 p-2' >
                     <Card.Body>
-                        <Row className="d-flex  h-100">
+                        <Row className="d-flex h-100">
 
                             <Col md={4} className='d-flex'>
                                 <ImageGallery />
@@ -33,7 +43,7 @@ function BatteryPurchasePage() {
 
 
                             <Col md={3} >
-                                <Card className='h-100 shadow-sm'>
+                                <Card className='h-100 shadow-sm '>
                                     <Card.Header className='d-flex flex-column justify-content-center py-3' style={{ background: '#F5F5F5' }}>
                                         <div className="lh-1">
                                             <h4 className='mb-0'>R$ {batteryData.value}</h4>
@@ -79,7 +89,11 @@ function BatteryPurchasePage() {
 
                                         <div className='mt-auto'>
                                             <Button variant='yellow py-2 fw-bold w-100 mb-2'>Comprar</Button>
-                                            <Button variant='outline-primary py-2 fw-bold w-100'>Adicionar ao Carrinho</Button>
+                                            <Button variant='outline-primary py-2 fw-bold w-100'
+                                                onClick={() => handleAddBattery()}
+                                            >
+                                                Adicionar ao Carrinho
+                                            </Button>
                                         </div>
                                     </Card.Body>
                                 </Card>

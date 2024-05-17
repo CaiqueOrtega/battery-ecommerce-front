@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col } from 'react-bootstrap';
-import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon , OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../assets/icons/IconsSet';
+import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../assets/icons/IconsSet';
 import logo from '../../../assets/images/logo.png';
 import LoginSignupButton from '../../common/LoginSignupButton';
 import './navbar.css';
@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 import ModalLogout from '../../common/ModalLogout';
 
 function VerifyAuth({ children }) {
-  const { userData, isContextLoaded } = useContext(AuthContext);
+  const { userData, isContextLoaded, navigate } = useContext(AuthContext);
   const { userRoleAuthorization } = AuthServices();
   const [auth, setAuth] = useState(true);
 
@@ -33,6 +33,7 @@ function VerifyAuth({ children }) {
 }
 
 function NavbarComponent({ setNavbarContent }) {
+  const { navigate } = useContext(AuthContext);
 
   const renderMobileLogin = () => (
     <Row className="d-lg-none mt-2 mobile-login pb-2 px-2">
@@ -65,38 +66,40 @@ function NavbarComponent({ setNavbarContent }) {
     </Dropdown>
   );
 
-  const navbarContent = () => (
-    <>
-      <Col md={6} className='order-last order-md-0 mt-3 mt-md-0'>
-        <form className="position-relative">
-          <Form.Control className="py-2 input-search-size" type="text" placeholder="Pesquise rapidamente a bateria ideal e energize..." />
-          <a type="button" className="position-absolute top-50 end-0 translate-middle-y bg-white border-start ps-2 me-2">
-            <SearchIcon currentColor={"c00d0d"} size={"28"} />
-          </a>
-        </form>
-      </Col>
+  const navbarContent = () => {
+    return (
+      <>
+        <Col md={6} className='order-last order-md-0 mt-3 mt-md-0'>
+          <form className="position-relative">
+            <Form.Control className="py-2 input-search-size" type="text" placeholder="Pesquise rapidamente a bateria ideal e energize..." />
+            <a type="button" className="position-absolute top-50 end-0 translate-middle-y bg-white border-start ps-2 me-2">
+              <SearchIcon currentColor={"c00d0d"} size={"28"} />
+            </a>
+          </form>
+        </Col>
 
-      <Col className='col-auto d-flex order-md-0 order-first '>
+        <Col className='col-auto d-flex order-md-0 order-first '>
 
-        {renderCart()}
-        <RenderDropdown />
+          {renderCart()}
+          <RenderDropdown />
 
 
-        <Navbar.Toggle className="border-0 ms-1 me-md-3" aria-controls="navbarContent" />
-      </Col>
+          <Navbar.Toggle className="border-0 ms-1 me-md-3" aria-controls="navbarContent" />
+        </Col>
 
-      <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
-        {renderMobileLogin()}
-      </Navbar.Collapse>
-    </>
-  );
+        <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
+          {renderMobileLogin()}
+        </Navbar.Collapse>
+      </>
+    )
+  };
 
   return (
     <Navbar expand="lg" className="bg-yellow shadow" variant="dark">
       <Row className="d-flex flex-fill g-0  px-2 px-lg-4 align-items-center justify-content-between">
         <Col className='col-auto order-first ms-md-3'>
           <Navbar.Brand className='m-0'>
-            <img src={logo} width="150px" alt="Logo" />
+            <img src={logo} width="150px" alt="Logo" onClick={() => { navigate('/') }} />
           </Navbar.Brand>
         </Col>
 
@@ -134,7 +137,7 @@ function RenderDropdown() {
 
           </Dropdown.Toggle>
 
-          <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 ' style={{width: '14em'}}>
+          <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 ' style={{ width: '14em' }}>
             <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
 
             <Link to="/configuracoes" className='d-flex align-items-center mb-1 dropdown-item'>
@@ -144,7 +147,7 @@ function RenderDropdown() {
 
               <div className='ms-2 d-flex flex-column lh-sm' >
                 <span className='fw-semibold '>{userData.name ? userData.name : 'carreganddo...'}</span>
-                <span className='small text-muted'>Minha Conta <ChevronLeftIcon size={'13px'}/> </span>
+                <span className='small text-muted'>Minha Conta <ChevronLeftIcon size={'13px'} /> </span>
               </div>
             </Link>
             <Dropdown.Divider className='mx-3' />
@@ -161,9 +164,9 @@ function RenderDropdown() {
                 <span className='ms-2'>Painel de controle</span></Link>
             </VerifyAuth>
             <Dropdown.Item className='d-flex align-items-center mb-1'>
-              <LockIconOutline currentColor={'a3a29f'}/> <span className='ms-2'>Segurança</span>
+              <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
             </Dropdown.Item>
-            <Dropdown.Divider className='mx-3'/>
+            <Dropdown.Divider className='mx-3' />
             <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>
               <ExitIcon />  <span className='ms-2'>Sair da conta</span>
             </Dropdown.Item>

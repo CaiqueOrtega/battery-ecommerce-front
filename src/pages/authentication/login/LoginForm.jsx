@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import {Form, Button} from 'react-bootstrap';
 import { LockIcon, EnvelopeIcon, AlertIcon } from '../../../assets/icons/IconsSet.jsx';
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon.jsx';
-import { useLocation } from "react-router-dom";
 import AuthServices from '../../../services/auth/AuthServices.jsx';
 
 
@@ -10,7 +9,6 @@ import AuthServices from '../../../services/auth/AuthServices.jsx';
 function LoginForm({ emailSingUp }) {
   const [emailLogin, setEmailLogin] = useState('');
   const [passwordLogin, setPasswordLogin] = useState('');
-  const location = useLocation();
   const { errorMessages, setErrorMessages, login } = AuthServices();
   const [prevFormDataLogin, setPrevFormDataLogin] = useState('');
   

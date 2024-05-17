@@ -9,6 +9,7 @@ import { BatteryProvider } from './context/BatteryProvider';
 import { DashBoardProvider } from './context/DashBoardProvider';
 import AuthenticationPage from './pages/authentication/AuthenticationPage';
 import BatteryPurchasePage from './pages/batteryPurchase/BatteryPurchasePage';
+import { CartProvider } from './context/CartProvider';
 
 function App() {
 
@@ -16,7 +17,7 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<BatteryProvider><HomePage /></BatteryProvider>} />
+          <Route path="/" element={<BatteryProvider><CartProvider><HomePage /></CartProvider></BatteryProvider>} />
           <Route path="/paineldecontrole" element={
             <BatteryProvider>
                 <DashBoardProvider>
@@ -24,8 +25,8 @@ function App() {
                 </DashBoardProvider>
             </BatteryProvider>} />
             <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
-            <Route path='/bateria' element={<BatteryProvider><BatteryPurchasePage /></BatteryProvider>}/>
-          <Route path="/configuracoes" element={<MyAccont />} />
+            <Route path='/bateria' element={<BatteryProvider><CartProvider><BatteryPurchasePage /></CartProvider></BatteryProvider>}/>
+          <Route path="/configuracoes" element={<CartProvider><MyAccont /></CartProvider>} />
         </Routes>
       </AuthProvider>
     </Router >

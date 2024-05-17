@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import NavbarComponent from "../../components/layout/navbar/Navbar";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon } from "../../assets/icons/IconsSet";
@@ -7,6 +7,7 @@ import { useContext } from "react";
 import AccontContent from "./accont/AccontContent";
 import AdressContent from "./address/AddressContent";
 import './settings.css'
+
 
 
 const CardOption = ({ icon, title, description, onClick }) => (
@@ -91,6 +92,10 @@ function Settings() {
     const { userData } = useContext(AuthContext);
     const [selectedOption, setSelectedOption] = useState('account');
     const [mobileVisibleCard, setMobileVisibleCard] = useState(false);
+
+    useEffect(() => {
+        document.title = "Minha conta";
+      }, []);
 
     const getContent = useMemo(() => {
         switch (selectedOption) {

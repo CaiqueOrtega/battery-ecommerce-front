@@ -17,6 +17,7 @@ function AuthProvider({ children }) {
   const { getUserByEmail } = UserService();
   const [userData, setUserData] = useState({});
 
+
   useEffect(() => {
     const checkToken = async () => {
 
@@ -62,7 +63,6 @@ function AuthProvider({ children }) {
   }
 
   const handleLogin = (generatedToken) => {
-    console.log('CONTEXTO', generatedToken);
     setToken(generatedToken);
     localStorage.setItem('token', generatedToken);
     navigate('/');
@@ -70,7 +70,6 @@ function AuthProvider({ children }) {
 
 
   const VerifyAuth = ({ children }) => {
-    console.log('teste')
     const { userRoleAuthorization } = AuthServices();
     const [response, setResponse] = useState(null);
 
