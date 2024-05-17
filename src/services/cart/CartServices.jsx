@@ -8,9 +8,11 @@ const CartServices = () => {
     const getByUser = async (userId) => {
         try {
             const response = await ConnectionAPI.get(`cart/user/${userId}`)
+            console.log('teste|TESTETETET', response)
             return response.data
         } catch (error) {
             handleAPIError(error)
+            console.log('error', error)
         }
     }
 

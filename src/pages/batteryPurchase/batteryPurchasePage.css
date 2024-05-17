@@ -9,6 +9,11 @@
     justify-content: center !important;
     align-items: center !important;
     z-index: 1050; 
-  
+}
+
+@media (min-width: 1200px){
+    .purchase-container{
+        min-width: 75.5rem;
+    }
 }
 

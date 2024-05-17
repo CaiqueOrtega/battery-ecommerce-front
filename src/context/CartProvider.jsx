@@ -15,6 +15,7 @@ function CartProvider({ children }) {
             const response = await getByUser(userId)
             setCart(response)
             setIsContextLoaded(true)
+            console.log(response)
         }
     }
 

@@ -77,22 +77,21 @@ function ImageGallery() {
                         key={index}
                         src={image.thumbnail}
                         alt={`Thumbnail ${index}`}
-                        className={`img-thumbnail mb-2 ${selectedImageIndex === index ? 'border border-warning' : ''}`}
+                        className={`img-thumbnail p-0 mb-2 rounded-1 ${selectedImageIndex === index ? 'border border-warning border-2' : ''}`}
                         onClick={() => setSelectedImageIndex(index)}
-                        style={{ cursor: 'pointer', width: '50px', height: '50px' }}
+                        style={{ cursor: 'pointer', width: '2.75em', height: '2.75em' }}
                     />
                 ))}
             </div>
 
-            <div style={{ maxWidth: '400px', maxHeight: '500px' }}>
+            <div style={{ maxWidth: '23.625em', height: '29.75em'}}>
                 <Carousel activeIndex={selectedImageIndex} onSelect={handleSlideChange} indicators={false} interval={null}>
                     {images.map((image, index) => (
                         <Carousel.Item key={index}>
                             <img
                                 src={image.original}
                                 alt={`Imagem ${index}`}
-                                className="d-block w-100"
-                                style={{ maxWidth: '350px', height: '468px', cursor: 'zoom-in' }}
+                                style={{ maxWidth: '23.625em', height: '29.75em', cursor: 'zoom-in' }}
                                 onClick={handleImageClick}
                             />
                         </Carousel.Item>
