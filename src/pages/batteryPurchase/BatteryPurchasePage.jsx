@@ -15,19 +15,24 @@ function BatteryPurchasePage() {
         <div className="vh-100">
             <NavbarComponent setNavbarContent={true} />
 
-            <Container fluid={'lg'} className='py-5 h-100 p-0'>
-                <Card className='border-0 shadow h-100 p-2 '>
+            <div className='h-100 w-100 p-5 d-flex align-items-center justify-content-center'>
+                <Card className='border-0 shadow h-100 p-2 ' >
                     <Card.Body>
                         <Row className="d-flex  h-100">
 
-                            <Col md={8} className='d-flex'>
+                            <Col md={4} className='d-flex'>
                                 <ImageGallery />
                             </Col>
 
+                            <Col md={5}>
+                                <div>
+                                    <h4>{batteryData.name}</h4>
+                                    <p className='text-muted'>{batteryData.description}</p>
+                                </div>
+                            </Col>
 
 
-
-                            <Col md={4}>
+                            <Col md={3} >
                                 <Card className='h-100 shadow-sm'>
                                     <Card.Header className='d-flex flex-column justify-content-center py-3' style={{ background: '#F5F5F5' }}>
                                         <div className="lh-1">
@@ -48,20 +53,20 @@ function BatteryPurchasePage() {
                                             <Card className="d-flex">
                                                 <Row>
                                                     <Col className='col-auto'>
-                                                        <Button variant="primary fw-bold rounded-end-0 px-3 " onClick={() => setQuantity(prevQuantity => Math.max(0, prevQuantity - 1))}>-</Button>
+                                                        <Button variant="primary fw-bold rounded-end-0 px-3 " onClick={() => setQuantity(prevQuantity => Math.max(1, prevQuantity - 1))}>-</Button>
                                                     </Col>
                                                     <Col className='d-flex justify-content-center align-items-center'>
-                                                    <FormControl
+                                                        <FormControl
                                                             type="text"
                                                             className="flex-grow-0 text-center py-1 border-0"
                                                             value={quantity}
                                                             onChange={(e) => {
                                                                 let value = Number(e.target.value);
-                                                                if (isNaN(value) || value < 0) {
-                                                                    value = 0;
+                                                                if (isNaN(value) || value < 1) {
+                                                                    value = 1;
                                                                 }
                                                                 setQuantity(Math.min(batteryData.quantity, value));
-                                                            }} 
+                                                            }}
                                                         />
                                                     </Col>
                                                     <Col className='col-auto'>
@@ -84,7 +89,7 @@ function BatteryPurchasePage() {
 
                     </Card.Body>
                 </Card>
-            </Container>
+            </div>
         </div>
     );
 

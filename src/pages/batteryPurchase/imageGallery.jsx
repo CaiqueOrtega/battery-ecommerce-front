@@ -6,16 +6,16 @@ import { ZoomInIcon, ZoomOutIcon, ResetZoomIcon } from '../../assets/icons/Icons
 function ImageGallery() {
     const images = [
         {
-            original: 'https://placehold.co/600x400/EEE/31343C',
-            thumbnail: 'https://placehold.co/600x400/EEE/31343C',
+            original: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
+            thumbnail: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
         },
         {
-            original: 'https://placehold.co/600x400/EEE/31343C',
-            thumbnail: 'https://placehold.co/600x400/EEE/31343C',
+            original: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
+            thumbnail: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
         },
         {
-            original: 'https://placehold.co/600x400/EEE/31343C',
-            thumbnail: 'https://placehold.co/600x400/EEE/31343C',
+            original: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
+            thumbnail: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
         },
     ];
 
@@ -92,7 +92,7 @@ function ImageGallery() {
                                 src={image.original}
                                 alt={`Imagem ${index}`}
                                 className="d-block w-100"
-                                style={{ maxWidth: '400px', maxHeight: '500px', cursor: 'pointer' }}
+                                style={{ maxWidth: '350px', height: '468px', cursor: 'zoom-in' }}
                                 onClick={handleImageClick}
                             />
                         </Carousel.Item>
@@ -122,9 +122,7 @@ function ImageGallery() {
                                     <img
                                         src={images[selectedImageIndex].original}
                                         alt={`Imagem ${selectedImageIndex}`}
-                                        className="fullscreen-image"
-                                        onClick={() => setShowFullscreen(false)}
-                                        style={{ cursor: 'pointer', maxWidth: '100%', maxHeight: '100%' }}
+                                        style={{maxWidth: '100%', maxHeight: '100%' }}
 
                                     />
                                 </TransformComponent>
