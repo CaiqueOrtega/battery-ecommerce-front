@@ -96,7 +96,7 @@ function NavbarComponent({ setNavbarContent }) {
       <Row className="d-flex flex-fill g-0  px-2 px-lg-4 align-items-center justify-content-between">
         <Col className='col-auto order-first ms-md-3'>
           <Navbar.Brand className='m-0'>
-            <img src={logo} width="180px" alt="Logo" />
+            <img src={logo} width="150px" alt="Logo" />
           </Navbar.Brand>
         </Col>
 
