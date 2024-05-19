@@ -1,6 +1,6 @@
 import { AddIcon } from "../../../assets/icons/IconsSet"
 
-function AdressContent() {
+function AddressContent() {
     console.log('teste')
 
     return (
@@ -17,4 +17,4 @@ function AdressContent() {
     );
 }
 
-export default AdressContent
+export default AddressContent

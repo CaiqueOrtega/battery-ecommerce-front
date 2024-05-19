@@ -35,7 +35,7 @@ const UserService = () => {
     }
   }
 
-  const desactiveAccont = async (userId, password) => {
+  const desactiveAccount = async (userId, password) => {
     try {
       await ConnectionAPI.delete(`users/${userId}/${password}`);
       logout()
@@ -60,7 +60,7 @@ const UserService = () => {
 
 
 
-  return { getUserByEmail, getUsers, changeRole, desactiveAccont, errorMessages, setErrorMessages, updateUser }
+  return { getUserByEmail, getUsers, changeRole, desactiveAccount, errorMessages, setErrorMessages, updateUser }
 };
 
 export default UserService;

@@ -4,9 +4,8 @@ import { DolarIcon, AlertIcon, LockIcon } from "../../../assets/icons/IconsSet";
 import { useState, useEffect, useContext } from "react";
 import UserService from "../../../services/users/UsersServices";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
-import { AuthContext } from "../../../context/AuthProvider";
 
-const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
+const ConfirmDesactiveAccountModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
     const [verifyPassword, setVerifyPassword] = useState('')
     const [verifyConfirmPassword, setVerifyConfirmPassword] = useState('')
     const [prevValues, setPrevValues] = useState({password: null, confirmPassword: null})
@@ -69,16 +68,16 @@ const ConfirmDesactiveAccontModal = ({ showModal, setShowModal, userData, handle
 }
 
 
-function AccontContent({ userData }) {
+function AccountContent({ userData }) {
     const [email, setEmail] = useState(userData ? userData.email : '')
     const [name, setName] = useState(userData ? userData.name : '')
     const [prevValues, setPrevValues] = useState(userData ? {name: userData.name, email: userData.email} : {})
     const [disableFormControl, setDisableFormControl] = useState(true);
     const [request, setRequest] = useState('view')
     const [successMessage, setSuccessMessage] = useState(null)
-    const [showConfirmDesactiveAccontModal, setShowConfirmDesactiveAccontModal] = useState(false);
+    const [showConfirmDesactiveAccountModal, setShowConfirmDesactiveAccountModal] = useState(false);
     const [showMainContent, setShowMainContent] = useState(false)
-    const { desactiveAccont, errorMessages, setErrorMessages, updateUser } = UserService();
+    const { desactiveAccount, errorMessages, setErrorMessages, updateUser } = UserService();
 
 
 
@@ -87,7 +86,7 @@ function AccontContent({ userData }) {
     
         if (action === 'desactive') {
             setShowMainContent(false);
-            const response = await desactiveAccont(userData.userId, password);
+            const response = await desactiveAccount(userData.userId, password);
             if (response) {
                 return true;
             } else {
@@ -189,18 +188,18 @@ function AccontContent({ userData }) {
                     : <Button variant="yellow ms-md-3" onClick={(e) => handleUpdate(userData.userId, name, email)}>Atualizar Dados</Button>
                 }
 
-                {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccontModal(true)}>Desativar Conta</Button>
+                {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccountModal(true)}>Desativar Conta</Button>
                     : <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setRequest('view')}>Cancelar</Button>
                 }
 
             </div>
 
 
-            <ConfirmDesactiveAccontModal showModal={showConfirmDesactiveAccontModal} setShowModal={setShowConfirmDesactiveAccontModal}
+            <ConfirmDesactiveAccountModal showModal={showConfirmDesactiveAccountModal} setShowModal={setShowConfirmDesactiveAccountModal}
                 userData={userData} handleConfirm={handleConfirm}
                 errorMessages={errorMessages} setErrorMessages={setErrorMessages} />
         </>
     );
 }
 
-export default AccontContent;
+export default AccountContent;

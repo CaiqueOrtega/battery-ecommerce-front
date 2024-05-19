@@ -4,8 +4,8 @@ import { Container, Row, Col, Card } from "react-bootstrap";
 import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon } from "../../assets/icons/IconsSet";
 import { AuthContext } from "../../context/AuthProvider";
 import { useContext } from "react";
-import AccontContent from "./accont/AccontContent";
-import AdressContent from "./address/AddressContent";
+import AccountContent from "./account/AccountContent";
+import AddressContent from "./address/AddressContent";
 import './settings.css'
 
 
@@ -103,7 +103,7 @@ function Settings() {
             case 'account':
                 return <AccontContent userData={userData} />;
             case 'address':
-                return <AdressContent />;
+                return <AddressContent />;
             default:
                 return null;
         }
