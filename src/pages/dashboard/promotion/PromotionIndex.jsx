@@ -15,7 +15,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const [showsModalPDF, setShowModalPDF] = useState(false);
     const [activeField, setActiveField] = useState(null);
 
@@ -330,6 +330,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                     <Pagination
                         totalItems={promotions.length}
                         itemsPerPage={itemsPerPage}
+                        setItemsPerPage={setItemsPerPage}
                         currentPage={currentPage}
                         onPageChange={setCurrentPage}
                     />

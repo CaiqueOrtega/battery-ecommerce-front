@@ -294,7 +294,7 @@ function BatteryIndex({ batteries, setBatteries }) {
         </>
     )
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = batteries.slice(indexOfFirstItem, indexOfLastItem);
@@ -383,6 +383,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                     <Pagination
                         totalItems={batteries.length}
                         itemsPerPage={itemsPerPage}
+                        setItemsPerPage={setItemsPerPage}
                         currentPage={currentPage}
                         onPageChange={setCurrentPage}
                     />

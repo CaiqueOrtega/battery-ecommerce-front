@@ -103,7 +103,7 @@ function UserIndex({ users, setUsers }) {
     }
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
@@ -166,12 +166,14 @@ function UserIndex({ users, setUsers }) {
                         </tbody>
                     </Table>
 
-                    <Pagination
-                        totalItems={users.length}
-                        itemsPerPage={itemsPerPage}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                    />
+                        <Pagination
+                            totalItems={users.length}
+                            itemsPerPage={itemsPerPage}
+                            setItemsPerPage={setItemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
+
                 </Card.Body>
             </Card>
 
