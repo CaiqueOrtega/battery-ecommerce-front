@@ -7,6 +7,7 @@ import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
 import ModalPdf from '../../../services/pdf/Report'
 import Pagination from '../../../components/common/PaginationTable';
+import SortButton from "../../../components/common/SortButton";
 
 
 export default function PromotionIndex({ promotions, setPromotions }) {
@@ -16,6 +17,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
     const [showsModalPDF, setShowModalPDF] = useState(false);
+    const [activeField, setActiveField] = useState(null);
 
 
     const [action, setAction] = useState('');
@@ -275,11 +277,36 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                     <Table responsive hover bordered>
                         <thead>
                             <tr>
-                                <th className='bg-table-header'>Código</th>
-                                <th className='bg-table-header'>Porcentagem</th>
-                                <th className='bg-table-header'>Data início</th>
-                                <th className='bg-table-header'>Data validade</th>
-                                <th className="bg-table-header">Status</th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Código
+                                        <SortButton field="code" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Porcentagem
+                                        <SortButton field="percentage" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Data início
+                                        <SortButton field="startDate" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Data validade
+                                        <SortButton field="expirationDate" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className="bg-table-header">
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Status
+                                        <SortButton field="status" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -294,7 +321,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                                     <td className='text-end'>{promotion.percentage}%</td>
                                     <td>{promotion.startDate}</td>
                                     <td>{promotion.expirationDate}</td>
-                                    <td>{promotion.status}</td>
+                                    <td>{promotion.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}</td>
                                 </tr>
                             ))}
                         </tbody>

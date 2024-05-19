@@ -6,6 +6,7 @@ import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal"
 import { AuthContext } from '../../../context/AuthProvider';
 import Pagination from "../../../components/common/PaginationTable";
 import ModalPdf from '../../../services/pdf/Report'
+import SortButton from "../../../components/common/SortButton";
 
 function UserIndex({ users, setUsers }) {
     const { userData } = useContext(AuthContext);
@@ -15,6 +16,7 @@ function UserIndex({ users, setUsers }) {
     const [selectedRole, setSelectedRole] = useState({});
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
     const [showsModalPDF, setShowModalPDF] = useState(false);
+    const [activeField, setActiveField] = useState(null);
 
     const { changeRole, errorMessages, setErrorMessages } = UserService()
 
@@ -119,10 +121,30 @@ function UserIndex({ users, setUsers }) {
                     <Table responsive hover bordered>
                         <thead>
                             <tr>
-                                <th className='bg-table-header'>Nome</th>
-                                <th className='bg-table-header'>Email</th>
-                                <th className='bg-table-header'>Cargo</th>
-                                <th className='bg-table-header'>Status</th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Nome
+                                        <SortButton field="name" values={users} setValues={setUsers} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Email
+                                        <SortButton field="email" values={users} setValues={setUsers} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Cargo
+                                        <SortButton field="role" values={users} setValues={setUsers} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
+                                <th className='bg-table-header'>
+                                    <div className='d-flex justify-content-between py-1'>
+                                        Status
+                                        <SortButton field="status" values={users} setValues={setUsers} activeField={activeField} setActiveField={setActiveField} />
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,8 +159,8 @@ function UserIndex({ users, setUsers }) {
                                 }}>
                                     <td>{user.name}</td>
                                     <td>{user.email}</td>
-                                    <td className='text-end'>{user.role}</td>
-                                    <td className='text-end'>{user.status}</td>
+                                    <td>{user.role == 'ADMIN' ? 'Administrador' : 'Usuário'}</td>
+                                    <td>{user.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}</td>
                                 </tr>
                             ))}
                         </tbody>

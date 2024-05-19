@@ -374,7 +374,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                                     <td className='table-cell-pointer'>{battery.description}</td>
                                     <td className='table-cell-pointer text-end'>{battery.value}</td>
                                     <td className='table-cell-pointer text-end'>{battery.quantity}</td>
-                                    <td className='table-cell-pointer text-end'>{battery.status}</td>
+                                    <td className='table-cell-pointer'>{battery.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}</td>
                                 </tr>
                             ))}
                         </tbody>

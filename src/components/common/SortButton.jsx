@@ -9,20 +9,37 @@ function SortButton({ field, values, setValues, activeField, setActiveField }) {
         setSortDirection(nextDirection);
 
         const sortedValues = [...values].sort((a, b) => {
-            // Função para comparar strings iniciadas por letras ou números
+            const valueA = a[field];
+            const valueB = b[field];
+
+            // Função para comparar strings iniciadas por letras, números ou datas
             const compareAlphaNumeric = (valueA, valueB) => {
-                // Verifica se os valores são numéricos
+                // Verifica se os valores são datas no formato "DD/MM/YYYY"
+                const isDate = (str) => /^\d{2}\/\d{2}\/\d{4}$/.test(str);
+
+                const parseDate = (str) => {
+                    const [day, month, year] = str.split('/').map(Number);
+                    return new Date(year, month - 1, day); // mês começa em 0 no objeto Date
+                };
+
+                if (isDate(valueA) && isDate(valueB)) {
+                    // Converte os valores para objetos Date e compara
+                    const dateA = parseDate(valueA);
+                    const dateB = parseDate(valueB);
+                    return nextDirection === 'asc' ? dateA - dateB : dateB - dateA;
+                } 
+
                 const isNumeric = /^\d/.test(valueA) && /^\d/.test(valueB);
                 if (isNumeric) {
                     // Converte os valores para números e compara
                     return nextDirection === 'asc' ? parseFloat(valueA) - parseFloat(valueB) : parseFloat(valueB) - parseFloat(valueA);
                 } else {
-                    // Se não forem numéricos, compara alfabeticamente
+                    // Se não forem numéricos ou datas, compara alfabeticamente
                     return nextDirection === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
                 }
             };
 
-            return compareAlphaNumeric(a[field], b[field]);
+            return compareAlphaNumeric(valueA, valueB);
         });
 
         setValues(sortedValues);
