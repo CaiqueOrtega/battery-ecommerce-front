@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Modal, Row, Col, Button } from 'react-bootstrap';
 import { PDFViewer, Document, Page, Text, View, Image, PDFDownloadLink, StyleSheet } from '@react-pdf/renderer';
 import logo from '../../assets/images/logo-PretoBranco.png';
@@ -285,9 +285,8 @@ const MyDocument = ({ data, user, type }) => {
 
 const ReportGenerator = ({ data, userData, type }) => {
     const pdfViewer = (
-        <PDFViewer width="100%" height="370em">
+        <PDFViewer width="100%" height="350em">
             <MyDocument data={data} user={userData} type={type} />
-
         </PDFViewer>
     );
 
@@ -303,10 +302,15 @@ const ReportGenerator = ({ data, userData, type }) => {
 };
 
 function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
-    console.log('show', showsModalPDF)
-
     const { userData } = useContext(AuthContext);
     const { pdfViewer, pdfButtonLink } = ReportGenerator({ data: currentItems, userData, type });
+    const [showModalPdfSwitch, setShowModalPdfSwitch] = useState(false)
+    const inputRef = useRef(null);
+
+    const handleShowModalPdfSwitchChange = useCallback(() => {
+        setShowModalPdfSwitch(prevState => !prevState);
+        inputRef.current.checked = !showModalPdfSwitch;
+    }, [showModalPdfSwitch]);
 
     return (
         <>
@@ -318,12 +322,82 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                 </Modal.Header>
 
                 <Modal.Body style={{ height: 400 }}>
-                    <Row>
+                    <Row className='h-100'>
                         <Col md={6}>
-                            {pdfViewer}
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                                    checked={showModalPdfSwitch}
+                                    onChange={handleShowModalPdfSwitchChange}
+                                    ref={inputRef}
+                                />
+                                <label class="form-check-label" for="flexSwitchCheckChecked">Pré visualização de PDF</label>
+                            </div>
+
+                            {showModalPdfSwitch && pdfViewer}
                         </Col>
 
                         <Col md={6}>
+                            <p>Filtros</p>
+                            {type == 'user' ?
+                                <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Usuários"
+                                >
+                                    <option disabled selected>Filtragem Usuários</option>
+                                    <option value="user-clear">Limpar Filtros</option>
+                                    <optgroup label='Status'>
+                                        <option value="user-active">Ativo</option>
+                                        <option value="user-inactive">Inativo</option>
+                                    </optgroup>
+                                    <optgroup label='Cargo'>
+                                        <option value="user-user">Usuário</option>
+                                        <option value="user-admin">Administrador</option>
+                                    </optgroup>
+                                </select>
+                                : type == 'battery' ?
+                                <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Usuários"
+                                >
+                                    <option disabled selected>Filtragem Baterias</option>
+                                    <option value="battery-clear">Limpar Filtros</option>
+                                    <optgroup label='Status'>
+                                        <option value="battery-active">Ativo</option>
+                                        <option value="battery-inactive">Inativo</option>
+                                    </optgroup>
+                                    <optgroup label='Preço'>
+                                        <option value="battery-value-100">0 R$ - 100 R$</option>
+                                        <option value="battery-value-250">100 R$ - 250 R$</option>
+                                        <option value="battery-value-500">250 R$ - 500 R$</option>
+                                    </optgroup>
+                                    <optgroup label='Quantidade'>
+                                        <option value="battery-quantity-100">0 - 100 Unidades</option>
+                                        <option value="battery-quantity-250">100 - 250 Unidades</option>
+                                        <option value="battery-quantity-500">250 - 500 Unidades</option>
+                                        <option value="battery-quantity-over-500">Acima de 500 Unidades</option>
+                                    </optgroup>
+                                </select>
+                                    : type == 'promotion' ?
+                                    <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Promoções"
+                                    >
+                                        <option disabled selected>Filtragem Promoções</option>
+                                        <option value="promotion-clear">Limpar Filtros</option>
+                                        <optgroup label='Status'>
+                                            <option value="promotion-active">Ativo</option>
+                                            <option value="promotion-inactive">Inativo</option>
+                                            <option value="promotion-expired">Vencido</option>
+                                        </optgroup>
+                                        <optgroup label='Vencimento'>
+                                            <option value="battery-validity-1">Próximo mês</option>
+                                            <option value="battery-validity-3">Próximos 3 meses</option>
+                                            <option value="battery-validity-6">Próximos 6 meses</option>
+                                            <option value="battery-validity-over-6">Acima de 6 meses</option>
+                                        </optgroup>
+                                        <optgroup label='Porcentagem de Desconto'>
+                                            <option value="battery-percentage-15">0 - 15%</option>
+                                            <option value="battery-percentage-30">15 - 30%</option>
+                                            <option value="battery-percentage-50">30 - 50% Unidades</option>
+                                            <option value="battery-percentage-over-50">Acima de 50%</option>
+                                        </optgroup>
+                                    </select>
+                                        : null}
+
                         </Col>
                     </Row>
                 </Modal.Body>
