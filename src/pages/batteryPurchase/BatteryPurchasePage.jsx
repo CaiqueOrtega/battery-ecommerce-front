@@ -4,7 +4,7 @@ import { Card, Container, Row, Col, Button, FormControl } from 'react-bootstrap'
 import NavbarComponent from '../../components/layout/navbar/Navbar';
 import ImageGallery from './imageGallery';
 import './batteryPurchasePage.css';
-import { MotocycleIcon } from '../../assets/icons/IconsSet';
+import { MotorcycleIcon } from '../../assets/icons/IconsSet';
 import CartServices from '../../services/cart/CartServices';
 import { CartContext } from '../../context/CartProvider';
 
@@ -48,7 +48,7 @@ function BatteryPurchasePage() {
                                             <h4 className='mb-0'>R$ {batteryData.value}</h4>
                                             <span className='text-success'>Em 5x R$ {(batteryData.value / 5).toFixed(2)} sem juros</span>
                                         </div>
-                                        <span className='mt-2 text-muted small'><MotocycleIcon /> Vendido por MacDavis Motos</span>
+                                        <span className='mt-2 text-muted small'><MotorcycleIcon /> Vendido por MacDavis Motos</span>
                                     </Card.Header>
 
                                     <Card.Body className='d-flex flex-column justify-content-between'>

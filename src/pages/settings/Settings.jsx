@@ -101,7 +101,7 @@ function Settings() {
     const getContent = useMemo(() => {
         switch (selectedOption) {
             case 'account':
-                return <AccontContent userData={userData} />;
+                return <AccountContent userData={userData} />;
             case 'address':
                 return <AddressContent />;
             default:

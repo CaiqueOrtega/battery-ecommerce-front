@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
-import { AtomIcon, BarCode, DolarIcon, StockIcon, TextBodyIcon, PdfIcon } from '../../../assets/icons/IconsSet';
+import { AtomIcon, BarCode, DollarIcon, StockIcon, TextBodyIcon, PdfIcon } from '../../../assets/icons/IconsSet';
 import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
 import BatteryCard from '../../../components/common/BatteryCard';
 import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
@@ -224,7 +224,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                                     <Col md={6}>
                                         <Form.Label className='w-100'>Preço</Form.Label>
                                         <FormGroupWithIcon
-                                            icon={<DolarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                                            icon={<DollarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                                             type='text'
                                             placeholder='Preço do produto (Ex: R$ 00,00 )'
                                             mb={'mb-4'}
