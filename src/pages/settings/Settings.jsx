@@ -30,7 +30,7 @@ const CardOption = ({ icon, title, description, onClick }) => (
     </Card>
 );
 
-const OptionsCards = ({ handleCardClick, userDataName }) => (
+const OptionsCards = ({ handleCardClick, userDataName, navigate }) => (
     <>
         <Card className="shadow mb-4">
             <Card.Body className="d-flex align-items-center">
@@ -84,12 +84,13 @@ const OptionsCards = ({ handleCardClick, userDataName }) => (
             icon={<CartIcon size={22} />}
             title="Voltar"
             description="Voltar a pagina Inicial"
+            onClick={() => navigate('/')}
         />
     </>
 );
 
 function Settings() {
-    const { userData } = useContext(AuthContext);
+    const { userData, navigate } = useContext(AuthContext);
     const [selectedOption, setSelectedOption] = useState('account');
     const [mobileVisibleCard, setMobileVisibleCard] = useState(false);
 
@@ -117,9 +118,12 @@ function Settings() {
                         <Row className="h-sm-100">
                             <Col md={4} className={`mt-4 mt-md-0 d-md-block ${mobileVisibleCard && 'd-none'}`}>
                                 <OptionsCards handleCardClick={(optionCard) => {
-                                    setSelectedOption(optionCard)
-                                    setMobileVisibleCard(true);
-                                }} userDataName={userData ? userData.name : ''} />
+                                        setSelectedOption(optionCard)
+                                        setMobileVisibleCard(true);
+                                    }}
+                                    userDataName={userData ? userData.name : ''} 
+                                    navigate={navigate}        
+                                />
                             </Col>
 
                             <Col className={`d-md-block ${!mobileVisibleCard && 'd-none'} expanded-card`}>
