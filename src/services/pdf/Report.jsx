@@ -126,7 +126,10 @@ const TablePromotion = ({ data }) => (
                 <View style={styles.tableCol}><Text>{row.percentage}</Text></View>
                 <View style={styles.tableCol}><Text>{row.startDate}</Text></View>
                 <View style={styles.tableCol}><Text>{row.expirationDate}</Text></View>
-                <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+                <View style={styles.tableCol}><Text>{row.status == 'ACTIVE' ? 'Ativo'
+                    : row.status == 'INACTIVE' ? 'Inativo'
+                        : row.status == 'EXPIRED' ? 'Vencido'
+                            : null}</Text></View>
             </View>
         ))}
     </View>
@@ -353,49 +356,49 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                     </optgroup>
                                 </select>
                                 : type == 'battery' ?
-                                <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Usuários"
-                                >
-                                    <option disabled selected>Filtragem Baterias</option>
-                                    <option value="battery-clear">Limpar Filtros</option>
-                                    <optgroup label='Status'>
-                                        <option value="battery-active">Ativo</option>
-                                        <option value="battery-inactive">Inativo</option>
-                                    </optgroup>
-                                    <optgroup label='Preço'>
-                                        <option value="battery-value-100">0 R$ - 100 R$</option>
-                                        <option value="battery-value-250">100 R$ - 250 R$</option>
-                                        <option value="battery-value-500">250 R$ - 500 R$</option>
-                                    </optgroup>
-                                    <optgroup label='Quantidade'>
-                                        <option value="battery-quantity-100">0 - 100 Unidades</option>
-                                        <option value="battery-quantity-250">100 - 250 Unidades</option>
-                                        <option value="battery-quantity-500">250 - 500 Unidades</option>
-                                        <option value="battery-quantity-over-500">Acima de 500 Unidades</option>
-                                    </optgroup>
-                                </select>
-                                    : type == 'promotion' ?
-                                    <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Promoções"
+                                    <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Usuários"
                                     >
-                                        <option disabled selected>Filtragem Promoções</option>
-                                        <option value="promotion-clear">Limpar Filtros</option>
+                                        <option disabled selected>Filtragem Baterias</option>
+                                        <option value="battery-clear">Limpar Filtros</option>
                                         <optgroup label='Status'>
-                                            <option value="promotion-active">Ativo</option>
-                                            <option value="promotion-inactive">Inativo</option>
-                                            <option value="promotion-expired">Vencido</option>
+                                            <option value="battery-active">Ativo</option>
+                                            <option value="battery-inactive">Inativo</option>
                                         </optgroup>
-                                        <optgroup label='Vencimento'>
-                                            <option value="battery-validity-1">Próximo mês</option>
-                                            <option value="battery-validity-3">Próximos 3 meses</option>
-                                            <option value="battery-validity-6">Próximos 6 meses</option>
-                                            <option value="battery-validity-over-6">Acima de 6 meses</option>
+                                        <optgroup label='Preço'>
+                                            <option value="battery-value-100">0 R$ - 100 R$</option>
+                                            <option value="battery-value-250">100 R$ - 250 R$</option>
+                                            <option value="battery-value-500">250 R$ - 500 R$</option>
                                         </optgroup>
-                                        <optgroup label='Porcentagem de Desconto'>
-                                            <option value="battery-percentage-15">0 - 15%</option>
-                                            <option value="battery-percentage-30">15 - 30%</option>
-                                            <option value="battery-percentage-50">30 - 50% Unidades</option>
-                                            <option value="battery-percentage-over-50">Acima de 50%</option>
+                                        <optgroup label='Quantidade'>
+                                            <option value="battery-quantity-100">0 - 100 Unidades</option>
+                                            <option value="battery-quantity-250">100 - 250 Unidades</option>
+                                            <option value="battery-quantity-500">250 - 500 Unidades</option>
+                                            <option value="battery-quantity-over-500">Acima de 500 Unidades</option>
                                         </optgroup>
                                     </select>
+                                    : type == 'promotion' ?
+                                        <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Promoções"
+                                        >
+                                            <option disabled selected>Filtragem Promoções</option>
+                                            <option value="promotion-clear">Limpar Filtros</option>
+                                            <optgroup label='Status'>
+                                                <option value="promotion-active">Ativo</option>
+                                                <option value="promotion-inactive">Inativo</option>
+                                                <option value="promotion-expired">Vencido</option>
+                                            </optgroup>
+                                            <optgroup label='Vencimento'>
+                                                <option value="battery-validity-1">Próximo mês</option>
+                                                <option value="battery-validity-3">Próximos 3 meses</option>
+                                                <option value="battery-validity-6">Próximos 6 meses</option>
+                                                <option value="battery-validity-over-6">Acima de 6 meses</option>
+                                            </optgroup>
+                                            <optgroup label='Porcentagem de Desconto'>
+                                                <option value="battery-percentage-15">0 - 15%</option>
+                                                <option value="battery-percentage-30">15 - 30%</option>
+                                                <option value="battery-percentage-50">30 - 50% Unidades</option>
+                                                <option value="battery-percentage-over-50">Acima de 50%</option>
+                                            </optgroup>
+                                        </select>
                                         : null}
 
                         </Col>

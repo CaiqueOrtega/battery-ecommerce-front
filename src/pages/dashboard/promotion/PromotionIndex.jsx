@@ -321,7 +321,10 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                                     <td className='text-end'>{promotion.percentage}%</td>
                                     <td>{promotion.startDate}</td>
                                     <td>{promotion.expirationDate}</td>
-                                    <td>{promotion.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}</td>
+                                    <td>{promotion.status == 'ACTIVE' ? 'Ativo'
+                                        : promotion.status == 'INACTIVE' ? 'Inativo'
+                                            : promotion.status == 'EXPIRED' ? 'Vencido'
+                                                : null}</td>
                                 </tr>
                             ))}
                         </tbody>
