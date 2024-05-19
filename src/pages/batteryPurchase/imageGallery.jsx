@@ -70,7 +70,7 @@ function ImageGallery() {
 
 
     return (
-        <>
+        <section className="d-flex">
             <div className="d-flex flex-column me-2">
                 {images.map((image, index) => (
                     <img
@@ -138,7 +138,7 @@ function ImageGallery() {
                 </div >
             )
             }
-        </>
+        </section>
     );
 }
 

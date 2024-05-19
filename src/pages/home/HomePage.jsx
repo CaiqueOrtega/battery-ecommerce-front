@@ -3,7 +3,7 @@ import NavbarComponent from '../../components/layout/navbar/Navbar';
 import { BatteryContext } from '../../context/BatteryProvider';
 import { BsArrowLeft, BsArrowRight } from '../../assets/icons/IconsSet';
 import BatteryCard from '../../components/common/BatteryCard';
-import { Carousel, Container, Card } from 'react-bootstrap';
+import { Carousel, Container, Row, Col } from 'react-bootstrap';
 import ControlledCarousel from './carousel/Carousel';
 import './home.css';
 import { useNavigate } from 'react-router-dom';
@@ -74,16 +74,22 @@ function HomePage() {
   };
 
   return (
-    <>
-      <NavbarComponent setNavbarContent={true} />
-      <ControlledCarousel />
+    <Row className="flex-column justify-content-between g-0" style={{ minHeight: '100vh' }}>
+      <Col xs={12} className="p-0">
+        <NavbarComponent setNavbarContent={true} />
+      </Col>
 
-      <Container className='mt-4'>
-        {renderBatteries()}
-      </Container >
+      <Col xs={12} className="p-0 flex-grow-1 d-flex flex-column">
+        <ControlledCarousel />
+        <Container className="mt-4">
+          {renderBatteries()}
+        </Container>
+      </Col>
 
-      <Footer/>
-    </>
+      <Col xs={12} className="p-0">
+        <Footer />
+      </Col>
+    </Row>
   );
 }
 

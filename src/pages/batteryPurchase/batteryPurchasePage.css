@@ -11,9 +11,14 @@
     z-index: 1050; 
 }
 
+.purchase-col-card{
+    max-width: 20.5em;
+}
+
 @media (min-width: 1200px){
     .purchase-container{
         min-width: 75.5rem;
     }
 }
+
 

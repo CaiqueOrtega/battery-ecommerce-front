@@ -1,12 +1,14 @@
 import { useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Card, Container, Row, Col, Button, FormControl } from 'react-bootstrap';
+import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup } from 'react-bootstrap';
+import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 import NavbarComponent from '../../components/layout/navbar/Navbar';
 import ImageGallery from './imageGallery';
 import './batteryPurchasePage.css';
 import { MotorcycleIcon } from '../../assets/icons/IconsSet';
 import CartServices from '../../services/cart/CartServices';
 import { CartContext } from '../../context/CartProvider';
+import AddressServices from '../../services/address/AddressServices';
 
 function BatteryPurchasePage() {
     const location = useLocation();
@@ -14,13 +16,16 @@ function BatteryPurchasePage() {
     const [quantity, setQuantity] = useState(1);
     const { addBattery } = CartServices()
     const { cart, setCart } = useContext(CartContext)
+    const [formCEP, setFormCEP] = useState('');
+    const { getFreight } = AddressServices();
 
     const handleAddBattery = async () => {
-            const response = await addBattery(cart.cartId, batteryData.batteryId, quantity)
-            console.log('response', response)
-            setCart(response)
+        const response = await addBattery(cart.cartId, batteryData.batteryId, quantity)
+        console.log('response', response)
+        setCart(response)
     }
 
+    console.log('babatata mais docece', formCEP)
     return (
         <>
             <NavbarComponent setNavbarContent={true} />
@@ -28,20 +33,21 @@ function BatteryPurchasePage() {
                 <Card className="border-0 shadow " >
                     <Card.Body>
                         <Row className="d-flex">
-
-                            <Col  className='col-auto d-flex'>
+                            <Col className='col-auto'>
                                 <ImageGallery />
                             </Col>
 
-                            <Col md={6} lg={{ span: 1, min: 4 }} className='flex-grow-1'>
+                            <Col>
                                 <div>
                                     <h4>{batteryData.name}</h4>
                                     <p className="text-muted">{batteryData.description}</p>
                                 </div>
+
+                                
                             </Col>
 
 
-                            <Col >
+                            <Col className='col-auto purchase-col-card'>
                                 <Card className='h-100 shadow-sm'  >
                                     <Card.Header className='d-flex flex-column justify-content-center py-3' style={{ background: '#F5F5F5' }}>
                                         <div className="lh-1">
@@ -53,8 +59,24 @@ function BatteryPurchasePage() {
 
                                     <Card.Body className='d-flex flex-column justify-content-between'>
 
-
                                         <div className='px-4'>
+
+                                            <div className=''>
+                                                <span>Calcular frete</span>
+                                                <Form className='d-flex align-items-center'>
+                                                    <InputGroup className='flex-nowrap' >
+                                                        <FormGroupWithIcon
+                                                            type={'text'}
+                                                            placeholder={'XXXXX-XXX'}
+                                                            value={formCEP}
+                                                            onChange={(e) => setFormCEP(e.target.value)}
+                                                        />
+                                                        <Button variant="red" onClick={() => getFreight(formCEP)}>Ok</Button>
+                                                    </InputGroup>
+                                                </Form>
+                                            </div>
+
+
                                             <div className='lh-sm mb-3'>
                                                 <h6 className='fw-bold mb-0'>Estoque disponível</h6>
                                                 <span>disponível: <span className='fw-bold'> {batteryData.quantity} unidades</span></span>
@@ -88,7 +110,7 @@ function BatteryPurchasePage() {
 
                                         <div className='mt-auto'>
                                             <Button variant='yellow py-2 fw-bold w-100 mb-2'>Comprar</Button>
-                                            <Button variant='outline-primary py-2 fw-bold w-100'
+                                            <Button variant='red-outline py-2 fw-bold w-100'
                                                 onClick={() => handleAddBattery()}
                                             >
                                                 Adicionar ao Carrinho

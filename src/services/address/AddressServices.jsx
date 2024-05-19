@@ -6,7 +6,7 @@ const AddressServices = () => {
 
     const createAddress = async (formAddressValues, user) => {
         try {
-            const response = await ConnectionAPI.post('/address', {
+            const response = await ConnectionAPI.post('address', {
                 address: formAddressValues.address,
                 number: formAddressValues.number,
                 neighborhood: formAddressValues.neighborhood,
@@ -22,7 +22,17 @@ const AddressServices = () => {
         }
     }
 
-    return { createAddress }
+    const getFreight = async (cep) =>{
+        try {
+            console.log('AAA', cep)
+            const response = await ConnectionAPI.get(`freight/${cep}`)
+            console.log(response)
+            return response.data
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
+    return { createAddress, getFreight }
 }
 
 export default AddressServices
