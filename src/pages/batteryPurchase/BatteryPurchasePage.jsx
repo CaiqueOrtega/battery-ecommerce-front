@@ -22,9 +22,9 @@ function BatteryPurchasePage() {
     }
 
     return (
-        <div className="vh-100">
+        <>
             <NavbarComponent setNavbarContent={true} />
-            <Container fluid={'xl'} className="purchase-container h-100 py-lg-4" >
+            <Container fluid={'xl'} className="purchase-container py-lg-4" >
                 <Card className="border-0 shadow " >
                     <Card.Body>
                         <Row className="d-flex">
@@ -103,7 +103,7 @@ function BatteryPurchasePage() {
                     </Card.Body>
                 </Card>
             </Container >
-        </div>
+        </>
     );
 
 }

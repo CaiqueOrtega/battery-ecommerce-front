@@ -13,7 +13,7 @@ function ControlledCarousel() {
 
   return (
     <div  className='position-relative z-1' style={{ height: '20rem', overflow: 'hidden' }}>
-      <Carousel activeIndex={index} onSelect={handleSelect}>
+      <Carousel activeIndex={index} onSelect={handleSelect} interval={3000}>
         <Carousel.Item>
           <img
             className="d-block w-100"
