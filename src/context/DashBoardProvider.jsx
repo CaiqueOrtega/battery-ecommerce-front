@@ -40,7 +40,7 @@ function DashBoardProvider({ children }) {
 
 
     return isContextLoaded ? (
-        <VerifyAuth>
+        <VerifyAuth request={true}>
             <DashBoardContext.Provider value={{ promotions, setPromotions, users, setUsers, batteries, setBatteries, setRenderOptionData }}>
                 {children}
             </DashBoardContext.Provider>

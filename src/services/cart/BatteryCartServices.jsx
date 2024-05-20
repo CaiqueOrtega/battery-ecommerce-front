@@ -2,13 +2,13 @@ import ErrorServices from "../error/ErrorServices";
 import ConnectionAPI from "../ConnectionAPI";
 
 
-const CartServices = () => {
+const BatteryCartServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
 
     const getByUser = async (userId) => {
         try {
             const response = await ConnectionAPI.get(`cart/user/${userId}`)
-            console.log('teste|TESTETETET', response)
+            console.log('', response)
             return response.data
         } catch (error) {
             handleAPIError(error)
@@ -29,4 +29,4 @@ const CartServices = () => {
     return { getByUser, addBattery }
 }
 
-export default CartServices
+export default BatteryCartServices

@@ -8,13 +8,34 @@
     width: 250px;
 }
 
-.mobile-login{
+.dropdown-menu-cart-size {
+    width: 21.875em;
+}
+
+.battery-cart-dropdown {
+    max-height: 13em;
+    overflow-y: auto;
+}
+
+.mobile-login {
     border-top: 1.3px solid #33333327;
+}
+
+.col-name-circle-mobile{
+    border-bottom: 1.3px solid #33333327;
 }
 
 .rounded-circle-navbar {
     width: 40px;
     height: 40px;
     font-size: 1rem;
+    border: 0.5px solid #3333333b;
+}
+
+
+.rounded-circle-navbar-collapse {
+    width: 55px;
+    height: 55px;
+    font-size: 1.5rem;
     border: 0.5px solid #3333333b;
 }

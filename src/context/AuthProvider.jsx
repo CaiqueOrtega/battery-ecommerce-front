@@ -34,7 +34,10 @@ function AuthProvider({ children }) {
             ConnectionAPI.defaults.headers['Authorization'] = `Bearer ${token}`;
             const user = await getUserByEmail(decodedToken.sub);
             if (user.status !== 'INACTIVE') {
-              setUserData(user);
+              const initials = fetchInitials(user.name);
+              const updatedUser = { ...user, initials: initials };
+
+              setUserData(updatedUser);
               setIsLoggedIn(true);
             }
           }
@@ -69,14 +72,14 @@ function AuthProvider({ children }) {
   }
 
 
-  const VerifyAuth = ({ children }) => {
+  const VerifyAuth = ({ children, request }) => {
     const { userRoleAuthorization } = AuthServices();
     const [response, setResponse] = useState(null);
 
     useEffect(() => {
       console.log(userData);
       async function fetchData() {
-        const response = await userRoleAuthorization(userData, true);
+        const response = await userRoleAuthorization(userData, request);
         setResponse(response);
       }
       fetchData();
@@ -85,6 +88,20 @@ function AuthProvider({ children }) {
     console.log(response)
     return response ? children : null;
   }
+
+  const fetchInitials = (userDataName) => {
+    let initials = '';
+    if (userDataName) {
+      const names = userDataName.split(' ');
+      if (names.length >= 2) {
+        initials = names[0].charAt(0).toUpperCase() + names[1].charAt(0).toUpperCase();
+      } else if (names.length === 1) {
+        initials = names[0].slice(0, 2).toUpperCase();
+      }
+    }
+    return initials;
+  }
+
 
   useEffect(() => {
     if (!isLoggedIn) {

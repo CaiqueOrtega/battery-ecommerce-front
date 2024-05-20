@@ -28,7 +28,7 @@ body {
     background-color: #ebebeb !important;
 }
 
-.dropdown-no-carret .dropdown-toggle::after {
+.dropdown-no-caret .dropdown-toggle::after {
     display: none;
 }
 
@@ -72,3 +72,8 @@ body {
     background-color: #f11100 !important;
     color: white !important;
 }
+
+
+.list-group {
+    --bs-list-group-bg: none !important; 
+  }

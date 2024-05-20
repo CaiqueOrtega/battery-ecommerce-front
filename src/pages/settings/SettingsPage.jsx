@@ -9,7 +9,6 @@ import AddressContent from "./address/AddressContent";
 import './settings.css'
 
 
-
 const CardOption = ({ icon, title, description, onClick }) => (
     <Card className="border-0 shadow mb-2 card-option " onClick={onClick}>
         <Card.Body>
@@ -30,14 +29,14 @@ const CardOption = ({ icon, title, description, onClick }) => (
     </Card>
 );
 
-const OptionsCards = ({ handleCardClick, userDataName, navigate }) => (
+const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigate }) => (
     <>
         <Card className="shadow mb-4">
             <Card.Body className="d-flex align-items-center">
                 <Row >
                     <Col xs={3} className="d-flex align-items-center justify-content-center p-0">
                         <div className="rounded-circle  bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center initial-circle">
-                            <span className="initial-letter">{userDataName ? userDataName.charAt(0).toUpperCase() : null}</span>
+                            <span className="initial-letter">{userDataInitials}</span>
                         </div>
                     </Col>
                     <Col xs={9} className="ps-2 p-0">
@@ -89,7 +88,7 @@ const OptionsCards = ({ handleCardClick, userDataName, navigate }) => (
     </>
 );
 
-function Settings() {
+function SettingsPage() {
     const { userData, navigate } = useContext(AuthContext);
     const [selectedOption, setSelectedOption] = useState('account');
     const [mobileVisibleCard, setMobileVisibleCard] = useState(false);
@@ -121,7 +120,8 @@ function Settings() {
                                         setSelectedOption(optionCard)
                                         setMobileVisibleCard(true);
                                     }}
-                                    userDataName={userData ? userData.name : ''} 
+                                    userDataName={userData?.name } 
+                                    userDataInitials={userData?.initials}
                                     navigate={navigate}        
                                 />
                             </Col>
@@ -145,4 +145,4 @@ function Settings() {
 
 }
 
-export default Settings;
+export default SettingsPage;
