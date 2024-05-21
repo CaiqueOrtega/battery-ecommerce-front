@@ -9,6 +9,10 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get('battery/all')
             return response.data
         } catch (error) {
+<<<<<<< HEAD
+=======
+            console.log('erro get ', error)
+>>>>>>> f5e12b34a6e37d831d904038b8d8c39e3250d659
         }
     }
 
@@ -18,10 +22,22 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get('battery')
             return response.data
         } catch (error) {
+<<<<<<< HEAD
+=======
+            console.log('erro get', error)
+>>>>>>> f5e12b34a6e37d831d904038b8d8c39e3250d659
         }
     }
 
-
+    const getByListBatteries = async (batteriesIds) => {
+        console.log(batteriesIds)
+        try {
+            const response = await ConnectionAPI.post('battery/list', batteriesIds)
+            return response.data
+        } catch (error) {
+            console.log('erro get ', error)
+        }
+    }
     
 
     const createBattery = async (batteryValues) => {
@@ -74,7 +90,7 @@ const BatteryServices = () => {
         }
     }
 
-    return { createBattery, getBatteriesAll, getBatteriesActive, updateBattery, deleteBattery, errorMessages, setErrorMessages, reactiveBattery }
+    return { createBattery, getBatteriesAll, getBatteriesActive, getByListBatteries , updateBattery, deleteBattery, errorMessages, setErrorMessages, reactiveBattery }
 }
 
 export default BatteryServices;
