@@ -9,7 +9,7 @@ import AuthenticationPage from './pages/authentication/AuthenticationPage';
 import BatteryPurchasePage from './pages/batteryPurchase/BatteryPurchasePage';
 
 import { AuthProvider } from './context/AuthProvider';
-import { BatteryProvider } from './context/BatteryProvider';
+import { GlobalDataProvider } from './context/GlobalDataProvider';
 import { DashBoardProvider } from './context/DashBoardProvider';
 import { BatteryCartProvider } from './context/BatteryCartProvider';
 import TermsAndConditions from './pages/terms/TermsAndConditions';
@@ -20,15 +20,10 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<BatteryProvider><BatteryCartProvider><HomePage /></BatteryCartProvider></BatteryProvider>} />
-          <Route path="/paineldecontrole" element={
-            <BatteryProvider>
-              <DashBoardProvider>
-                <DashboardPage />
-              </DashBoardProvider>
-            </BatteryProvider>} />
+          <Route path="/" element={<GlobalDataProvider><BatteryCartProvider><HomePage /></BatteryCartProvider></GlobalDataProvider>} />
+          <Route path="/paineldecontrole" element={<DashBoardProvider><DashboardPage /> </DashBoardProvider>} />
           <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
-          <Route path='/bateria' element={<BatteryProvider><BatteryCartProvider><BatteryPurchasePage /></BatteryCartProvider></BatteryProvider>} />
+          <Route path='/bateria' element={<GlobalDataProvider><BatteryCartProvider><BatteryPurchasePage /></BatteryCartProvider></GlobalDataProvider>} />
           <Route path="/configuracoes" element={<BatteryCartProvider><Settings /></BatteryCartProvider>} />
           <Route path='/termos' element={<TermsAndConditions/>}/>
         </Routes>

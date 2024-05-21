@@ -23,6 +23,16 @@ const AddressServices = () => {
         }
     }
 
+    const getAddressByUserId = async (userId) =>{
+        try{
+            const response= await ConnectionAPI.get(`address/user/${userId}`)
+            return response.data;
+
+        }catch(error){
+            handleAPIError(error)
+        }
+    }
+
     const getFreight = async (cep) =>{
         try {
             console.log('AAA', cep)
@@ -46,7 +56,7 @@ const AddressServices = () => {
     
  
 
-    return { createAddress, getFreight, getAddress }
+    return { createAddress, getFreight, getAddress, getAddressByUserId }
 
 }
 

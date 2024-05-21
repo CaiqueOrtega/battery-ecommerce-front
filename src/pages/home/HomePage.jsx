@@ -1,6 +1,5 @@
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import NavbarComponent from '../../components/layout/navbar/Navbar';
-import { BatteryContext } from '../../context/BatteryProvider';
 import { BsArrowLeft, BsArrowRight } from '../../assets/icons/IconsSet';
 import BatteryCard from '../../components/common/BatteryCard';
 import { Carousel, Container, Row, Col } from 'react-bootstrap';
@@ -8,15 +7,16 @@ import ControlledCarousel from './carousel/Carousel';
 import './home.css';
 import { useNavigate } from 'react-router-dom';
 import Footer from './footer/Footer';
+import { useGlobalData } from '../../context/GlobalDataProvider'; 
 
 function HomePage() {
-  const { batteriesActive, setGetBatteryActive } = useContext(BatteryContext);
+  const { batteriesActive, setFetchBatteryData }  = useGlobalData();
   const [batteriesPerPage, setBatteriesPerPage] = useState(5);
   const navigate = useNavigate();
 
   useEffect(() => {
     document.title = "Página Inicial";
-    setGetBatteryActive(prevState => !prevState);
+    setFetchBatteryData(prevState => !prevState);
   }, []);
 
 

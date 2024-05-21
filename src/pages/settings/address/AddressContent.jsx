@@ -9,7 +9,8 @@ function AddressContent() {
     const [showAddressModal, setShowAddressModal] = useState(false)
 
     return (
-        <>
+        <section>
+            <AddressModal setShowAddressModal={setShowAddressModal} showAddressModal={showAddressModal} />
             <div className="d-flex justify-content-between">
                 <h4>Meus Endereços</h4>
 
@@ -20,17 +21,30 @@ function AddressContent() {
                     <span className="ms-2">Adicionar novo Endereço</span>
                 </a>
             </div>
-            <AddressModal setShowAddressModal={setShowAddressModal} showAddressModal={showAddressModal} />
-        </>
+
+
+
+
+
+        </section>
     );
 }
+
+function UserAddress() {
+
+
+    return (
+            <></>
+    );
+}
+
 
 function AddressModal({ setShowAddressModal, showAddressModal }) {
     const { userData } = useContext(AuthContext);
     const { createAddress, getAddress } = AddressServices()
     const formRef = useRef(null)
     const [formAddressValues, setFormAddressValues] = useState({
-    CEP: '',
+        CEP: '',
         address: '',
         number: '',
         neighborhood: '',
@@ -58,7 +72,7 @@ function AddressModal({ setShowAddressModal, showAddressModal }) {
         }
     }
 
-    async function handleSubmit(){
+    async function handleSubmit() {
         const response = await createAddress(formAddressValues, userData.userId)
         console.log(response)
     }
@@ -114,7 +128,7 @@ function AddressModal({ setShowAddressModal, showAddressModal }) {
                             value={formAddressValues.complement}
                             onChange={(e) => setFormAddressValues({ ...formAddressValues, complement: e.target.value })}
                             disableRequired={true}
-                            
+
                         />
                     </Form.Label>
 
