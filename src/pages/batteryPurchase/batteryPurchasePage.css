@@ -35,6 +35,11 @@
     }
 }
 
+.card-body-freight{
+    height: 85px;
+    overflow-y: auto !important;
+}
+
 
 @media (max-width: 600px){
     .image-carousel{

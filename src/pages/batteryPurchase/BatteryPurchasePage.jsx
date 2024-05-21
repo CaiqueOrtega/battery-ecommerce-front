@@ -10,7 +10,7 @@ import BatteryCartServices from '../../services/cart/BatteryCartServices';
 import { BatteryCartContext } from '../../context/BatteryCartProvider';
 import AddressServices from '../../services/address/AddressServices';
 import { AuthContext } from '../../context/AuthProvider';
-import { MapIcon } from '../../assets/icons/IconsSet';
+import { MapIcon, DeliveryIcon } from '../../assets/icons/IconsSet';
 
 function BatteryPurchasePage() {
     const location = useLocation();
@@ -19,10 +19,11 @@ function BatteryPurchasePage() {
     const { addBattery } = BatteryCartServices();
     const { batteryCart, setBatteryCart } = useContext(BatteryCartContext);
     const [formCEP, setFormCEP] = useState('');
-    const { getFreight } = AddressServices();
+    const { getFreight, getAddress } = AddressServices();
     const { isLoggedIn } = useContext(AuthContext);
     const [freightValues, setFreightValues] = useState({});
     const [prevFormCEP, setPrevFormCEP] = useState({})
+    const [addressValues, setAddressValues] = useState({})
 
     const handleAddBattery = async () => {
         if (isLoggedIn && batteryCart) {
@@ -70,15 +71,55 @@ function BatteryPurchasePage() {
         }
     }
 
-    const handleFreight = async (e, formCEP) =>{
+    const handleFreight = async (e, formCEP) => {
         e.preventDefault();
-        
-        if(formCEP != prevFormCEP){
-            const response = await getFreight(formCEP);
-            setFreightValues(response);
-            setPrevFormCEP(formCEP);
+
+        if (formCEP != prevFormCEP) {
+            let response;
+            response = await getAddress(formCEP);
+
+            if (response) {
+                setAddressValues(response);
+                response = await getFreight(formCEP);
+                setFreightValues(response);
+                console.log('Freight value', freightValues)
+                setPrevFormCEP(formCEP);
+            }
         }
     }
+
+
+    const renderFreightCards = () => {
+        return (
+            <Card className='mt-3'>
+                <Card.Header type='button' className='small px-2 text-decoration-underline' >
+                        <MapIcon size={'15px'}/> {addressValues.logradouro}, {addressValues.bairro}
+                </Card.Header>
+                <Card.Body className='card-body-freight pt-1'>
+                    {freightValues.map((freight, index) => (
+                        <div key={index} className={`${index > 0 ? 'mt-2 pt-1' : ''}`}>
+                            {freight.discountPercentage > 0 && (
+                                <span className='text-muted small'>
+                                    Frete: <del>R${freight.defaultValue.toFixed(2)}</del><sup style={{ fontSize: '0.7em' }}>{freight.discountPercentage}%</sup>  <span className='text-success'>R${freight.contractValue.toFixed(2)}</span> ({freight.providerMethod})
+                                </span>
+                            )}
+                            {freight.discountPercentage === 0 && (
+                                <span className='text-muted small'>
+                                    Frete: R${freight.defaultValue.toFixed(2)} ({freight.providerMethod})
+                                </span>
+                            )}
+                            <br/>
+                            <span className='text-muted small'><DeliveryIcon size={'18px'} /> Você receberá em até {freight.estimateDays} dia{freight.estimateDays > 1 && 's'}</span>
+                            <hr className='mb-0'/>
+                        </div>
+                    ))}
+                </Card.Body>
+            </Card>
+        );
+    }
+    
+    
+    
 
     return (
         <>
@@ -110,25 +151,34 @@ function BatteryPurchasePage() {
 
                                     <Card.Body className=' d-flex flex-column justify-content-between'>
 
+
+                                        <section className=''>
+                                            {freightValues.length > 0 ? (
+                                                <div className="mt-3">
+                                                    {renderFreightCards()}
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span>Calcular frete</span>
+                                                    <Form className='d-flex align-items-center'>
+                                                        <InputGroup className='flex-nowrap'>
+                                                            <FormGroupWithIcon
+                                                                icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
+                                                                type={'text'}
+                                                                placeholder={'Digite o CEP'}
+                                                                value={formCEP}
+                                                                onChange={(e) => setFormCEP(e.target.value)}
+                                                            />
+                                                            <Button variant="red" onClick={(e) => handleFreight(e, formCEP)}>ok</Button>
+                                                        </InputGroup>
+                                                    </Form>
+                                                </>
+                                            )}
+                                        </section>
+
+
+
                                         <div className='px-4 h-100 d-flex flex-column justify-content-between'>
-
-                                            <div className=''>
-                                                <span>Calcular frete</span>
-                                                <Form className='d-flex align-items-center'>
-                                                    <InputGroup className='flex-nowrap' >
-                                                        <FormGroupWithIcon
-                                                            icon={<MapIcon  className='position-absolute ms-3' currentColor='#333' />}
-                                                            type={'text'}
-                                                            placeholder={'XXXXX-XXX'}
-                                                            value={formCEP}
-                                                            onChange={(e) => setFormCEP(e.target.value)}
-                                                        />
-                                                        <Button variant="red" onClick={(e) => handleFreight(e, formCEP)}>Ok</Button>
-                                                    </InputGroup>
-                                                </Form>
-                                            </div>
-
-
                                             <div className='mb-3 pb-1'>
                                                 <div className='lh-sm mb-3'>
                                                     <h6 className='fw-bold mb-0'>Estoque disponível</h6>
@@ -159,16 +209,17 @@ function BatteryPurchasePage() {
                                                     </Row>
                                                 </Card>
                                             </div>
+
+                                            <div>
+                                                <Button variant='yellow py-2 fw-bold w-100 mb-2'>Comprar</Button>
+                                                <Button variant='red-outline py-2 fw-bold w-100'
+                                                    onClick={() => handleAddBattery()}
+                                                >
+                                                    Adicionar ao Carrinho
+                                                </Button>
+                                            </div>
                                         </div>
 
-                                        <div className='mt-auto px-4'>
-                                            <Button variant='yellow py-2 fw-bold w-100 mb-2'>Comprar</Button>
-                                            <Button variant='red-outline py-2 fw-bold w-100'
-                                                onClick={() => handleAddBattery()}
-                                            >
-                                                Adicionar ao Carrinho
-                                            </Button>
-                                        </div>
                                     </Card.Body>
                                 </Card>
                             </Col>
