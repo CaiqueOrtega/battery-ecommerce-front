@@ -160,15 +160,15 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
   const { batteryCart } = useContext(BatteryCartContext);
 
 
-  const CartNotLoggedDropdownMenu = () => (
+  const CartEmptyDropdownMenu = () => (
     <Dropdown.Menu className="dropdown-menu-size rounded-4 shadow border-0 dropdown-menu-end mt-2 py-5 px-4 text-center">
       <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
-      <h5 className='text-muted '>Entre na sua conta, para ter acesso ao carrinho</h5>
+      <h5 className='text-muted '>Seu Carrinho esta Vazio</h5>
     </Dropdown.Menu>
   );
 
 
-  const CartLoggedDropdownMenu = () => (
+  const CartDropdownMenu = () => (
     <Dropdown.Menu className="dropdown-menu-cart-size rounded-4 shadow border-0 dropdown-menu-end mt-2 py-3 px-4">
       <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
       {Object.keys(batteryCart).length === 0 ? (
@@ -213,7 +213,7 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
       <Dropdown.Toggle as={NavLink} className='me-3'>
         <CartIcon strokeWidth={'0.2'} size={30} />
       </Dropdown.Toggle>
-      {!isLoggedIn ? <CartNotLoggedDropdownMenu /> : <CartLoggedDropdownMenu />}
+      {!batteryCart ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
 
     </Dropdown>
   );

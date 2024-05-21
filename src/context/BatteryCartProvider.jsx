@@ -1,13 +1,15 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import CartServices from "../services/cart/BatteryCartServices";
+import BatteryCartServices from "../services/cart/BatteryCartServices";
+import BatteryServices from "../services/battery/BatteryServices";
 import { AuthContext } from "./AuthProvider";
 
 const BatteryCartContext = createContext({})
 
 function BatteryCartProvider({ children }) {
     const [batteryCart, setBatteryCart] = useState({});
-    const { getByUser } = CartServices();
-    const { userData } = useContext(AuthContext);
+    const { getByListBatteries } = BatteryServices ();
+    const { getByUser } = BatteryCartServices();
+    const { userData, isLoggedIn } = useContext(AuthContext);
 
     const handleCartUser = async (userId) => {
         if (userId) {
@@ -21,11 +23,28 @@ function BatteryCartProvider({ children }) {
         }
     };
 
-    useEffect(() => {
-        if (userData?.userId) {
-            handleCartUser(userData.userId);
+    const handleCartNotLogged = async () => {
+        try {
+            const storedCart = localStorage.getItem('batteryCart');
+            if (storedCart) {
+                const cartData = JSON.parse(storedCart);
+                const batteriesId = cartData.batteries.map(battery => battery.batteryId);
+                const response = await getByListBatteries(batteriesId);
+                setBatteryCart({ batteries: response});
+                console.log('Carrinho de Bateria (não logado):', response);
+            }
+        } catch (error) {
+            console.error("Falha ao pegar carrinho (não logado):", error);
         }
-    }, [userData]);
+    };
+
+    useEffect(() => {
+        if (userData?.userId && isLoggedIn) {
+            handleCartUser(userData.userId);
+        } else {
+            handleCartNotLogged();
+        }
+    }, [userData, isLoggedIn]);
 
     return (
         <BatteryCartContext.Provider value={{ batteryCart, setBatteryCart }}>

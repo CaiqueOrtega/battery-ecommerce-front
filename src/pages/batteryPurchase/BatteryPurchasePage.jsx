@@ -9,6 +9,8 @@ import { MotorcycleIcon } from '../../assets/icons/IconsSet';
 import BatteryCartServices from '../../services/cart/BatteryCartServices';
 import { BatteryCartContext } from '../../context/BatteryCartProvider';
 import AddressServices from '../../services/address/AddressServices';
+import { AuthContext } from '../../context/AuthProvider';
+
 
 function BatteryPurchasePage() {
     const location = useLocation();
@@ -18,11 +20,52 @@ function BatteryPurchasePage() {
     const { batteryCart, setBatteryCart } = useContext(BatteryCartContext)
     const [formCEP, setFormCEP] = useState('');
     const { getFreight } = AddressServices();
+    const { isLoggedIn } = useContext(AuthContext);
 
     const handleAddBattery = async () => {
-        const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity)
-        console.log('response', response)
-        setBatteryCart(response)
+        if (isLoggedIn) {
+            const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity)
+            console.log('response', response)
+            setBatteryCart(response)
+        } else {
+            let batteriesAddCart = [];
+            let totalPrice = 0;
+
+            const storedCart = localStorage.getItem('batteryCart');
+
+            if (storedCart) {
+                const cartData = JSON.parse(storedCart);
+                totalPrice = cartData.totalPrice + (batteryData.value * quantity);
+                batteriesAddCart = cartData.batteries;
+
+                if (batteriesAddCart.some(battery => battery.batteryId === batteryData.batteryId)) {
+                    batteriesAddCart.forEach(battery => {
+                        if (battery.batteryId === batteryData.batteryId) {
+                            battery.quantity += quantity;
+                        }
+                    });
+                } else {
+                    batteriesAddCart.push({
+                        batteryId: batteryData.batteryId,
+                        quantity: quantity
+                    });
+                }
+            } else {
+                totalPrice = batteryData.value * quantity;
+                batteriesAddCart.push({
+                    batteryId: batteryData.batteryId,
+                    quantity: quantity
+                });
+            }
+
+            const newItem = {
+                totalPrice: totalPrice,
+                batteries: batteriesAddCart
+            };
+
+            localStorage.setItem('batteryCart', JSON.stringify(newItem));
+
+        }
     }
 
     return (
@@ -36,7 +79,7 @@ function BatteryPurchasePage() {
                                 <ImageGallery />
                             </Col>
 
-                            <Col className='purchase-col-info align-self-start' >
+                            <Col className='purchase-col-info'>
                                 <div>
                                     <h4>{batteryData.name}</h4>
                                     <p className="text-muted">{batteryData.description}</p>
@@ -44,8 +87,8 @@ function BatteryPurchasePage() {
                             </Col>
 
 
-                            <Col className='col-auto purchase-col-card align-self-start'>
-                                <Card className='shadow-sm'  >
+                            <Col className='col-auto purchase-col-card '>
+                                <Card className='shadow-sm h-100'>
                                     <Card.Header className='d-flex flex-column justify-content-center py-3 mb-0' style={{ background: '#F5F5F5' }}>
                                         <div className="lh-1">
                                             <h4 className='mb-0'>R$ {batteryData.value}</h4>
