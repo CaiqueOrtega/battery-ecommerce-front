@@ -1,7 +1,12 @@
 import { Card } from "react-bootstrap";
 import NavbarComponent from "../../components/layout/navbar/Navbar";
+import { useEffect } from "react";
 
 export default function TermsAndConditions() {
+    useEffect(() => {
+        document.title = "Termos e Condições";
+      }, []);
+      
     return (
         <>
             <NavbarComponent />
