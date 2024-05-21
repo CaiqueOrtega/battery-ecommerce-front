@@ -83,15 +83,20 @@ function AuthProvider({ children }) {
     const [response, setResponse] = useState(null);
 
     useEffect(() => {
-      async function fetchData() {
-        const response = await userRoleAuthorization(userData, request);
-        setResponse(response);
+      if (isContextLoaded) {
+        async function fetchData() {
+          const response = await userRoleAuthorization(userData, request);
+          setResponse(response);
+        }
+        fetchData();
       }
-      fetchData();
     }, [userData, isContextLoaded, isLoggedIn]);
+
 
     return response ? children : null;
   }
+
+
 
   const fetchInitials = (userDataName) => {
     let initials = '';
@@ -107,7 +112,6 @@ function AuthProvider({ children }) {
   }
 
   useEffect(() => {
-    console.log(isContextLoaded, isLoggedIn)
     if (!isLoggedIn && isContextLoaded) {
       navigate('/');
     }

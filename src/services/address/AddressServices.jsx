@@ -1,5 +1,6 @@
 import ConnectionAPI from "../ConnectionAPI"
 import ErrorServices from "../error/ErrorServices";
+import ViaCepAPI from "../ViaCepAPI"
 
 const AddressServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
@@ -32,7 +33,21 @@ const AddressServices = () => {
             handleAPIError(error)
         }
     }
-    return { createAddress, getFreight }
+
+        const getAddress = async (cep) => {
+            try {
+                const response = await ViaCepAPI.get(`${cep}/json/`)
+                console.log(response.data)
+                return response.data
+            } catch (error) {
+                console.error('erro no cep')
+            }
+        }
+    
+ 
+
+    return { createAddress, getFreight, getAddress }
+
 }
 
 export default AddressServices

@@ -2,7 +2,6 @@ import { Button, Form, Modal } from "react-bootstrap";
 import { AddIcon } from "../../../assets/icons/IconsSet"
 import { useRef, useState, useContext } from "react";
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
-import CepServices from "../../../services/cep/CepServices";
 import { AuthContext } from "../../../context/AuthProvider";
 import AddressServices from "../../../services/address/AddressServices";
 
@@ -28,8 +27,7 @@ function AddressContent() {
 
 function AddressModal({ setShowAddressModal, showAddressModal }) {
     const { userData } = useContext(AuthContext);
-    const { getAddress } = CepServices()
-    const { createAddress } = AddressServices()
+    const { createAddress, getAddress } = AddressServices()
     const formRef = useRef(null)
     const [formAddressValues, setFormAddressValues] = useState({
     CEP: '',

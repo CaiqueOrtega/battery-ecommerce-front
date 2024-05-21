@@ -11,6 +11,7 @@
     z-index: 1050; 
 }
 
+
 .purchase-col-card{
     max-width: 20.5em;
 }
@@ -24,5 +25,30 @@
     }
 }
 
+@media(max-width: 1100px){
+    .purchase-container {
+        padding: 0 !important;
+    }
+    .purchase-col-card{
+        max-width: none !important;
+        padding-inline: 0 !important;
+    }
+}
 
 
+@media (max-width: 600px){
+    .image-carousel{
+        max-width: 19em !important;
+        max-height: 19em !important;
+    }
+    .container-image-carousel{
+        max-width: 19em !important;
+        max-height: 19em !important;
+    }
+
+    .card-value-purchase {
+        border: none !important;
+    }
+
+
+}

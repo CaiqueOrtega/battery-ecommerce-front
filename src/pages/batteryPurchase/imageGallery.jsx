@@ -84,11 +84,12 @@ function ImageGallery() {
                 ))}
             </div>
 
-            <div style={{ maxWidth: '23.625em', height: '29.75em'}}>
+            <div className='container-image-carousel' style={{ maxWidth: '23.625em', height: '29.75em' }}>
                 <Carousel activeIndex={selectedImageIndex} onSelect={handleSlideChange} indicators={false} interval={null}>
                     {images.map((image, index) => (
                         <Carousel.Item key={index}>
                             <img
+                                className='image-carousel'
                                 src={image.original}
                                 alt={`Imagem ${index}`}
                                 style={{ maxWidth: '23.625em', height: '29.75em', cursor: 'zoom-in' }}
@@ -121,7 +122,7 @@ function ImageGallery() {
                                     <img
                                         src={images[selectedImageIndex].original}
                                         alt={`Imagem ${selectedImageIndex}`}
-                                        style={{maxWidth: '100%', maxHeight: '100%' }}
+                                        style={{ maxWidth: '100%', maxHeight: '100%' }}
 
                                     />
                                 </TransformComponent>
