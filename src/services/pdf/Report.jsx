@@ -5,6 +5,8 @@ import logo from '../../assets/images/logo-PretoBranco.png';
 import { AuthContext } from '../../context/AuthProvider';
 import { useContext } from 'react';
 import UserService from '../users/UsersServices';
+import BatteryServices from '../battery/BatteryServices';
+import PromotionService from '../promotion/PromotionService';
 
 
 // Estilo para o PDF
@@ -108,99 +110,101 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         fontSize: 10
+    },
+    noContentText: {
+        textAlign: 'center',
+        marginTop: 10
     }
 });
 
 // Component, de tabela
 const TablePromotion = ({ data }) => (
-    <View style={styles.table}>
-        <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}><Text>Código</Text></View>
-            <View style={styles.tableColHeader}><Text>Porcentagem</Text></View>
-            <View style={styles.tableColHeader}><Text>Data Início</Text></View>
-            <View style={styles.tableColHeader}><Text>Data Validade</Text></View>
-            <View style={styles.tableColHeader}><Text>Status</Text></View>
-        </View>
-        {data.map((row, index) => (
-            <View style={styles.tableRow} key={index}>
-                <View style={styles.tableCol}><Text>{row.code}</Text></View>
-                <View style={styles.tableCol}><Text>{row.percentage}</Text></View>
-                <View style={styles.tableCol}><Text>{row.startDate}</Text></View>
-                <View style={styles.tableCol}><Text>{row.expirationDate}</Text></View>
-                <View style={styles.tableCol}><Text>{row.status == 'ACTIVE' ? 'Ativo'
-                    : row.status == 'INACTIVE' ? 'Inativo'
-                        : row.status == 'EXPIRED' ? 'Vencido'
-                            : null}</Text></View>
+    data.length === 0 ? <Text>Sem dados disponíveis</Text> : (
+        <View style={styles.table}>
+            <View style={styles.tableRow}>
+                <View style={styles.tableColHeader}><Text>Código</Text></View>
+                <View style={styles.tableColHeader}><Text>Porcentagem</Text></View>
+                <View style={styles.tableColHeader}><Text>Data Início</Text></View>
+                <View style={styles.tableColHeader}><Text>Data Validade</Text></View>
+                <View style={styles.tableColHeader}><Text>Status</Text></View>
             </View>
-        ))}
-    </View>
+            {data.map((row, index) => (
+                <View style={styles.tableRow} key={index}>
+                    <View style={styles.tableCol}><Text>{row.code}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.percentage}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.startDate}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.expirationDate}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo'
+                        : row.status === 'INACTIVE' ? 'Inativo'
+                            : row.status === 'EXPIRED' ? 'Vencido'
+                                : null}</Text></View>
+                </View>
+            ))}
+        </View>
+    )
 );
 
 const TableBattery = ({ data }) => (
-    <View style={styles.table}>
-        <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}><Text>Código</Text></View>
-            <View style={styles.tableColHeader}><Text>Nome</Text></View>
-            <View style={styles.tableColHeader}><Text>Valor</Text></View>
-            <View style={styles.tableColHeader}><Text>Status</Text></View>
-        </View>
-        {data.map((row, index) => (
-            <View style={styles.tableRow} key={index}>
-                <View style={styles.tableCol}><Text>{row.code}</Text></View>
-                <View style={styles.tableCol}><Text>{row.name}</Text></View>
-                <View style={styles.tableCol}><Text>{row.value}</Text></View>
-                <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+    data.length === 0 ? <Text>Sem dados disponíveis</Text> : (
+        <View style={styles.table}>
+            <View style={styles.tableRow}>
+                <View style={styles.tableColHeader}><Text>Código</Text></View>
+                <View style={styles.tableColHeader}><Text>Nome</Text></View>
+                <View style={styles.tableColHeader}><Text>Valor</Text></View>
+                <View style={styles.tableColHeader}><Text>Quantidade</Text></View>
+                <View style={styles.tableColHeader}><Text>Status</Text></View>
             </View>
-        ))}
-    </View>
+            {data.map((row, index) => (
+                <View style={styles.tableRow} key={index}>
+                    <View style={styles.tableCol}><Text>{row.code}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.name}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.value}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.quantity}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+                </View>
+            ))}
+        </View>
+    )
 );
 
 const TableUser = ({ data }) => (
-    <View style={styles.table}>
-        <View style={styles.tableRow}>
-            <View style={styles.tableColHeader}><Text>Nome</Text></View>
-            <View style={styles.tableColHeader}><Text>Email</Text></View>
-            <View style={styles.tableColHeader}><Text>Cargo</Text></View>
-            <View style={styles.tableColHeader}><Text>Status</Text></View>
-        </View>
-        {data.map((row, index) => (
-            <View style={styles.tableRow} key={index}>
-                <View style={styles.tableCol}><Text>{row.name}</Text></View>
-                <View style={styles.tableCol}><Text>{row.email}</Text></View>
-                <View style={styles.tableCol}><Text>{row.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</Text></View>
-                <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+    data.length === 0 ? <Text>Sem dados disponíveis</Text> : (
+        <View style={styles.table}>
+            <View style={styles.tableRow}>
+                <View style={styles.tableColHeader}><Text>Nome</Text></View>
+                <View style={styles.tableColHeader}><Text>Email</Text></View>
+                <View style={styles.tableColHeader}><Text>Cargo</Text></View>
+                <View style={styles.tableColHeader}><Text>Status</Text></View>
             </View>
-        ))}
-    </View>
+            {data.map((row, index) => (
+                <View style={styles.tableRow} key={index}>
+                    <View style={styles.tableCol}><Text>{row.name}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.email}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
+                </View>
+            ))}
+        </View>
+    )
 );
 
 
-
 const MyDocument = ({ data, user, type }) => {
-    // Definir o número de itens por página para a primeira e as seguintes
     const ITEMS_PER_PAGE_FIRST = 18;
     const ITEMS_PER_PAGE_NEXT = 35;
     const date = new Date().toLocaleString();
 
-    // Dividir os dados em partes para as páginas
     const chunks = data.reduce((chunks, item, index) => {
         let chunkIndex;
-        // Verificar se estamos na primeira página ou não
         if (index < ITEMS_PER_PAGE_FIRST) {
             chunkIndex = 0;
         } else {
-            // Se não for a primeira página, calcular o índice da página com base no número de itens por página seguinte
             chunkIndex = ITEMS_PER_PAGE_FIRST + Math.floor((index - ITEMS_PER_PAGE_FIRST) / ITEMS_PER_PAGE_NEXT);
         }
-
-        // Criar uma nova parte se não existir
         if (!chunks[chunkIndex]) {
             chunks[chunkIndex] = [];
         }
-
-        // Adicionar o item à parte correspondente
         chunks[chunkIndex].push(item);
-
         return chunks;
     }, []);
 
@@ -221,53 +225,41 @@ const MyDocument = ({ data, user, type }) => {
 
     return (
         <Document>
-            {chunks.map((chunk, pageIndex) => (
-                <Page key={pageIndex} size="A4" style={styles.page}>
+            {chunks.length === 0 ? (
+                <Page size="A4" style={styles.page}>
                     <View style={styles.section}>
-                        {pageIndex === 0 && (
-                            <View>
-                                <View style={styles.header}>
-                                    <View style={styles.columnImage}>
-                                        <Image source={logo} style={styles.logo} />
-                                    </View>
-                                    <View style={styles.columnText}>
-                                        {type === 'battery' ? (
-                                            <Text>Relatório de Baterias</Text>
-                                        ) : type === 'promotion' ? (
-                                            <Text>Relatório de Promoções</Text>
-                                        ) : type === 'user' ? (
-                                            <Text>Relatório de Usuários</Text>
-                                        ) : null}
-                                    </View>
-                                </View>
-                                <View style={styles.subtitle}>
-                                    {type === 'battery' ? (
-                                        <Text>{batterySubtitle}</Text>
-                                    ) : type === 'promotion' ? (
-                                        <Text>{promotionSubtitle}</Text>
-                                    ) : type === 'user' ? (
-                                        <Text>{userSubtitle}</Text>
-                                    ) : null}
-                                </View>
-                                <View style={styles.divisor}>
-                                    <Text>Usuário Solicitante</Text>
-                                </View>
-                                <View style={styles.userInfo}>
-                                    <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
-                                    <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
-                                    <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
-                                </View>
+                        <View style={styles.header}>
+                            <View style={styles.columnImage}>
+                                <Image src={logo} style={styles.logo} />
                             </View>
-                        )}
-                        {/* Parte da tabela */}
-                        {type === 'battery' ? (
-                            <TableBattery data={chunk} />
-                        ) : type === 'promotion' ? (
-                            <TablePromotion data={chunk} />
-                        ) : type === 'user' ? (
-                            <TableUser data={chunk} />
-                        ) : null}
-
+                            <View style={styles.columnText}>
+                                {type === 'battery' ? (
+                                    <Text>Relatório de Baterias</Text>
+                                ) : type === 'promotion' ? (
+                                    <Text>Relatório de Promoções</Text>
+                                ) : type === 'user' ? (
+                                    <Text>Relatório de Usuários</Text>
+                                ) : null}
+                            </View>
+                        </View>
+                        <View style={styles.subtitle}>
+                            {type === 'battery' ? (
+                                <Text>{batterySubtitle}</Text>
+                            ) : type === 'promotion' ? (
+                                <Text>{promotionSubtitle}</Text>
+                            ) : type === 'user' ? (
+                                <Text>{userSubtitle}</Text>
+                            ) : null}
+                        </View>
+                        <View style={styles.divisor}>
+                            <Text>Usuário Solicitante</Text>
+                        </View>
+                        <View style={styles.userInfo}>
+                            <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                            <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                            <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                        </View>
+                        <Text style={styles.noContentText}>Sem dados disponíveis</Text>
                         <View style={styles.pageCounter}>
                             <Text>{date}</Text>
                             <Text render={({ pageNumber, totalPages }) => (
@@ -276,10 +268,66 @@ const MyDocument = ({ data, user, type }) => {
                         </View>
                     </View>
                 </Page>
-            ))}
+            ) : (
+                chunks.map((chunk, pageIndex) => (
+                    <Page key={pageIndex} size="A4" style={styles.page}>
+                        <View style={styles.section}>
+                            {pageIndex === 0 && (
+                                <View>
+                                    <View style={styles.header}>
+                                        <View style={styles.columnImage}>
+                                            <Image src={logo} style={styles.logo} />
+                                        </View>
+                                        <View style={styles.columnText}>
+                                            {type === 'battery' ? (
+                                                <Text>Relatório de Baterias</Text>
+                                            ) : type === 'promotion' ? (
+                                                <Text>Relatório de Promoções</Text>
+                                            ) : type === 'user' ? (
+                                                <Text>Relatório de Usuários</Text>
+                                            ) : null}
+                                        </View>
+                                    </View>
+                                    <View style={styles.subtitle}>
+                                        {type === 'battery' ? (
+                                            <Text>{batterySubtitle}</Text>
+                                        ) : type === 'promotion' ? (
+                                            <Text>{promotionSubtitle}</Text>
+                                        ) : type === 'user' ? (
+                                            <Text>{userSubtitle}</Text>
+                                        ) : null}
+                                    </View>
+                                    <View style={styles.divisor}>
+                                        <Text>Usuário Solicitante</Text>
+                                    </View>
+                                    <View style={styles.userInfo}>
+                                        <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                                        <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                                        <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                                    </View>
+                                </View>
+                            )}
+                            {type === 'battery' ? (
+                                <TableBattery data={chunk} />
+                            ) : type === 'promotion' ? (
+                                <TablePromotion data={chunk} />
+                            ) : type === 'user' ? (
+                                <TableUser data={chunk} />
+                            ) : null}
+                            <View style={styles.pageCounter}>
+                                <Text>{date}</Text>
+                                <Text render={({ pageNumber, totalPages }) => (
+                                    `${pageNumber} / ${totalPages}`
+                                )} fixed />
+                            </View>
+                        </View>
+                    </Page>
+                ))
+            )}
         </Document>
     );
 };
+
 
 
 
@@ -311,37 +359,61 @@ const ReportGenerator = () => {
 
 function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { userData } = useContext(AuthContext);
+
+
     const [report, setReport] = useState(
         type === 'user' ? 'user-clear' :
-        type === 'battery' ? 'battery-clear' :
-        type === 'promotion' ? 'promotion-clear' :
-        ''
+            type === 'battery' ? 'battery-clear' :
+                type === 'promotion' ? 'promotion-clear' :
+                    ''
     );
 
-    const [data, setData] = useState(currentItems);
+    const [data, setData] = useState([]);
     const { pdfViewer, pdfButtonLink } = ReportGenerator();
     const [showModalPdfSwitch, setShowModalPdfSwitch] = useState(false);
     const inputRef = useRef(null);
+    const [shouldDataUpdate, setShouldDataUpdate] = useState(false)
 
     const handleShowModalPdfSwitchChange = useCallback(() => {
         setShowModalPdfSwitch(prevState => !prevState);
         inputRef.current.checked = !showModalPdfSwitch;
     }, [showModalPdfSwitch]);
 
-    const { getReportData } = UserService();
+    const { getUserReportData } = UserService();
+    const { getBatteryReportData } = BatteryServices()
+    const { getPromotionReportData } = PromotionService()
 
     async function handleReportChange() {
-        switch (type) {
-            case 'user':
-                const response = await getReportData(report);
-                setData(response);
-                break;
+        if (shouldDataUpdate != null) {
+            switch (type) {
+                case 'user':
+                    const userResponse = await getUserReportData(report);
+                    setData(userResponse);
+                    setShouldDataUpdate(false)
+                    break;
+                case 'battery':
+                    const batteryResponse = await getBatteryReportData(report)
+                    setData(batteryResponse)
+                    setShouldDataUpdate(false)
+                    break;
+                case 'promotion':
+                    const promotionResponse = await getPromotionReportData(report)
+                    setData(promotionResponse)
+                    setShouldDataUpdate(false)
+                    break;
+                default:
+                    setData([])
+                    break;
+            }
         }
     }
 
+
     useEffect(() => {
-        handleReportChange();
-    }, [report]);
+        setData(currentItems);
+        handleReportChange()
+    }, [currentItems, shouldDataUpdate]);
+
 
     return (
         <>
@@ -365,7 +437,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <label className="form-check-label" htmlFor="flexSwitchCheckChecked">Pré visualização de PDF</label>
                             </div>
 
-                            {showModalPdfSwitch && pdfViewer(data, userData, type)}
+                            {showModalPdfSwitch ? pdfViewer(data, userData, type) : null}
                         </Col>
                         <Col md={6}>
                             <p>Filtros</p>
@@ -373,7 +445,9 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Usuários"
-                                    onChange={(e) => setReport(e.target.value)}
+                                    onChange={(e) => {
+                                        setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true)
+                                    }}
                                 >
                                     <option disabled>Filtragem Usuários</option>
                                     <option value="user-clear">Limpar Filtros</option>
@@ -391,9 +465,11 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Baterias"
+                                    onChange={(e) => { setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true) }}
                                 >
-                                    <option disabled>Filtragem Baterias</option>
-                                    <option value="battery-clear">Limpar Filtros</option>
+                                    <optgroup label='Filtragem Baterias'>
+                                        <option value="battery-clear">Limpar Filtros</option>
+                                    </optgroup>
                                     <optgroup label='Status'>
                                         <option value="battery-active">Ativo</option>
                                         <option value="battery-inactive">Inativo</option>
@@ -416,6 +492,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Promoções"
+                                    onChange={(e) => { setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true)  }}
                                 >
                                     <option disabled>Filtragem Promoções</option>
                                     <option value="promotion-clear">Limpar Filtros</option>
@@ -425,16 +502,16 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                         <option value="promotion-expired">Vencido</option>
                                     </optgroup>
                                     <optgroup label='Vencimento'>
-                                        <option value="battery-validity-1">Próximo mês</option>
-                                        <option value="battery-validity-3">Próximos 3 meses</option>
-                                        <option value="battery-validity-6">Próximos 6 meses</option>
-                                        <option value="battery-validity-over-6">Acima de 6 meses</option>
+                                        <option value="promotion-validity-1">Próximo mês</option>
+                                        <option value="promotion-validity-3">Próximos 3 meses</option>
+                                        <option value="promotion-validity-6">Próximos 6 meses</option>
+                                        <option value="promotion-validity-over-6">Acima de 6 meses</option>
                                     </optgroup>
                                     <optgroup label='Porcentagem de Desconto'>
-                                        <option value="battery-percentage-15">0 - 15%</option>
-                                        <option value="battery-percentage-30">15 - 30%</option>
-                                        <option value="battery-percentage-50">30 - 50% Unidades</option>
-                                        <option value="battery-percentage-over-50">Acima de 50%</option>
+                                        <option value="promotion-percentage-15">0 - 15%</option>
+                                        <option value="promotion-percentage-30">15 - 30%</option>
+                                        <option value="promotion-percentage-50">30 - 50%</option>
+                                        <option value="promotion-percentage-over-50">Acima de 50%</option>
                                     </optgroup>
                                 </select>
                             )}
@@ -443,6 +520,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModalPDF(false)}>Fechar</Button>
+
                     {pdfButtonLink(data, userData, type)}
                 </Modal.Footer>
             </Modal>

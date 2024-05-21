@@ -31,12 +31,13 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, setIt
                 <select className="form-select form-select-sm w-auto h-50 mt-1" aria-label="Registros por página"
                     onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
                 >
-                    <option disabled defaultValue>Registros por página</option>
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="24">25</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
+                    <optgroup label='Registros por página'>
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </optgroup>
                 </select>
                 <ul className="pagination">
                     <li className={"page-item " + (currentPage === 1 ? "disabled" : "")}>
@@ -56,7 +57,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, setIt
                     </li>
                 </ul>
             </div>
-            <p className="text-end text-muted">Há um total de {totalItems} registros na tabela</p>
+            <p className="text-end text-muted small">Há um total de {totalItems} registros na tabela</p>
         </>
     );
 }

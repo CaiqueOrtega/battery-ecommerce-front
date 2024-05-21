@@ -55,7 +55,7 @@ const UserService = () => {
     }
   }
 
-  const getReportData = async (report) => {
+  const getUserReportData = async (report) => {
     try{
       const response = await ConnectionAPI.get(`users/report/${report}`)
       return response.data
@@ -66,7 +66,7 @@ const UserService = () => {
 
 
 
-  return { getUserByEmail, getUsers, changeRole, desactiveAccount, errorMessages, setErrorMessages, updateUser, getReportData }
+  return { getUserByEmail, getUsers, changeRole, desactiveAccount, errorMessages, setErrorMessages, updateUser, getUserReportData }
 };
 
 export default UserService;

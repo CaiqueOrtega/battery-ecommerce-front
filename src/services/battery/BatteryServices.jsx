@@ -82,7 +82,16 @@ const BatteryServices = () => {
         }
     }
 
-    return { createBattery, getBatteriesAll, getBatteriesActive, getByListBatteries , updateBattery, deleteBattery, errorMessages, setErrorMessages, reactiveBattery }
+    const getBatteryReportData = async (report) => {
+        try {
+            const response = await ConnectionAPI.get(`battery/report/${report}`)
+            return response.data
+        } catch (error){
+            console.log("NOSSA")
+        }
+    }
+
+    return { createBattery, getBatteriesAll, getBatteriesActive, getByListBatteries, getBatteryReportData, updateBattery, deleteBattery, errorMessages, setErrorMessages, reactiveBattery }
 }
 
 export default BatteryServices;
