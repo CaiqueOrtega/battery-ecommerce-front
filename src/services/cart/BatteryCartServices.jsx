@@ -8,7 +8,6 @@ const BatteryCartServices = () => {
     const getByUser = async (userId) => {
         try {
             const response = await ConnectionAPI.get(`cart/user/${userId}`)
-            console.log('', response)
             return response.data
         } catch (error) {
             handleAPIError(error)

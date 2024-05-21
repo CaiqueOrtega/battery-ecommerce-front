@@ -19,67 +19,19 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route
-            path="/"
-            element={<HomePageWithProviders />}
-          />
-          <Route
-            path="/paineldecontrole"
-            element={<DashboardPageWithProviders />}
-          />
-          <Route
-            path="/autenticacao/:action"
-            element={<AuthenticationPage />}
-          />
-          <Route
-            path="/bateria"
-            element={<BatteryPurchasePageWithProviders />}
-          />
-          <Route
-            path="/configuracoes"
-            element={<SettingsWithProvider />}
-          />
+          <Route path="/" element={<BatteryProvider><BatteryCartProvider><HomePage /></BatteryCartProvider></BatteryProvider>} />
+          <Route path="/paineldecontrole" element={
+            <BatteryProvider>
+              <DashBoardProvider>
+                <DashboardPage />
+              </DashBoardProvider>
+            </BatteryProvider>} />
+          <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
+          <Route path='/bateria' element={<BatteryProvider><BatteryCartProvider><BatteryPurchasePage /></BatteryCartProvider></BatteryProvider>} />
+          <Route path="/configuracoes" element={<BatteryCartProvider><Settings /></BatteryCartProvider>} />
         </Routes>
       </AuthProvider>
     </Router>
-  );
-}
-
-function HomePageWithProviders() {
-  return (
-    <BatteryProvider>
-      <BatteryCartProvider>
-        <HomePage />
-      </BatteryCartProvider>
-    </BatteryProvider>
-  );
-}
-
-function DashboardPageWithProviders() {
-  return (
-    <BatteryProvider>
-      <DashBoardProvider>
-        <DashboardPage />
-      </DashBoardProvider>
-    </BatteryProvider>
-  );
-}
-
-function BatteryPurchasePageWithProviders() {
-  return (
-    <BatteryProvider>
-      <BatteryCartProvider>
-        <BatteryPurchasePage />
-      </BatteryCartProvider>
-    </BatteryProvider>
-  );
-}
-
-function SettingsWithProvider() {
-  return (
-    <BatteryCartProvider>
-      <Settings />
-    </BatteryCartProvider>
   );
 }
 

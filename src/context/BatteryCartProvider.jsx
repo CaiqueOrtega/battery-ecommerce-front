@@ -7,7 +7,7 @@ const BatteryCartContext = createContext({})
 
 function BatteryCartProvider({ children }) {
     const [batteryCart, setBatteryCart] = useState({});
-    const { getByListBatteries } = BatteryServices ();
+    const { getByListBatteries } = BatteryServices();
     const { getByUser } = BatteryCartServices();
     const { userData, isLoggedIn } = useContext(AuthContext);
 
@@ -16,7 +16,6 @@ function BatteryCartProvider({ children }) {
             try {
                 const response = await getByUser(userId);
                 setBatteryCart(response);
-                console.log('Carrinho de Bateria:', response);
             } catch (error) {
                 console.error("falha ao pegar carrinho:", error);
             }
@@ -31,7 +30,7 @@ function BatteryCartProvider({ children }) {
                 const cartData = JSON.parse(storedCart);
                 const batteriesId = cartData.batteries.map(battery => battery.batteryId);
                 const response = await getByListBatteries(batteriesId);
-    
+
                 const updatedBatteries = cartData.batteries.map(cartBattery => {
                     const matchingBattery = response.find(battery => battery.batteryId === cartBattery.batteryId);
                     if (matchingBattery) {
@@ -44,8 +43,8 @@ function BatteryCartProvider({ children }) {
                     return null;
                 }).filter(battery => battery !== null);
 
-                const totalValue = cartData.totalPrice || 0; 
-         
+                const totalValue = cartData.totalPrice || 0;
+
                 setBatteryCart({
                     totalValue: totalValue,
                     promotion: cartData.promotion || null,
@@ -57,13 +56,16 @@ function BatteryCartProvider({ children }) {
             console.error("Falha ao pegar carrinho (não logado):", error);
         }
     };
-    
+
 
     useEffect(() => {
-        if (userData?.userId && isLoggedIn) {
-            handleCartUser(userData.userId);
-        } else {
-            handleCartNotLogged();
+        if(Object.keys(batteryCart).length === 0){
+            console.log('entrou');
+            if (userData?.userId && isLoggedIn) {
+                handleCartUser(userData.userId);
+            } else {
+                handleCartNotLogged();
+            }
         }
     }, [userData, isLoggedIn]);
 

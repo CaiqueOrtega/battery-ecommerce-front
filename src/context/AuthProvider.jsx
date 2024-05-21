@@ -77,7 +77,6 @@ function AuthProvider({ children }) {
     const [response, setResponse] = useState(null);
 
     useEffect(() => {
-      console.log(userData);
       async function fetchData() {
         const response = await userRoleAuthorization(userData, request);
         setResponse(response);
@@ -85,7 +84,6 @@ function AuthProvider({ children }) {
       fetchData();
     }, [userData, isContextLoaded, isLoggedIn]);
 
-    console.log(response)
     return response ? children : null;
   }
 
@@ -104,8 +102,11 @@ function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!isLoggedIn && isContextLoaded) {
+
       navigate('/');
+
     }
+
   }, [isLoggedIn]);
 
   return isContextLoaded ? (
