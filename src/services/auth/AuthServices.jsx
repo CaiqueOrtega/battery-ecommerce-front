@@ -30,7 +30,6 @@ const AuthServices = () => {
             if (request) {
                 navigate('/');
             }
-
         }
 
     }

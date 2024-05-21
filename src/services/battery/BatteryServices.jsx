@@ -9,10 +9,6 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get('battery/all')
             return response.data
         } catch (error) {
-<<<<<<< HEAD
-=======
-            console.log('erro get ', error)
->>>>>>> f5e12b34a6e37d831d904038b8d8c39e3250d659
         }
     }
 
@@ -22,10 +18,6 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get('battery')
             return response.data
         } catch (error) {
-<<<<<<< HEAD
-=======
-            console.log('erro get', error)
->>>>>>> f5e12b34a6e37d831d904038b8d8c39e3250d659
         }
     }
 
