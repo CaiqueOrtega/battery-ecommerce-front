@@ -1,6 +1,7 @@
-import { Card } from "react-bootstrap";
+import { Card, Container } from "react-bootstrap";
 import NavbarComponent from "../../components/layout/navbar/Navbar";
 import { useEffect } from "react";
+import './terms.css'
 
 export default function TermsAndConditions() {
     useEffect(() => {
@@ -10,17 +11,17 @@ export default function TermsAndConditions() {
     return (
         <>
             <NavbarComponent />
-            <div className="d-flex flex-column align-items-center p-5">
-                <Card className="w-50 rounded-4 text-muted">
+            <Container className="container-terms py-md-5">
+                <Card className="card-terms rounded-4 text-muted">
                     <Card.Header>
                         <Card.Title>
                             <h1 className="text-xl fw-bold text-center p-2 text-dark">Termos e Condições</h1>
                         </Card.Title>
                     </Card.Header>
-                    <Card.Body className="p-5">
-                        <div className="mx-5" style={{ textAlign: "justify" }}>
+                    <Card.Body className="p-md-5 ">
+                        <div className="mx-md-5 mx-2" style={{ textAlign: "justify" }}>
                             <p>Última modificação: 21 de maio, 2024</p>
-                            <p className="fw-bold text-dark text-justify">Resumo dos termos e condições</p>
+                            <p className="fw-bold text-dark">Resumo dos termos e condições</p>
                             <p>
                                 A.O.BA | Alavarse Ortega BaseTech é apenas um nome artístico da dupla desenvolvedora,
                                 este projeto foi inicialmente desenhado como um trabalho para finalização do curso de
@@ -62,7 +63,7 @@ export default function TermsAndConditions() {
                             </p>
                             <p className="fw-bold text-dark">3 - Jurisdição e Lei Aplicável</p>
                             <p>
-                                Conforme o Marco Civil da internet (Lei Nº 12.965,de 23 de Abril de 2024), o site preza pela constituição
+                                Conforme o Marco Civil da Internet (Lei Nº 12.965,de 23 de Abril de 2024), o site preza pela constituição
                                 brasileira e quais quebras das leis estabelecidas na mesma, terão medidas tomadas.
                             </p>
                             <p className="fw-bold text-dark">4 - Comunicação</p>
@@ -78,7 +79,7 @@ export default function TermsAndConditions() {
                         </div>
                     </Card.Body>
                 </Card>
-            </div>
+            </Container>
         </>
     )
 }

@@ -1,0 +1,15 @@
+
+.container-terms{
+    max-width: 55rem !important;
+}
+
+@media (max-width: 600px) {
+    .container-terms {
+        padding-inline: 0 !important;
+    }
+
+    .card-terms{
+        border-radius: 0 !important;
+    }
+
+}
