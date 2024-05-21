@@ -23,6 +23,7 @@ function BatteryCartProvider({ children }) {
         }
     };
 
+
     const handleCartNotLogged = async () => {
         try {
             const storedCart = localStorage.getItem('batteryCart');
@@ -30,13 +31,33 @@ function BatteryCartProvider({ children }) {
                 const cartData = JSON.parse(storedCart);
                 const batteriesId = cartData.batteries.map(battery => battery.batteryId);
                 const response = await getByListBatteries(batteriesId);
-                setBatteryCart({ batteries: response});
-                console.log('Carrinho de Bateria (não logado):', response);
+    
+                const updatedBatteries = cartData.batteries.map(cartBattery => {
+                    const matchingBattery = response.find(battery => battery.batteryId === cartBattery.batteryId);
+                    if (matchingBattery) {
+                        return {
+                            cart_battery_id: cartBattery.cart_battery_id,
+                            quantity: cartBattery.quantity,
+                            battery: { ...matchingBattery }
+                        };
+                    }
+                    return null;
+                }).filter(battery => battery !== null);
+
+                const totalValue = cartData.totalPrice || 0; 
+         
+                setBatteryCart({
+                    totalValue: totalValue,
+                    promotion: cartData.promotion || null,
+                    batteries: updatedBatteries
+                });
+                console.log('Carrinho de Bateria (não logado):', updatedBatteries);
             }
         } catch (error) {
             console.error("Falha ao pegar carrinho (não logado):", error);
         }
     };
+    
 
     useEffect(() => {
         if (userData?.userId && isLoggedIn) {

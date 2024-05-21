@@ -5,7 +5,6 @@ import { AlertIcon } from "../../assets/icons/IconsSet";
 const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, bgBorder, disable, className, disableRequired }) => {
     const inputRef = useRef(null);
     const [isFocused, setIsFocused] = useState(false);
-    console.log(disableRequired)
 
     useEffect(() => {
 

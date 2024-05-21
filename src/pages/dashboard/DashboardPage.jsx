@@ -102,7 +102,7 @@ function SearchForm() {
 
 function NotificationsDropdown() {
     return (
-        <Dropdown as={NavItem} className='dropdown-no-carret me-3'>
+        <Dropdown as={NavItem} className='dropdown-no-caret me-3'>
             <Dropdown.Toggle as={NavLink}>
                 <BellIcon />
             </Dropdown.Toggle>
@@ -118,7 +118,7 @@ function UserDropdown() {
 
     return (
         <>
-            <Dropdown as={NavItem} className='dropdown-no-carret ms-1'>
+            <Dropdown as={NavItem} className='dropdown-no-caret ms-1'>
                 <Dropdown.Toggle as={NavLink} className='d-flex align-items-center'>
                     <UndrawProfile />
                     <span className='ms-1 d-none d-md-block'>{userData ? userData.name.length > 7 ? `${userData.name.slice(0, 7)}...` : userData.name : null}</span>

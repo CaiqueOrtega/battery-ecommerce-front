@@ -102,9 +102,8 @@ function AuthProvider({ children }) {
     return initials;
   }
 
-
   useEffect(() => {
-    if (!isLoggedIn) {
+    if (!isLoggedIn && isContextLoaded) {
       navigate('/');
     }
   }, [isLoggedIn]);
