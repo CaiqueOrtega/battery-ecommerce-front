@@ -59,10 +59,16 @@ function AuthProvider({ children }) {
 
 
   const logout = () => {
-    localStorage.clear();
-    setIsLoggedIn(false);
-    setUserData(null);
-    setToken('');
+    try {
+      localStorage.removeItem('token');
+      setIsLoggedIn(false);
+      setUserData(null);
+      setToken('');
+      return true;
+    } catch (error) {
+      console.error("Erro ao fazer logout:", error);
+      return false;
+    }
   }
 
   const handleLogin = (generatedToken) => {
@@ -101,13 +107,11 @@ function AuthProvider({ children }) {
   }
 
   useEffect(() => {
+    console.log(isContextLoaded, isLoggedIn)
     if (!isLoggedIn && isContextLoaded) {
-
       navigate('/');
-
     }
-
-  }, [isLoggedIn]);
+  }, [isLoggedIn, token]);
 
   return isContextLoaded ? (
     <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin, VerifyAuth }}>
