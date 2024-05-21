@@ -5,6 +5,7 @@ import logo from '../../assets/images/logo-PretoBranco.png';
 import { AuthContext } from '../../context/AuthProvider';
 import { useContext } from 'react';
 import UserService from '../users/UsersServices';
+import BatteryServices from '../battery/BatteryServices';
 
 
 // Estilo para o PDF
@@ -221,62 +222,64 @@ const MyDocument = ({ data, user, type }) => {
 
     return (
         <Document>
-            {chunks.map((chunk, pageIndex) => (
-                <Page key={pageIndex} size="A4" style={styles.page}>
-                    <View style={styles.section}>
-                        {pageIndex === 0 && (
-                            <View>
-                                <View style={styles.header}>
-                                    <View style={styles.columnImage}>
-                                        <Image source={logo} style={styles.logo} />
+
+            {
+                chunks.map((chunk, pageIndex) => (
+                    <Page key={pageIndex} size="A4" style={styles.page}>
+                        <View style={styles.section}>
+                            {pageIndex === 0 && (
+                                <View>
+                                    <View style={styles.header}>
+                                        <View style={styles.columnImage}>
+                                            <Image source={logo} style={styles.logo} />
+                                        </View>
+                                        <View style={styles.columnText}>
+                                            {type === 'battery' ? (
+                                                <Text>Relatório de Baterias</Text>
+                                            ) : type === 'promotion' ? (
+                                                <Text>Relatório de Promoções</Text>
+                                            ) : type === 'user' ? (
+                                                <Text>Relatório de Usuários</Text>
+                                            ) : null}
+                                        </View>
                                     </View>
-                                    <View style={styles.columnText}>
+                                    <View style={styles.subtitle}>
                                         {type === 'battery' ? (
-                                            <Text>Relatório de Baterias</Text>
+                                            <Text>{batterySubtitle}</Text>
                                         ) : type === 'promotion' ? (
-                                            <Text>Relatório de Promoções</Text>
+                                            <Text>{promotionSubtitle}</Text>
                                         ) : type === 'user' ? (
-                                            <Text>Relatório de Usuários</Text>
+                                            <Text>{userSubtitle}</Text>
                                         ) : null}
                                     </View>
+                                    <View style={styles.divisor}>
+                                        <Text>Usuário Solicitante</Text>
+                                    </View>
+                                    <View style={styles.userInfo}>
+                                        <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                                        <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                                        <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                                    </View>
                                 </View>
-                                <View style={styles.subtitle}>
-                                    {type === 'battery' ? (
-                                        <Text>{batterySubtitle}</Text>
-                                    ) : type === 'promotion' ? (
-                                        <Text>{promotionSubtitle}</Text>
-                                    ) : type === 'user' ? (
-                                        <Text>{userSubtitle}</Text>
-                                    ) : null}
-                                </View>
-                                <View style={styles.divisor}>
-                                    <Text>Usuário Solicitante</Text>
-                                </View>
-                                <View style={styles.userInfo}>
-                                    <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
-                                    <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
-                                    <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
-                                </View>
-                            </View>
-                        )}
-                        {/* Parte da tabela */}
-                        {type === 'battery' ? (
-                            <TableBattery data={chunk} />
-                        ) : type === 'promotion' ? (
-                            <TablePromotion data={chunk} />
-                        ) : type === 'user' ? (
-                            <TableUser data={chunk} />
-                        ) : null}
+                            )}
+                            {/* Parte da tabela */}
+                            {type === 'battery' ? (
+                                <TableBattery data={chunk} />
+                            ) : type === 'promotion' ? (
+                                <TablePromotion data={chunk} />
+                            ) : type === 'user' ? (
+                                <TableUser data={chunk} />
+                            ) : null}
 
-                        <View style={styles.pageCounter}>
-                            <Text>{date}</Text>
-                            <Text render={({ pageNumber, totalPages }) => (
-                                `${pageNumber} / ${totalPages}`
-                            )} fixed />
+                            <View style={styles.pageCounter}>
+                                <Text>{date}</Text>
+                                <Text render={({ pageNumber, totalPages }) => (
+                                    `${pageNumber} / ${totalPages}`
+                                )} fixed />
+                            </View>
                         </View>
-                    </View>
-                </Page>
-            ))}
+                    </Page>
+                ))}
         </Document>
     );
 };
@@ -311,37 +314,54 @@ const ReportGenerator = () => {
 
 function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { userData } = useContext(AuthContext);
+
+    console.log('current', currentItems)
+
     const [report, setReport] = useState(
         type === 'user' ? 'user-clear' :
-        type === 'battery' ? 'battery-clear' :
-        type === 'promotion' ? 'promotion-clear' :
-        ''
+            type === 'battery' ? 'battery-clear' :
+                type === 'promotion' ? 'promotion-clear' :
+                    ''
     );
 
-    const [data, setData] = useState(currentItems);
+    const [data, setData] = useState([]);
     const { pdfViewer, pdfButtonLink } = ReportGenerator();
     const [showModalPdfSwitch, setShowModalPdfSwitch] = useState(false);
     const inputRef = useRef(null);
+    const [shouldDataUpdate, setShouldDataUpdate] = useState(false)
 
     const handleShowModalPdfSwitchChange = useCallback(() => {
         setShowModalPdfSwitch(prevState => !prevState);
         inputRef.current.checked = !showModalPdfSwitch;
     }, [showModalPdfSwitch]);
 
-    const { getReportData } = UserService();
+    const { getUserReportData } = UserService();
+    const { getBatteryReportData } = BatteryServices()
 
     async function handleReportChange() {
-        switch (type) {
-            case 'user':
-                const response = await getReportData(report);
-                setData(response);
-                break;
+        if (shouldDataUpdate != null) {
+            switch (type) {
+                case 'user':
+                    const userResponse = await getUserReportData(report);
+                    setData(userResponse);
+                    setShouldDataUpdate(false)
+                    break;
+                case 'battery':
+                    const response = await getBatteryReportData(report)
+                    console.log(response)
+                    setData(response)
+                    setShouldDataUpdate(false)
+                    break;
+            }
         }
     }
 
+
     useEffect(() => {
-        handleReportChange();
-    }, [report]);
+        setData(currentItems);
+        handleReportChange()
+    }, [currentItems,shouldDataUpdate]);
+
 
     return (
         <>
@@ -365,7 +385,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <label className="form-check-label" htmlFor="flexSwitchCheckChecked">Pré visualização de PDF</label>
                             </div>
 
-                            {showModalPdfSwitch && pdfViewer(data, userData, type)}
+                            {showModalPdfSwitch ? pdfViewer(data, userData, type) : null}
                         </Col>
                         <Col md={6}>
                             <p>Filtros</p>
@@ -373,7 +393,9 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Usuários"
-                                    onChange={(e) => setReport(e.target.value)}
+                                    onChange={(e) => {
+                                        setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true)
+                                    }}
                                 >
                                     <option disabled>Filtragem Usuários</option>
                                     <option value="user-clear">Limpar Filtros</option>
@@ -391,9 +413,11 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Baterias"
+                                    onChange={(e) => { setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true) }}
                                 >
-                                    <option disabled>Filtragem Baterias</option>
-                                    <option value="battery-clear">Limpar Filtros</option>
+                                    <optgroup label='Filtragem Baterias'>
+                                        <option value="battery-clear">Limpar Filtros</option>
+                                    </optgroup>
                                     <optgroup label='Status'>
                                         <option value="battery-active">Ativo</option>
                                         <option value="battery-inactive">Inativo</option>
@@ -416,6 +440,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Promoções"
+                                    onChange={(e) => { setReport(e.target.value), handleReportChange() }}
                                 >
                                     <option disabled>Filtragem Promoções</option>
                                     <option value="promotion-clear">Limpar Filtros</option>
@@ -443,6 +468,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModalPDF(false)}>Fechar</Button>
+
                     {pdfButtonLink(data, userData, type)}
                 </Modal.Footer>
             </Modal>

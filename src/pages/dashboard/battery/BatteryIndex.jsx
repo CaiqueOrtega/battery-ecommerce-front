@@ -156,6 +156,8 @@ function BatteryIndex({ batteries, setBatteries }) {
         }
     };
 
+    console.log('batteries', batteries)
+
     const renderBatteryFormModal = () => (
         <>
             <Modal size="lg" show={showBatteryFormModal} onHide={() => setShowBatteryFormModal(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
@@ -290,7 +292,6 @@ function BatteryIndex({ batteries, setBatteries }) {
                 confirmChangesModalData={confirmChangesModalData}
             />
 
-            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'}/>
         </>
     )
     const [currentPage, setCurrentPage] = useState(1);
@@ -391,6 +392,9 @@ function BatteryIndex({ batteries, setBatteries }) {
             </Card>
 
             {renderBatteryFormModal()}
+
+            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'}/>
+
         </>
     );
 }
