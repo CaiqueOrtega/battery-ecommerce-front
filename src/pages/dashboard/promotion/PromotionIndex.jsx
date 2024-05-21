@@ -15,7 +15,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [showsModalPDF, setShowModalPDF] = useState(false);
     const [activeField, setActiveField] = useState(null);
 

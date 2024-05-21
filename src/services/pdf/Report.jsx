@@ -6,6 +6,7 @@ import { AuthContext } from '../../context/AuthProvider';
 import { useContext } from 'react';
 import UserService from '../users/UsersServices';
 import BatteryServices from '../battery/BatteryServices';
+import PromotionService from '../promotion/PromotionService';
 
 
 // Estilo para o PDF
@@ -380,6 +381,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
 
     const { getUserReportData } = UserService();
     const { getBatteryReportData } = BatteryServices()
+    const { getPromotionReportData } = PromotionService()
 
     async function handleReportChange() {
         if (shouldDataUpdate != null) {
@@ -390,9 +392,17 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                     setShouldDataUpdate(false)
                     break;
                 case 'battery':
-                    const response = await getBatteryReportData(report)
-                    setData(response)
+                    const batteryResponse = await getBatteryReportData(report)
+                    setData(batteryResponse)
                     setShouldDataUpdate(false)
+                    break;
+                case 'promotion':
+                    const promotionResponse = await getPromotionReportData(report)
+                    setData(promotionResponse)
+                    setShouldDataUpdate(false)
+                    break;
+                default:
+                    setData([])
                     break;
             }
         }
@@ -482,7 +492,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 <select
                                     className="form-select form-select-sm w-100 h-25 mt-1"
                                     aria-label="Filtragem Promoções"
-                                    onChange={(e) => { setReport(e.target.value), handleReportChange() }}
+                                    onChange={(e) => { setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true)  }}
                                 >
                                     <option disabled>Filtragem Promoções</option>
                                     <option value="promotion-clear">Limpar Filtros</option>
@@ -492,16 +502,16 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                         <option value="promotion-expired">Vencido</option>
                                     </optgroup>
                                     <optgroup label='Vencimento'>
-                                        <option value="battery-validity-1">Próximo mês</option>
-                                        <option value="battery-validity-3">Próximos 3 meses</option>
-                                        <option value="battery-validity-6">Próximos 6 meses</option>
-                                        <option value="battery-validity-over-6">Acima de 6 meses</option>
+                                        <option value="promotion-validity-1">Próximo mês</option>
+                                        <option value="promotion-validity-3">Próximos 3 meses</option>
+                                        <option value="promotion-validity-6">Próximos 6 meses</option>
+                                        <option value="promotion-validity-over-6">Acima de 6 meses</option>
                                     </optgroup>
                                     <optgroup label='Porcentagem de Desconto'>
-                                        <option value="battery-percentage-15">0 - 15%</option>
-                                        <option value="battery-percentage-30">15 - 30%</option>
-                                        <option value="battery-percentage-50">30 - 50% Unidades</option>
-                                        <option value="battery-percentage-over-50">Acima de 50%</option>
+                                        <option value="promotion-percentage-15">0 - 15%</option>
+                                        <option value="promotion-percentage-30">15 - 30%</option>
+                                        <option value="promotion-percentage-50">30 - 50%</option>
+                                        <option value="promotion-percentage-over-50">Acima de 50%</option>
                                     </optgroup>
                                 </select>
                             )}
