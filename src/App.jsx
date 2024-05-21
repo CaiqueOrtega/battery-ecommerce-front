@@ -12,6 +12,7 @@ import { AuthProvider } from './context/AuthProvider';
 import { BatteryProvider } from './context/BatteryProvider';
 import { DashBoardProvider } from './context/DashBoardProvider';
 import { BatteryCartProvider } from './context/BatteryCartProvider';
+import TermsAndConditions from './pages/terms/TermsAndConditions';
 
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
           <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
           <Route path='/bateria' element={<BatteryProvider><BatteryCartProvider><BatteryPurchasePage /></BatteryCartProvider></BatteryProvider>} />
           <Route path="/configuracoes" element={<BatteryCartProvider><Settings /></BatteryCartProvider>} />
+          <Route path='/termos' element={<TermsAndConditions/>}/>
         </Routes>
       </AuthProvider>
     </Router>

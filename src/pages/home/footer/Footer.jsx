@@ -2,7 +2,7 @@ export default function Footer() {
     return (
         <footer className="text-center bg-yellow ">
             <hr />
-            <a type="button" className="m-3 ">Termos e Condições</a>
+            <a type="button" href="/termos" className="m-3 ">Termos e Condições</a>
             <div className="p-3 lh-sm text-dark">
                 <p className=" mt-2 small ">Copyright © 2024: <span className="ms-3"> A.O.BA | Alavarse Ortega BaseTech </span></p>
                 <p className="mt-2 small ">CNPJ: n.º 27.414.171/0001-13 | Endereço: Av. América, n.º 1461,
