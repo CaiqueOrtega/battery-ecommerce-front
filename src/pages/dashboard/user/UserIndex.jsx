@@ -61,7 +61,7 @@ function UserIndex({ users, setUsers }) {
                         <InputGroup hasValidation>
                             <Form.Select className={`${errorMessages.role && 'is-invalid'} rounded-start`} defaultValue={selectedRole.role} value={selectedRole} onChange={(e) => setSelectedRole(e.target.value)}>
                                 <option hidden>Selecione o cargo que deseja...</option>
-                                <option disabled value={selectedUser.role}>{selectedUser.role === 'ADMIN' ? 'Adiministrador' : 'Usuário'}</option>
+                                <option disabled value={selectedUser.role}>{selectedUser.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</option>
                                 <option value={selectedUser.role === 'ADMIN' ? 'USER' : 'ADMIN'}>{selectedUser.role === 'ADMIN' ? 'Usuário' : 'Administrador'}</option>
                             </Form.Select>
                             <Form.Control.Feedback type="invalid" className="ms-1">

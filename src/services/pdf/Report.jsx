@@ -1,9 +1,10 @@
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Modal, Row, Col, Button } from 'react-bootstrap';
 import { PDFViewer, Document, Page, Text, View, Image, PDFDownloadLink, StyleSheet } from '@react-pdf/renderer';
 import logo from '../../assets/images/logo-PretoBranco.png';
 import { AuthContext } from '../../context/AuthProvider';
 import { useContext } from 'react';
+import UserService from '../users/UsersServices';
 
 
 // Estilo para o PDF
@@ -233,7 +234,7 @@ const MyDocument = ({ data, user, type }) => {
                                         {type === 'battery' ? (
                                             <Text>Relatório de Baterias</Text>
                                         ) : type === 'promotion' ? (
-                                            <Text>Relatótio de Promoções</Text>
+                                            <Text>Relatório de Promoções</Text>
                                         ) : type === 'user' ? (
                                             <Text>Relatório de Usuários</Text>
                                         ) : null}
@@ -286,28 +287,40 @@ const MyDocument = ({ data, user, type }) => {
 
 
 
-const ReportGenerator = ({ data, userData, type }) => {
-    const pdfViewer = (
-        <PDFViewer width="100%" height="350em">
-            <MyDocument data={data} user={userData} type={type} />
-        </PDFViewer>
-    );
+const ReportGenerator = () => {
+    const pdfViewer = (data, userData, type) => {
+        return (
+            <PDFViewer width="100%" height="350em">
+                <MyDocument data={data} user={userData} type={type} />
+            </PDFViewer>
+        )
+    };
 
-    const pdfButtonLink = (
-        <PDFDownloadLink className='btn btn-red' document={<MyDocument data={data} user={userData} type={type} />} fileName="relatorio.pdf" style={styles.buttom}>
-            {({ blob, url, loading, error }) =>
-                loading ? 'Gerando PDF...' : 'Baixar PDF'
-            }
-        </PDFDownloadLink>
-    );
+    const pdfButtonLink = (data, userData, type) => {
+        return (
+            <PDFDownloadLink className='btn btn-red' document={<MyDocument data={data} user={userData} type={type} />} fileName="relatorio.pdf" style={styles.buttom}>
+                {({ blob, url, loading, error }) =>
+                    loading ? 'Gerando PDF...' : 'Baixar PDF'
+                }
+            </PDFDownloadLink>
+        );
+    }
 
     return { pdfViewer, pdfButtonLink };
 };
 
 function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { userData } = useContext(AuthContext);
-    const { pdfViewer, pdfButtonLink } = ReportGenerator({ data: currentItems, userData, type });
-    const [showModalPdfSwitch, setShowModalPdfSwitch] = useState(false)
+    const [report, setReport] = useState(
+        type === 'user' ? 'user-clear' :
+        type === 'battery' ? 'battery-clear' :
+        type === 'promotion' ? 'promotion-clear' :
+        ''
+    );
+
+    const [data, setData] = useState(currentItems);
+    const { pdfViewer, pdfButtonLink } = ReportGenerator();
+    const [showModalPdfSwitch, setShowModalPdfSwitch] = useState(false);
     const inputRef = useRef(null);
 
     const handleShowModalPdfSwitchChange = useCallback(() => {
@@ -315,36 +328,54 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
         inputRef.current.checked = !showModalPdfSwitch;
     }, [showModalPdfSwitch]);
 
+    const { getReportData } = UserService();
+
+    async function handleReportChange() {
+        switch (type) {
+            case 'user':
+                const response = await getReportData(report);
+                setData(response);
+                break;
+        }
+    }
+
+    useEffect(() => {
+        handleReportChange();
+    }, [report]);
+
     return (
         <>
             <Modal size='lg' show={showsModalPDF} onHide={() => setShowModalPDF(false)} backdrop='false' centered>
                 <Modal.Header closeButton className='bg-red text-white'>
-                    <Modal.Title>
-                        Configurar Relatório
-                    </Modal.Title>
+                    <Modal.Title>Configurar Relatório</Modal.Title>
                 </Modal.Header>
-
                 <Modal.Body style={{ height: 400 }}>
                     <Row className='h-100'>
                         <Col md={6}>
-                            <div class="form-check form-switch">
-                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked"
+                            <div className="form-check form-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    role="switch"
+                                    id="flexSwitchCheckChecked"
                                     checked={showModalPdfSwitch}
                                     onChange={handleShowModalPdfSwitchChange}
                                     ref={inputRef}
                                 />
-                                <label class="form-check-label" for="flexSwitchCheckChecked">Pré visualização de PDF</label>
+                                <label className="form-check-label" htmlFor="flexSwitchCheckChecked">Pré visualização de PDF</label>
                             </div>
 
-                            {showModalPdfSwitch && pdfViewer}
+                            {showModalPdfSwitch && pdfViewer(data, userData, type)}
                         </Col>
-
                         <Col md={6}>
                             <p>Filtros</p>
-                            {type == 'user' ?
-                                <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Usuários"
+                            {type === 'user' && (
+                                <select
+                                    className="form-select form-select-sm w-100 h-25 mt-1"
+                                    aria-label="Filtragem Usuários"
+                                    onChange={(e) => setReport(e.target.value)}
                                 >
-                                    <option disabled selected>Filtragem Usuários</option>
+                                    <option disabled>Filtragem Usuários</option>
                                     <option value="user-clear">Limpar Filtros</option>
                                     <optgroup label='Status'>
                                         <option value="user-active">Ativo</option>
@@ -355,64 +386,68 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                         <option value="user-admin">Administrador</option>
                                     </optgroup>
                                 </select>
-                                : type == 'battery' ?
-                                    <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Usuários"
-                                    >
-                                        <option disabled selected>Filtragem Baterias</option>
-                                        <option value="battery-clear">Limpar Filtros</option>
-                                        <optgroup label='Status'>
-                                            <option value="battery-active">Ativo</option>
-                                            <option value="battery-inactive">Inativo</option>
-                                        </optgroup>
-                                        <optgroup label='Preço'>
-                                            <option value="battery-value-100">0 R$ - 100 R$</option>
-                                            <option value="battery-value-250">100 R$ - 250 R$</option>
-                                            <option value="battery-value-500">250 R$ - 500 R$</option>
-                                        </optgroup>
-                                        <optgroup label='Quantidade'>
-                                            <option value="battery-quantity-100">0 - 100 Unidades</option>
-                                            <option value="battery-quantity-250">100 - 250 Unidades</option>
-                                            <option value="battery-quantity-500">250 - 500 Unidades</option>
-                                            <option value="battery-quantity-over-500">Acima de 500 Unidades</option>
-                                        </optgroup>
-                                    </select>
-                                    : type == 'promotion' ?
-                                        <select class="form-select form-select-sm w-100 h-25 mt-1" aria-label="Filtragem Promoções"
-                                        >
-                                            <option disabled selected>Filtragem Promoções</option>
-                                            <option value="promotion-clear">Limpar Filtros</option>
-                                            <optgroup label='Status'>
-                                                <option value="promotion-active">Ativo</option>
-                                                <option value="promotion-inactive">Inativo</option>
-                                                <option value="promotion-expired">Vencido</option>
-                                            </optgroup>
-                                            <optgroup label='Vencimento'>
-                                                <option value="battery-validity-1">Próximo mês</option>
-                                                <option value="battery-validity-3">Próximos 3 meses</option>
-                                                <option value="battery-validity-6">Próximos 6 meses</option>
-                                                <option value="battery-validity-over-6">Acima de 6 meses</option>
-                                            </optgroup>
-                                            <optgroup label='Porcentagem de Desconto'>
-                                                <option value="battery-percentage-15">0 - 15%</option>
-                                                <option value="battery-percentage-30">15 - 30%</option>
-                                                <option value="battery-percentage-50">30 - 50% Unidades</option>
-                                                <option value="battery-percentage-over-50">Acima de 50%</option>
-                                            </optgroup>
-                                        </select>
-                                        : null}
-
+                            )}
+                            {type === 'battery' && (
+                                <select
+                                    className="form-select form-select-sm w-100 h-25 mt-1"
+                                    aria-label="Filtragem Baterias"
+                                >
+                                    <option disabled>Filtragem Baterias</option>
+                                    <option value="battery-clear">Limpar Filtros</option>
+                                    <optgroup label='Status'>
+                                        <option value="battery-active">Ativo</option>
+                                        <option value="battery-inactive">Inativo</option>
+                                    </optgroup>
+                                    <optgroup label='Preço'>
+                                        <option value="battery-value-100">0 R$ - 100 R$</option>
+                                        <option value="battery-value-250">100 R$ - 250 R$</option>
+                                        <option value="battery-value-500">250 R$ - 500 R$</option>
+                                        <option value="battery-value-over-500">Acima de 500 R$</option>
+                                    </optgroup>
+                                    <optgroup label='Quantidade'>
+                                        <option value="battery-quantity-100">0 - 100 Unidades</option>
+                                        <option value="battery-quantity-250">100 - 250 Unidades</option>
+                                        <option value="battery-quantity-500">250 - 500 Unidades</option>
+                                        <option value="battery-quantity-over-500">Acima de 500 Unidades</option>
+                                    </optgroup>
+                                </select>
+                            )}
+                            {type === 'promotion' && (
+                                <select
+                                    className="form-select form-select-sm w-100 h-25 mt-1"
+                                    aria-label="Filtragem Promoções"
+                                >
+                                    <option disabled>Filtragem Promoções</option>
+                                    <option value="promotion-clear">Limpar Filtros</option>
+                                    <optgroup label='Status'>
+                                        <option value="promotion-active">Ativo</option>
+                                        <option value="promotion-inactive">Inativo</option>
+                                        <option value="promotion-expired">Vencido</option>
+                                    </optgroup>
+                                    <optgroup label='Vencimento'>
+                                        <option value="battery-validity-1">Próximo mês</option>
+                                        <option value="battery-validity-3">Próximos 3 meses</option>
+                                        <option value="battery-validity-6">Próximos 6 meses</option>
+                                        <option value="battery-validity-over-6">Acima de 6 meses</option>
+                                    </optgroup>
+                                    <optgroup label='Porcentagem de Desconto'>
+                                        <option value="battery-percentage-15">0 - 15%</option>
+                                        <option value="battery-percentage-30">15 - 30%</option>
+                                        <option value="battery-percentage-50">30 - 50% Unidades</option>
+                                        <option value="battery-percentage-over-50">Acima de 50%</option>
+                                    </optgroup>
+                                </select>
+                            )}
                         </Col>
                     </Row>
                 </Modal.Body>
-
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModalPDF(false)}>Fechar</Button>
-                    {pdfButtonLink}
+                    {pdfButtonLink(data, userData, type)}
                 </Modal.Footer>
             </Modal>
         </>
     );
 }
-
 
 export default ModalPdf;

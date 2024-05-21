@@ -28,10 +28,10 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, setIt
     return (
         <>
             <div className="d-flex justify-content-end gap-2">
-                <select class="form-select form-select-sm w-auto h-50 mt-1" aria-label="Registros por página"
+                <select className="form-select form-select-sm w-auto h-50 mt-1" aria-label="Registros por página"
                     onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
                 >
-                    <option disabled selected>Registros por página</option>
+                    <option disabled defaultValue>Registros por página</option>
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="24">25</option>

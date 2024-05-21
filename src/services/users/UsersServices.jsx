@@ -13,7 +13,6 @@ const UserService = () => {
       const response = await ConnectionAPI.get(`users/email/${email}`);
       return response.data;
     } catch (error) {
-      console.error('Erro ao pegar usuário:', error);
     }
   }
 
@@ -21,9 +20,7 @@ const UserService = () => {
     try {
       const response = await ConnectionAPI.get('users')
       return response.data
-    } catch (error) {
-      console.log("DEU PAU")
-    }
+    } catch (error) {    }
   }
 
   const changeRole = async (userId, selectedRole, loggedUserId) => {  
@@ -58,9 +55,18 @@ const UserService = () => {
     }
   }
 
+  const getReportData = async (report) => {
+    try{
+      const response = await ConnectionAPI.get(`users/report/${report}`)
+      return response.data
+    } catch (error){
+      console.log(error)
+    }
+  }
 
 
-  return { getUserByEmail, getUsers, changeRole, desactiveAccount, errorMessages, setErrorMessages, updateUser }
+
+  return { getUserByEmail, getUsers, changeRole, desactiveAccount, errorMessages, setErrorMessages, updateUser, getReportData }
 };
 
 export default UserService;

@@ -9,7 +9,6 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get('battery/all')
             return response.data
         } catch (error) {
-            console.log('erro get battry', error)
         }
     }
 
@@ -19,7 +18,6 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get('battery')
             return response.data
         } catch (error) {
-            console.log('erro get battry', error)
         }
     }
 
@@ -35,7 +33,6 @@ const BatteryServices = () => {
                 quantity: batteryValues.quantity,
                 code: batteryValues.code
             });
-            console.log('respponse Teste', response.data)
             return response.data;
         } catch (error) {
             handleAPIError(error);
@@ -43,7 +40,6 @@ const BatteryServices = () => {
     }
 
     const updateBattery = async (batteryId, batteryValues) => {
-        console.log("TESTE UPDATE", batteryId, batteryValues);
         try {
             await ConnectionAPI.patch(`battery/${batteryId}`, {
                 name: batteryValues.name,
@@ -55,7 +51,6 @@ const BatteryServices = () => {
             )
             return  true;
         } catch (error) {
-            console.log(error)
             handleAPIError(error);
         }
     }
