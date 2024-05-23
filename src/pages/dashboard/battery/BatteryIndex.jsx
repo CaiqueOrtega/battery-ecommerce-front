@@ -5,7 +5,7 @@ import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess'
 import BatteryCard from '../../../components/common/BatteryCard';
 import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import Pagination from '../../../components/common/PaginationTable';
+import Pagination from '../../../components/common/Pagination';
 import SortButton from '../../../components/common/SortButton';
 import BatteryServices from '../../../services/battery/BatteryServices';
 import ModalPdf from '../../../services/pdf/Report'
@@ -295,7 +295,7 @@ function BatteryIndex({ batteries, setBatteries }) {
         </>
     )
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = batteries.slice(indexOfFirstItem, indexOfLastItem);

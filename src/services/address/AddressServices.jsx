@@ -5,7 +5,8 @@ import ViaCepAPI from "../ViaCepAPI"
 const AddressServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
 
-    const createAddress = async (formAddressValues, user) => {
+    const createAddress = async (formAddressValues, userId) => {
+        console.log('teste', formAddressValues.main )
         try {
             const response = await ConnectionAPI.post('address', {
                 address: formAddressValues.address,
@@ -14,8 +15,9 @@ const AddressServices = () => {
                 complement: formAddressValues.complement,
                 city: formAddressValues.city,
                 state: formAddressValues.state,
-                CEP: formAddressValues.CEP,
-                userId: user
+                CEP: formAddressValues.cep,
+                main: formAddressValues.main ,
+                userId: userId
             })
             return response.data
         } catch (error) {
@@ -23,17 +25,56 @@ const AddressServices = () => {
         }
     }
 
-    const getAddressByUserId = async (userId) =>{
-        try{
-            const response= await ConnectionAPI.get(`address/user/${userId}`)
-            return response.data;
+    const updateAddress = async (formUpdateAddressValues, addressId) => {
+        try {
+            const response = await ConnectionAPI.patch(`address/${addressId}`, {
+                address: formUpdateAddressValues.address,
+                number: formUpdateAddressValues.number,
+                neighborhood: formUpdateAddressValues.neighborhood,
+                complement: formUpdateAddressValues.complement,
+                city: formUpdateAddressValues.city,
+                state: formUpdateAddressValues.state,
+                CEP: formUpdateAddressValues.cep,
+                main: formUpdateAddressValues.main
+            })
 
-        }catch(error){
+            return response.data;
+        } catch (error) {
             handleAPIError(error)
         }
     }
 
-    const getFreight = async (cep) =>{
+    const deleteAddress = async (addressId) => {
+        try {
+            const response = await ConnectionAPI.delete(`address/${addressId}`)
+            console.log('response delete', response.status)
+            return response.status;
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
+
+     const updateMainAddress = async (addressId) =>{
+        console.log('teste', addressId)
+        try {
+            const response = await ConnectionAPI.patch(`address/main/${addressId}`)
+            console.log('response update main', response)
+            return response.data;
+        } catch (error) {
+            handleAPIError(error)
+        }
+     } 
+
+    const getAddressByUserId = async (userId) => {
+        try {
+            const response = await ConnectionAPI.get(`address/user/${userId}`)
+            return response.data;
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
+
+    const getFreight = async (cep) => {
         try {
             console.log('AAA', cep)
             const response = await ConnectionAPI.get(`freight/${cep}`)
@@ -44,19 +85,19 @@ const AddressServices = () => {
         }
     }
 
-        const getAddress = async (cep) => {
-            try {
-                const response = await ViaCepAPI.get(`${cep}/json/`)
-                console.log(response.data)
-                return response.data
-            } catch (error) {
-                console.error('erro no cep')
-            }
+    const getAddressCep = async (cep) => {
+        try {
+            const response = await ViaCepAPI.get(`${cep}/json/`)
+            console.log(response.data)
+            return response.data
+        } catch (error) {
+            console.error('erro no cep')
         }
-    
- 
+    }
 
-    return { createAddress, getFreight, getAddress, getAddressByUserId }
+
+
+    return { createAddress, updateAddress, updateMainAddress, deleteAddress, getFreight, getAddressCep, getAddressByUserId, errorMessages, setErrorMessages }
 
 }
 

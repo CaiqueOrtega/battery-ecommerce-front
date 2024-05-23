@@ -4,7 +4,7 @@ import { AlertIcon, PdfIcon } from "../../../assets/icons/IconsSet";
 import UserService from "../../../services/users/UsersServices";
 import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal";
 import { AuthContext } from '../../../context/AuthProvider';
-import Pagination from "../../../components/common/PaginationTable";
+import Pagination from "../../../components/common/Pagination";
 import ModalPdf from '../../../services/pdf/Report'
 import SortButton from "../../../components/common/SortButton";
 
@@ -103,7 +103,7 @@ function UserIndex({ users, setUsers }) {
     }
 
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);

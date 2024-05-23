@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import NavbarComponent from "../../components/layout/navbar/Navbar";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon } from "../../assets/icons/IconsSet";
+import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon, LockIconOutline, BsArrowLeft } from "../../assets/icons/IconsSet";
 import { AuthContext } from "../../context/AuthProvider";
 import { useContext } from "react";
 import AccountContent from "./account/AccountContent";
@@ -9,7 +9,7 @@ import AddressContent from "./address/AddressContent";
 import './settings.css'
 
 
-const CardOption = ({ icon, title, description, onClick }) => (
+const CardOption = ({ icon, title, description, disableArrowLeft, onClick }) => (
     <Card className="border-0 shadow mb-2 card-option " onClick={onClick}>
         <Card.Body>
             <Row className="g-0">
@@ -22,7 +22,7 @@ const CardOption = ({ icon, title, description, onClick }) => (
                     <span className="text-muted small">{description}</span>
                 </Col>
                 <Col className="col-auto d-flex align-items-center">
-                    <ChevronLeftIcon />
+                    {!disableArrowLeft && <ChevronLeftIcon />}
                 </Col>
             </Row>
         </Card.Body>
@@ -73,6 +73,13 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
         />
 
         <CardOption
+            icon={<LockIconOutline size={22} />}
+            title="Segurança"
+            description="Ver e alterar medidas de segurança"
+            onClick={() => handleCardClick('security')}
+        />
+
+        <CardOption
             icon={<CartIcon size={22} />}
             title="Cartões"
             description="Ver ou alterar meios de pagamento"
@@ -80,11 +87,13 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
         />
 
         <CardOption
-            icon={<CartIcon size={22} />}
+            icon={ <BsArrowLeft currentColor={'currentColor'} size={'35px'}/>}
             title="Voltar"
-            description="Voltar a pagina Inicial"
+            description="voltar para pagina inicial"
             onClick={() => navigate('/')}
+            disableArrowLeft={true}
         />
+
     </>
 );
 
@@ -93,9 +102,10 @@ function SettingsPage() {
     const [selectedOption, setSelectedOption] = useState('account');
     const [mobileVisibleCard, setMobileVisibleCard] = useState(false);
 
+
     useEffect(() => {
-        document.title = "Minha conta";
-      }, []);
+        document.title = "Configurações";
+    }, []);
 
     const getContent = useMemo(() => {
         switch (selectedOption) {
@@ -115,25 +125,21 @@ function SettingsPage() {
                 <div className="flex-grow-1 d-flex align-items-center justify-content-center">
                     <Container fluid={'lg'} className="h-sm-100 py-md-5">
                         <Row className="h-sm-100">
-                            <Col md={4} className={`mt-4 mt-md-0 d-md-block ${mobileVisibleCard && 'd-none'}`}>
+                            <Col md={4} className={`mt-4 mt-md-0 d-md-block ${mobileVisibleCard && 'd-none'}`} id="first-column">
                                 <OptionsCards handleCardClick={(optionCard) => {
-                                        setSelectedOption(optionCard)
-                                        setMobileVisibleCard(true);
-                                    }}
-                                    userDataName={userData?.name } 
+                                    setSelectedOption(optionCard)
+                                    setMobileVisibleCard(true);
+                                }}
+                                    userDataName={userData?.name}
                                     userDataInitials={userData?.initials}
-                                    navigate={navigate}        
+                                    navigate={navigate}
                                 />
                             </Col>
 
-                            <Col className={`d-md-block ${!mobileVisibleCard && 'd-none'} expanded-card`}>
+                            <Col className={`d-md-block ${!mobileVisibleCard && 'd-none'} expanded-card`} >
                                 <Card className="shadow card-main h-sm-100">
-                                    <Card.Body>
-                                        <Container className="px-md-5 py-md-2">
-                                            <a type="button" className="color-red d-md-none" onClick={() => setMobileVisibleCard(false)}>Voltar</a>
-                                            {getContent}
-                                        </Container>
-                                    </Card.Body>
+                                    <a type="button" className="color-red d-md-none position-absolute " onClick={() => setMobileVisibleCard(false)}>Voltar</a>
+                                    {getContent}
                                 </Card>
                             </Col>
                         </Row>

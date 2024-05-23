@@ -6,7 +6,7 @@ import PromotionService from "../../../services/promotion/PromotionService";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
 import ModalPdf from '../../../services/pdf/Report'
-import Pagination from '../../../components/common/PaginationTable';
+import Pagination from '../../../components/common/Pagination';
 import SortButton from "../../../components/common/SortButton";
 
 
@@ -14,8 +14,6 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     const [selectedPromotion, setSelectedPromotion] = useState(null);
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(5);
     const [showsModalPDF, setShowModalPDF] = useState(false);
     const [activeField, setActiveField] = useState(null);
 
@@ -250,7 +248,8 @@ export default function PromotionIndex({ promotions, setPromotions }) {
         </>
     )
 
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentItems = promotions.slice(indexOfFirstItem, indexOfLastItem);

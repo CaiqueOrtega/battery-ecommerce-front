@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Modal, Row, Col, Button } from 'react-bootstrap';
+import { Modal, Row, Col, Button, Card, FormSelect, FormLabel } from 'react-bootstrap';
 import { PDFViewer, Document, Page, Text, View, Image, PDFDownloadLink, StyleSheet } from '@react-pdf/renderer';
 import logo from '../../assets/images/logo-PretoBranco.png';
 import { AuthContext } from '../../context/AuthProvider';
@@ -93,6 +93,9 @@ const styles = StyleSheet.create({
         alignItems: 'center'
     },
     userInfo: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        flexDirection: 'row-reverse',
         borderBottom: 1,
         padding: 10,
         fontSize: 12
@@ -189,8 +192,9 @@ const TableUser = ({ data }) => (
 );
 
 
-const MyDocument = ({ data, user, type }) => {
-    const ITEMS_PER_PAGE_FIRST = 18;
+const MyDocument = ({ data, user, type, filter }) => {
+
+    const ITEMS_PER_PAGE_FIRST = 15;
     const ITEMS_PER_PAGE_NEXT = 35;
     const date = new Date().toLocaleString();
 
@@ -255,9 +259,17 @@ const MyDocument = ({ data, user, type }) => {
                             <Text>Usuário Solicitante</Text>
                         </View>
                         <View style={styles.userInfo}>
-                            <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
-                            <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
-                            <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                            <View>
+                                {filter ? (
+                                    <Text><Text style={styles.boldText}>Filtro selecionado: </Text>{filter}</Text>
+                                ) : null}
+                            </View>
+
+                            <View>
+                                <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                                <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                                <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                            </View>
                         </View>
                         <Text style={styles.noContentText}>Sem dados disponíveis</Text>
                         <View style={styles.pageCounter}>
@@ -301,9 +313,17 @@ const MyDocument = ({ data, user, type }) => {
                                         <Text>Usuário Solicitante</Text>
                                     </View>
                                     <View style={styles.userInfo}>
-                                        <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
-                                        <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
-                                        <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                                        <View>
+                                            {filter ? (
+                                                <Text><Text style={styles.boldText}>Filtro selecionado: </Text>{filter}</Text>
+                                            ) : null}
+                                        </View>
+
+                                        <View>
+                                            <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                                            <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                                            <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                                        </View>
                                     </View>
                                 </View>
                             )}
@@ -331,22 +351,18 @@ const MyDocument = ({ data, user, type }) => {
 
 
 
-
-
-
-
 const ReportGenerator = () => {
-    const pdfViewer = (data, userData, type) => {
+    const pdfViewer = (data, userData, type, filter) => {
         return (
-            <PDFViewer width="100%" height="350em">
-                <MyDocument data={data} user={userData} type={type} />
+            <PDFViewer width="100%" height="360em">
+                <MyDocument data={data} user={userData} type={type} filter={filter} />
             </PDFViewer>
         )
     };
 
-    const pdfButtonLink = (data, userData, type) => {
+    const pdfButtonLink = (data, userData, type, filter) => {
         return (
-            <PDFDownloadLink className='btn btn-red' document={<MyDocument data={data} user={userData} type={type} />} fileName="relatorio.pdf" style={styles.buttom}>
+            <PDFDownloadLink className='btn btn-red' document={<MyDocument data={data} user={userData} type={type} filter={filter} />} fileName="relatorio.pdf" style={styles.button}>
                 {({ blob, url, loading, error }) =>
                     loading ? 'Gerando PDF...' : 'Baixar PDF'
                 }
@@ -359,7 +375,7 @@ const ReportGenerator = () => {
 
 function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { userData } = useContext(AuthContext);
-
+    const [selectedFilter, setSelectedFilter] = useState('Sem filtros');
 
     const [report, setReport] = useState(
         type === 'user' ? 'user-clear' :
@@ -415,113 +431,112 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     }, [currentItems, shouldDataUpdate]);
 
 
+    const optionsByType = {
+        user: [
+            { label: 'Sem filtros', value: 'user-clear' },
+            { label: 'Ativo', value: 'user-active', group: 'Status' },
+            { label: 'Inativo', value: 'user-inactive', group: 'Status' },
+            { label: 'Usuário', value: 'user-user', group: 'Cargo' },
+            { label: 'Administrador', value: 'user-admin', group: 'Cargo' }
+        ],
+        battery: [
+            { label: 'Sem filtros', value: 'battery-clear' },
+            { label: 'Ativo', value: 'battery-active', group: 'Status' },
+            { label: 'Inativo', value: 'battery-inactive', group: 'Status' },
+            { label: '0 R$ - 100 R$', value: 'battery-value-100', group: 'Preço' },
+            { label: '100 R$ - 250 R$', value: 'battery-value-250', group: 'Preço' },
+            { label: '250 R$ - 500 R$', value: 'battery-value-500', group: 'Preço' },
+            { label: 'Acima de 500 R$', value: 'battery-value-over-500', group: 'Preço' },
+            { label: '0 - 100 Unidades', value: 'battery-quantity-100', group: 'Quantidade' },
+            { label: '100 - 250 Unidades', value: 'battery-quantity-250', group: 'Quantidade' },
+            { label: '250 - 500 Unidades', value: 'battery-quantity-500', group: 'Quantidade' },
+            { label: 'Acima de 500 Unidades', value: 'battery-quantity-over-500', group: 'Quantidade' }
+        ],
+        promotion: [
+            { label: 'Sem filtros', value: 'promotion-clear' },
+            { label: 'Ativo', value: 'promotion-active', group: 'Status' },
+            { label: 'Inativo', value: 'promotion-inactive', group: 'Status' },
+            { label: 'Vencido', value: 'promotion-expired', group: 'Status' },
+            { label: 'Próximo mês', value: 'promotion-validity-1', group: 'Vencimento' },
+            { label: 'Próximos 3 meses', value: 'promotion-validity-3', group: 'Vencimento' },
+            { label: 'Próximos 6 meses', value: 'promotion-validity-6', group: 'Vencimento' },
+            { label: 'Acima de 6 meses', value: 'promotion-validity-over-6', group: 'Vencimento' },
+            { label: '0 - 15%', value: 'promotion-percentage-15', group: 'Porcentagem de Desconto' },
+            { label: '15 - 30%', value: 'promotion-percentage-30', group: 'Porcentagem de Desconto' },
+            { label: '30 - 50%', value: 'promotion-percentage-50', group: 'Porcentagem de Desconto' },
+            { label: 'Acima de 50%', value: 'promotion-percentage-over-50', group: 'Porcentagem de Desconto' }
+        ]
+    };
+
+    useEffect(() => {
+        console.log('teste filtro', selectedFilter)
+    }, [selectedFilter])
+
+
+
     return (
         <>
-            <Modal size='lg' show={showsModalPDF} onHide={() => setShowModalPDF(false)} backdrop='false' centered>
-                <Modal.Header closeButton className='bg-red text-white'>
+            <Modal show={showsModalPDF} onHide={() => setShowModalPDF(false)} backdrop='false' centered>
+                <Modal.Header className='bg-red text-white'>
                     <Modal.Title>Configurar Relatório</Modal.Title>
+                    <button className='btn-close btn-close-white' onClick={() => setShowModalPDF(false)} />
                 </Modal.Header>
-                <Modal.Body style={{ height: 400 }}>
-                    <Row className='h-100'>
-                        <Col md={6}>
-                            <div className="form-check form-switch">
-                                <input
-                                    className="form-check-input"
-                                    type="checkbox"
-                                    role="switch"
-                                    id="flexSwitchCheckChecked"
-                                    checked={showModalPdfSwitch}
-                                    onChange={handleShowModalPdfSwitchChange}
-                                    ref={inputRef}
-                                />
-                                <label className="form-check-label" htmlFor="flexSwitchCheckChecked">Pré visualização de PDF</label>
-                            </div>
+                <Modal.Body >
+                    <Row className='h-100 d-flex flex-column '>
+                        <Col>
+                            <Card className='shadow-sm'>
+                                <Card.Body className='d-flex justify-content-between '>
+                                    <span className='fw-bold text-muted'>
+                                        Configurações do PDF
+                                    </span>
+                                    <div className="form-check form-switch ">
+                                        <input
+                                            className="form-check-input small"
+                                            type="checkbox"
+                                            role="switch"
+                                            id="flexSwitchCheckChecked"
+                                            checked={showModalPdfSwitch}
+                                            onChange={handleShowModalPdfSwitchChange}
+                                            ref={inputRef}
+                                        />
+                                        <label className="form-check-label small text-muted" htmlFor="flexSwitchCheckChecked">Pré-visualização</label>
+                                    </div>
+                                </Card.Body>
+                            </Card>
 
-                            {showModalPdfSwitch ? pdfViewer(data, userData, type) : null}
-                        </Col>
-                        <Col md={6}>
-                            <p>Filtros</p>
-                            {type === 'user' && (
-                                <select
-                                    className="form-select form-select-sm w-100 h-25 mt-1"
-                                    aria-label="Filtragem Usuários"
+                            <FormLabel className='w-100 mt-4'>
+                                Filtros
+                                <FormSelect
+                                    className=" py-2 mt-1"
+                                    aria-label={`Filtragem ${type === 'user' ? 'Usuários' : type === 'battery' ? 'Baterias' : 'Promoções'}`}
                                     onChange={(e) => {
-                                        setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true)
+                                        setSelectedFilter(e.target.options[e.target.selectedIndex].text);
+                                        setReport(e.target.value);
+                                        handleReportChange();
+                                        setShouldDataUpdate(true);
                                     }}
                                 >
-                                    <option disabled>Filtragem Usuários</option>
-                                    <option value="user-clear">Limpar Filtros</option>
-                                    <optgroup label='Status'>
-                                        <option value="user-active">Ativo</option>
-                                        <option value="user-inactive">Inativo</option>
-                                    </optgroup>
-                                    <optgroup label='Cargo'>
-                                        <option value="user-user">Usuário</option>
-                                        <option value="user-admin">Administrador</option>
-                                    </optgroup>
-                                </select>
-                            )}
-                            {type === 'battery' && (
-                                <select
-                                    className="form-select form-select-sm w-100 h-25 mt-1"
-                                    aria-label="Filtragem Baterias"
-                                    onChange={(e) => { setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true) }}
-                                >
-                                    <optgroup label='Filtragem Baterias'>
-                                        <option value="battery-clear">Limpar Filtros</option>
-                                    </optgroup>
-                                    <optgroup label='Status'>
-                                        <option value="battery-active">Ativo</option>
-                                        <option value="battery-inactive">Inativo</option>
-                                    </optgroup>
-                                    <optgroup label='Preço'>
-                                        <option value="battery-value-100">0 R$ - 100 R$</option>
-                                        <option value="battery-value-250">100 R$ - 250 R$</option>
-                                        <option value="battery-value-500">250 R$ - 500 R$</option>
-                                        <option value="battery-value-over-500">Acima de 500 R$</option>
-                                    </optgroup>
-                                    <optgroup label='Quantidade'>
-                                        <option value="battery-quantity-100">0 - 100 Unidades</option>
-                                        <option value="battery-quantity-250">100 - 250 Unidades</option>
-                                        <option value="battery-quantity-500">250 - 500 Unidades</option>
-                                        <option value="battery-quantity-over-500">Acima de 500 Unidades</option>
-                                    </optgroup>
-                                </select>
-                            )}
-                            {type === 'promotion' && (
-                                <select
-                                    className="form-select form-select-sm w-100 h-25 mt-1"
-                                    aria-label="Filtragem Promoções"
-                                    onChange={(e) => { setReport(e.target.value), handleReportChange(), setShouldDataUpdate(true)  }}
-                                >
-                                    <option disabled>Filtragem Promoções</option>
-                                    <option value="promotion-clear">Limpar Filtros</option>
-                                    <optgroup label='Status'>
-                                        <option value="promotion-active">Ativo</option>
-                                        <option value="promotion-inactive">Inativo</option>
-                                        <option value="promotion-expired">Vencido</option>
-                                    </optgroup>
-                                    <optgroup label='Vencimento'>
-                                        <option value="promotion-validity-1">Próximo mês</option>
-                                        <option value="promotion-validity-3">Próximos 3 meses</option>
-                                        <option value="promotion-validity-6">Próximos 6 meses</option>
-                                        <option value="promotion-validity-over-6">Acima de 6 meses</option>
-                                    </optgroup>
-                                    <optgroup label='Porcentagem de Desconto'>
-                                        <option value="promotion-percentage-15">0 - 15%</option>
-                                        <option value="promotion-percentage-30">15 - 30%</option>
-                                        <option value="promotion-percentage-50">30 - 50%</option>
-                                        <option value="promotion-percentage-over-50">Acima de 50%</option>
-                                    </optgroup>
-                                </select>
-                            )}
+                                    {optionsByType[type].map((option, index) => (
+                                        <React.Fragment key={index}>
+                                            {index === 0 || option.group !== optionsByType[type][index - 1].group ? (
+                                                <optgroup label={option.group}></optgroup>
+                                            ) : null}
+                                            <option value={option.value}>{option.label}</option>
+                                        </React.Fragment>
+                                    ))}
+                                </FormSelect>
+                            </FormLabel>
+                        </Col>
+
+                        <Col className={`mt-3 ${!showModalPdfSwitch ? 'd-none' : ''}`}>
+                            {showModalPdfSwitch ? pdfViewer(data, userData, type, selectedFilter) : null}
                         </Col>
                     </Row>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModalPDF(false)}>Fechar</Button>
 
-                    {pdfButtonLink(data, userData, type)}
+                    {pdfButtonLink(data, userData, type, selectedFilter)}
                 </Modal.Footer>
             </Modal>
         </>

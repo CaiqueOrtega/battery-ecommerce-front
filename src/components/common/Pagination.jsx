@@ -1,42 +1,48 @@
-import React from 'react';
+import { useEffect } from "react";
 
 function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, setItemsPerPage }) {
+
+
     const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const pagesPerSet = 5;
+    const currentSet = Math.ceil(currentPage / pagesPerSet);
+    const startPage = (currentSet - 1) * pagesPerSet + 1;
+    let endPage = startPage + pagesPerSet - 1;
+    endPage = Math.min(endPage, totalPages);
+
+
 
     const handlePageChange = (pageNumber) => {
         onPageChange(pageNumber);
     };
 
-    const calculatePageRange = () => {
-        const pagesPerSet = 5;
-        const currentSet = Math.ceil(currentPage / pagesPerSet);
-        const startPage = (currentSet - 1) * pagesPerSet + 1;
-        let endPage = startPage + pagesPerSet - 1;
-        if (endPage > totalPages) {
-            endPage = totalPages;
+    const generatePerPageOptions = () => {
+        const options = [];
+        let increment = 5;
+        while (increment <= totalItems) {
+            options.push(<option key={increment} value={increment}>{increment}</option>);
+            increment += 5;
         }
-        return { startPage, endPage };
+        if (increment - 5 !== totalItems) {
+            options.push(<option key={totalItems} value={totalItems}>{totalItems}</option>);
+        }
+        return options;
     };
 
-    const { startPage, endPage } = calculatePageRange();
+    const pageNumbers = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
 
-    const pageNumbers = [];
-    for (let i = startPage; i <= endPage; i++) {
-        pageNumbers.push(i);
-    }
 
     return (
         <>
             <div className="d-flex justify-content-end gap-2">
-                <select className="form-select form-select-sm w-auto h-50 mt-1" aria-label="Registros por página"
+                <select
+                    className="form-select form-select-sm w-auto h-50 mt-1"
+                    aria-label="Registros por página"
                     onChange={(e) => setItemsPerPage(parseInt(e.target.value))}
+                    value={itemsPerPage}
                 >
                     <optgroup label='Registros por página'>
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
+                        {generatePerPageOptions()}
                     </optgroup>
                 </select>
                 <ul className="pagination">

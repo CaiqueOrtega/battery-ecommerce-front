@@ -20,16 +20,42 @@ function App() {
     <Router>
       <AuthProvider>
         <Routes>
-          <Route path="/" element={<GlobalDataProvider><BatteryCartProvider><HomePage /></BatteryCartProvider></GlobalDataProvider>} />
-          <Route path="/paineldecontrole" element={<DashBoardProvider><DashboardPage /> </DashBoardProvider>} />
+          <Route path="/" element={
+            <GlobalDataProvider>
+              <BatteryCartProvider
+              ><HomePage />
+              </BatteryCartProvider>
+            </GlobalDataProvider>}
+          />
+
+          <Route path='/bateria' element={
+            <GlobalDataProvider>
+              <BatteryCartProvider>
+                <BatteryPurchasePage />
+              </BatteryCartProvider>
+            </GlobalDataProvider>
+          } />
+
+
+          <Route path="/configuracoes" element={
+            <GlobalDataProvider>
+              <Settings />
+            </GlobalDataProvider>} />
+
+
+          <Route path="/paineldecontrole" element={
+            <DashBoardProvider>
+              <DashboardPage />
+            </DashBoardProvider>} />
+
+          <Route path='/termos' element={<TermsAndConditions />} />
           <Route path="/autenticacao/:action" element={<AuthenticationPage />} />
-          <Route path='/bateria' element={<GlobalDataProvider><BatteryCartProvider><BatteryPurchasePage /></BatteryCartProvider></GlobalDataProvider>} />
-          <Route path="/configuracoes" element={<BatteryCartProvider><Settings /></BatteryCartProvider>} />
-          <Route path='/termos' element={<TermsAndConditions/>}/>
         </Routes>
       </AuthProvider>
     </Router>
   );
+
+
 }
 
 export default App;

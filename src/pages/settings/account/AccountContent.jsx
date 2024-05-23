@@ -5,7 +5,7 @@ import { useState, useEffect, useContext } from "react";
 import UserService from "../../../services/users/UsersServices";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
 
-const ConfirmDesactiveAccountModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
+const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
     const [verifyPassword, setVerifyPassword] = useState('')
     const [verifyConfirmPassword, setVerifyConfirmPassword] = useState('')
     const [prevValues, setPrevValues] = useState({password: null, confirmPassword: null})
@@ -54,7 +54,7 @@ const ConfirmDesactiveAccountModal = ({ showModal, setShowModal, userData, handl
                         return
                     }
                     
-                        const response = await handleConfirm(e, 'desactive', verifyPassword)
+                        const response = await handleConfirm(e, 'disable', verifyPassword)
                     if (!response){
                         setPrevValues({password: verifyPassword, confirmPassword: verifyConfirmPassword})
                     }
@@ -75,18 +75,18 @@ function AccountContent({ userData }) {
     const [disableFormControl, setDisableFormControl] = useState(true);
     const [request, setRequest] = useState('view')
     const [successMessage, setSuccessMessage] = useState(null)
-    const [showConfirmDesactiveAccountModal, setShowConfirmDesactiveAccountModal] = useState(false);
+    const [showConfirmDisableAccountModal, setShowConfirmDisableAccountModal] = useState(false);
     const [showMainContent, setShowMainContent] = useState(false)
-    const { desactiveAccount, errorMessages, setErrorMessages, updateUser } = UserService();
+    const { disableAccount, errorMessages, setErrorMessages, updateUser } = UserService();
 
 
 
     const handleConfirm = async (e, action, password) => {
         e.preventDefault();
     
-        if (action === 'desactive') {
+        if (action === 'disable') {
             setShowMainContent(false);
-            const response = await desactiveAccount(userData.userId, password);
+            const response = await disableAccount(userData.userId, password);
             if (response) {
                 return true;
             } else {
@@ -130,8 +130,8 @@ function AccountContent({ userData }) {
 
 
     return (
-        <>
-            <header className="mb-2">
+        <section className="px-5 py-4 d-flex h-100 justify-content-center flex-column ">
+            <header className="mb-4 pb-2">
                 <h4>Dados da Conta</h4>
                 <span className="text-muted">Atualize suas informações pessoais aqui para garantir uma experiência personalizada.
                     Mantenha seus detalhes precisos e atualizados.</span>
@@ -139,7 +139,7 @@ function AccountContent({ userData }) {
 
             {showMainContent === true ? <AlertErrorOrSuccess successMessage={successMessage} errorMessages={errorMessages} /> : null}
 
-            <Form className="mt-3">
+            <Form>
                 <Row>
                     <Col md={12}>
                         <Form.Label>Nome completo</Form.Label>
@@ -176,7 +176,6 @@ function AccountContent({ userData }) {
                             placeholder=''
                             value={userData ? userData.document : ''}
                             disable={true}
-                            mb={'mb-3'}
                         />
                     </Col>
 
@@ -188,17 +187,17 @@ function AccountContent({ userData }) {
                     : <Button variant="yellow ms-md-3" onClick={(e) => handleUpdate(userData.userId, name, email)}>Atualizar Dados</Button>
                 }
 
-                {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDesactiveAccountModal(true)}>Desativar Conta</Button>
+                {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDisableAccountModal(true)}>Desativar Conta</Button>
                     : <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setRequest('view')}>Cancelar</Button>
                 }
 
             </div>
 
 
-            <ConfirmDesactiveAccountModal showModal={showConfirmDesactiveAccountModal} setShowModal={setShowConfirmDesactiveAccountModal}
+            <ConfirmDisableAccountModal showModal={showConfirmDisableAccountModal} setShowModal={setShowConfirmDisableAccountModal}
                 userData={userData} handleConfirm={handleConfirm}
                 errorMessages={errorMessages} setErrorMessages={setErrorMessages} />
-        </>
+        </section>
     );
 }
 

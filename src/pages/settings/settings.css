@@ -13,10 +13,12 @@
     }
 }
 
+.card-option{
+    cursor: pointer;
+}
 
 .card-main {
     height: 99%;
-    overflow-y: auto !important;
 }
 
 .initial-welcome {
@@ -28,3 +30,4 @@
     height: 65px;
     font-size: 2rem;
 }
+

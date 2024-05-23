@@ -19,7 +19,7 @@ function BatteryPurchasePage() {
     const { addBattery } = BatteryCartServices();
     const { batteryCart, setBatteryCart } = useContext(BatteryCartContext);
     const [formCEP, setFormCEP] = useState('');
-    const { getFreight, getAddress } = AddressServices();
+    const { getFreight, getAddressCep } = AddressServices();
     const { isLoggedIn } = useContext(AuthContext);
     const [freightValues, setFreightValues] = useState({});
     const [prevFormCEP, setPrevFormCEP] = useState({})
@@ -76,7 +76,7 @@ function BatteryPurchasePage() {
 
         if (formCEP != prevFormCEP) {
             let response;
-            response = await getAddress(formCEP);
+            response = await getAddressCep(formCEP);
 
             if (response) {
                 setAddressValues(response);

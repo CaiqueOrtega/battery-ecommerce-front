@@ -78,7 +78,7 @@ function AuthProvider({ children }) {
   }
 
 
-  const VerifyAuth = ({ children, request }) => {
+  function VerifyAuth ({ children, request }) {
     const { userRoleAuthorization } = AuthServices();
     const [response, setResponse] = useState(null);
 
