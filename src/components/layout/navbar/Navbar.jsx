@@ -9,12 +9,42 @@ import { Link } from 'react-router-dom';
 import ModalLogout from '../../common/ModalLogout';
 import { BatteryCartContext } from '../../../context/BatteryCartProvider';
 import exemploImageCart from '../../../assets/images/exemploImageRegister.png'
-
+import AuthServices from '../../../services/auth/AuthServices';
 
 function NavbarComponent({ setNavbarContent }) {
-  const { navigate } = useContext(AuthContext);
-  const { logout, userData, isLoggedIn, VerifyAuth } = useContext(AuthContext);
+  const { logout, userData, isLoggedIn, navigate } = useContext(AuthContext);
+  const { VerifyAuth } = AuthServices();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const renderLinksDropDown = () => {
+    return (
+      <>
+        <Link to="/configuracoes/pedidos" className='d-flex align-items-center mb-1 dropdown-item'>
+          <OrderIcon /> <span className='ms-2'>Pedidos</span>
+        </Link>
+
+        <Link to="/configuracoes/enderecos" className='d-flex align-items-center mb-1 dropdown-item'>
+          <MapIcon /> <span className='ms-2'>Endereço</span>
+        </Link>
+
+        <VerifyAuth request={false}>
+          <Link to="/paineldecontrole" className='dropdown-item d-flex align-items-center' >
+            <ControlIcon />
+            <span className='ms-2'>Painel de controle</span>
+          </Link>
+        </VerifyAuth>
+
+        <Link to="/configuracoes/seguranca" className='d-flex align-items-center mb-1 dropdown-item'>
+          <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
+        </Link>
+        <Dropdown.Divider className='mx-3' />
+        <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>
+          <ExitIcon />  <span className='ms-2'>Sair da conta</span>
+        </Dropdown.Item>
+      </>
+    )
+  }
+
 
 
   const navbarContent = () => {
@@ -33,8 +63,14 @@ function NavbarComponent({ setNavbarContent }) {
 
 
           <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} />
-          <RenderUserDropdownMenu userData={userData} isLoggedIn={isLoggedIn} VerifyAuth={VerifyAuth} setShowLogoutModal={setShowLogoutModal} />
-          <Navbar.Toggle className="border-0 ms-1 me-md-3" aria-controls="navbarContent" />
+
+          <RenderUserDropdownMenu
+            userData={userData}
+            isLoggedIn={isLoggedIn}
+            VerifyAuth={VerifyAuth}
+            setShowLogoutModal={setShowLogoutModal}
+            renderLinksDropDown={renderLinksDropDown}
+            />
         </Col>
       </>
     )
@@ -46,8 +82,8 @@ function NavbarComponent({ setNavbarContent }) {
       <Navbar expand="lg" className="bg-yellow shadow pb-0" variant="dark">
         <Row className="d-flex flex-fill pb-2 g-0 px-2 px-lg-4 align-items-center justify-content-between">
           <Col className='col-auto order-first ms-md-3'>
-            <Navbar.Brand className='m-0'>
-              <img src={logo} width="150px" alt="Logo" onClick={() => { navigate('/') }} />
+            <Navbar.Brand className='m-0 navbar-brand-image'>
+              <img className="logo-navbar" src={logo} width="150px" alt="Logo" onClick={() => { navigate('/') }} />
             </Navbar.Brand>
           </Col>
 
@@ -55,21 +91,31 @@ function NavbarComponent({ setNavbarContent }) {
 
         </Row>
 
-
-        <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
-          <RenderMobileNavbarCollapseContent isLoggedIn={isLoggedIn} userData={userData} VerifyAuth={VerifyAuth} setShowLogoutModal={setShowLogoutModal} />
-        </Navbar.Collapse>
-
+       
+          <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
+            <RenderMobileNavbarCollapseContent
+              isLoggedIn={isLoggedIn}
+              userData={userData}
+              renderLinksDropDown={renderLinksDropDown}
+            />
+          </Navbar.Collapse>
       </Navbar >
 
-      <ModalLogout showLogoutModal={showLogoutModal} setShowLogoutModal={setShowLogoutModal} logout={logout} />
+      <ModalLogout
+        showLogoutModal={showLogoutModal}
+        setShowLogoutModal={setShowLogoutModal}
+        logout={logout} />
+
+
+
+
     </>
   );
 }
 
 
 
-function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, VerifyAuth, setShowLogoutModal }) {
+function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDropDown }) {
 
   const NotLoggedContent = () => (
     <section className="px-4 pb-3">
@@ -108,36 +154,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, VerifyAuth, s
 
 
       <Col className='p-3 bg-light '>
-        <ListGroup className='list-group-flush'>
-          <ListGroup.Item action className='border-0'>
-            <Link to="/configuracoes/pedidos" className='d-flex align-items-center text-dark text-decoration-none '>
-              <OrderIcon /> <span className='ms-2'>Pedidos</span>
-            </Link>
-          </ListGroup.Item >
-          <ListGroup.Item action className='border-0'>
-            <Link to="/configuracoes/enderecos" className='d-flex align-items-center text-dark text-decoration-none'>
-              <MapIcon /> <span className='ms-2'>Endereço</span>
-            </Link>
-          </ListGroup.Item>
-          <VerifyAuth request={false}>
-            <ListGroup.Item action className='border-0'>
-              <Link to="/paineldecontrole" className='d-flex align-items-center text-decoration-none  text-dark'>
-                <ControlIcon />
-                <span className='ms-2'>Painel de controle</span>
-              </Link>
-            </ListGroup.Item>
-          </VerifyAuth>
-          <ListGroup.Item action className='border-0'>
-            <Link to="/configuracoes/seguranca" className='d-flex align-items-center text-decoration-none  text-dark'>
-              <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
-            </Link>
-          </ListGroup.Item>
-          <ListGroup.Item action className='text-danger border-0' onClick={() => setShowLogoutModal(true)}>
-            <div className='d-flex align-items-center text-decoration-none '>
-              <ExitIcon />  <span className='ms-2'>Sair da conta</span>
-            </div>
-          </ListGroup.Item>
-        </ListGroup>
+        {renderLinksDropDown()}
       </Col>
     </>
   )
@@ -222,7 +239,7 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
 
 
 
-function RenderUserDropdownMenu({ userData, isLoggedIn, VerifyAuth, setShowLogoutModal }) {
+function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {
 
 
 
@@ -266,27 +283,8 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, VerifyAuth, setShowLogou
             </div>
           </Link>
           <Dropdown.Divider className='mx-3' />
+          {renderLinksDropDown()}
 
-          <Link to="/configuracoes/pedidos" className='d-flex align-items-center mb-1 dropdown-item'>
-            <OrderIcon /> <span className='ms-2'>Pedidos</span>
-          </Link>
-
-          <Link to="/configuracoes/enderecos" className='d-flex align-items-center mb-1 dropdown-item'>
-            <MapIcon /> <span className='ms-2'>Endereço</span>
-          </Link>
-          <VerifyAuth request={false}>
-            <Link to="/paineldecontrole" className='dropdown-item d-flex align-items-center' >
-              <ControlIcon />
-              <span className='ms-2'>Painel de controle</span>
-            </Link>
-          </VerifyAuth>
-          <Link to="/configuracoes/seguranca" className='d-flex align-items-center mb-1 dropdown-item'>
-            <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
-          </Link>
-          <Dropdown.Divider className='mx-3' />
-          <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>
-            <ExitIcon />  <span className='ms-2'>Sair da conta</span>
-          </Dropdown.Item>
         </Dropdown.Menu>
 
       </>
@@ -302,5 +300,7 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, VerifyAuth, setShowLogou
   )
 
 }
+
+
 
 export default NavbarComponent;

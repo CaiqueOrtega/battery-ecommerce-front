@@ -1,13 +1,19 @@
 import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import AlertErrorOrSuccess from './AlertErrorOrSuccess';
+import { useBatteryCartProvider } from '../../context/BatteryCartProvider';
+import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
 
 function ModalLogout({ showLogoutModal, setShowLogoutModal, logout }) {
     const [errorMessages, setErrorMessages] = useState();
+    const {resetCartData} = useBatteryCartProvider();
+    const { resetAddress } = useGlobalDataProvider();
 
     const handleLogout = () => {
         if (logout()) {
             setShowLogoutModal(false);
+            resetAddress();
+            resetCartData()
         } else {
             console.log('entrou6')
             setErrorMessages({ general: "Houve um problema ao tentar sair. Por favor, tente novamente mais tarde." });

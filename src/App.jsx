@@ -14,7 +14,6 @@ import { DashBoardProvider } from './context/DashBoardProvider';
 import { BatteryCartProvider } from './context/BatteryCartProvider';
 import TermsAndConditions from './pages/terms/TermsAndConditions';
 
-
 function App() {
   return (
     <Router>
@@ -44,9 +43,10 @@ function App() {
 
 
           <Route path="/paineldecontrole" element={
-            <DashBoardProvider>
-              <DashboardPage />
-            </DashBoardProvider>} />
+              <DashBoardProvider>
+                <DashboardPage />
+              </DashBoardProvider>
+          } />
 
           <Route path='/termos' element={<TermsAndConditions />} />
           <Route path="/autenticacao/:action" element={<AuthenticationPage />} />

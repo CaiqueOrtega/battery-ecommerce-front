@@ -38,25 +38,28 @@ function GlobalDataProvider({ children }) {
         }
     };
 
+
     useEffect(() => {
-            fetchBatteries();
+        fetchBatteries();
     }, [fetchBatteryData]);
 
+    const resetAddress = () => {
+        setAddress({});
+    }
 
-    return isContextLoaded ? (
+    return isContextLoaded && (
         <GlobalDataContext.Provider value={{
             batteriesActive,
             setFetchBatteryData,
             fetchAddress,
             addressIsLoaded,
             address,
-            setAddress
+            setAddress,
+            resetAddress
         }}>
             {children}
         </GlobalDataContext.Provider>
-    ) : (
-        <div>Loading...</div>
-    );
+    )
 }
 
 export { GlobalDataContext, GlobalDataProvider };

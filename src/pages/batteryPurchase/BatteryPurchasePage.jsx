@@ -31,7 +31,7 @@ function BatteryPurchasePage() {
     const [freightValues, setFreightValues] = useState({});
     const [prevFormCEP, setPrevFormCEP] = useState({})
     const [addressValues, setAddressValues] = useState({})
-    const { fetchAddress, address, setAddress } = useGlobalDataProvider();
+    const { fetchAddress, address } = useGlobalDataProvider();
     const [showSelectedAddressModal, setShowSelectedAddressModal] = useState(false);
 
     useEffect(() => {
@@ -62,51 +62,57 @@ function BatteryPurchasePage() {
     }, [address]);
 
 
-
-    const handleAddBattery = async () => {
+    const handleAddBatteryToCart = async () => {
         if (isLoggedIn && batteryCart) {
-            const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity)
-            console.log('response', response)
-            setBatteryCart(response)
+            await addBatteryToServerCart();
         } else {
-            let batteriesAddCart = [];
-            let totalPrice = 0;
+            addBatteryToLocalCart();
+        }
+    }
 
-            const storedCart = localStorage.getItem('batteryCart');
+    const addBatteryToServerCart = async () => {
+        const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity);
+        console.log('response', response);
+        setBatteryCart(response);
+    }
 
-            if (storedCart) {
-                const cartData = JSON.parse(storedCart);
-                totalPrice = cartData.totalPrice + (batteryData.value * quantity);
-                batteriesAddCart = cartData.batteries;
+    const addBatteryToLocalCart = () => {
+        let batteriesAddCart = [];
+        let totalPrice = 0;
 
-                if (batteriesAddCart.some(battery => battery.batteryId === batteryData.batteryId)) {
-                    batteriesAddCart.forEach(battery => {
-                        if (battery.batteryId === batteryData.batteryId) {
-                            battery.quantity += quantity;
-                        }
-                    });
-                } else {
-                    batteriesAddCart.push({
-                        batteryId: batteryData.batteryId,
-                        quantity: quantity
-                    });
-                }
+        const storedCart = localStorage.getItem('batteryCart');
+
+        if (storedCart) {
+            const cartData = JSON.parse(storedCart);
+            totalPrice = cartData.totalPrice + (batteryData.value * quantity);
+            batteriesAddCart = cartData.batteries;
+
+            if (batteriesAddCart.some(battery => battery.batteryId === batteryData.batteryId)) {
+                batteriesAddCart.forEach(battery => {
+                    if (battery.batteryId === batteryData.batteryId) {
+                        battery.quantity += quantity;
+                    }
+                });
             } else {
-                totalPrice = batteryData.value * quantity;
                 batteriesAddCart.push({
                     batteryId: batteryData.batteryId,
                     quantity: quantity
                 });
             }
-
-            const newItem = {
-                totalPrice: totalPrice,
-                batteries: batteriesAddCart
-            };
-
-            localStorage.setItem('batteryCart', JSON.stringify(newItem));
-
+        } else {
+            totalPrice = batteryData.value * quantity;
+            batteriesAddCart.push({
+                batteryId: batteryData.batteryId,
+                quantity: quantity
+            });
         }
+
+        const newItem = {
+            totalPrice: totalPrice,
+            batteries: batteriesAddCart
+        };
+
+        localStorage.setItem('batteryCart', JSON.stringify(newItem));
     }
 
     const handleGetAddressByCep = async (e, formCEP, requestModal) => {
@@ -136,7 +142,6 @@ function BatteryPurchasePage() {
             }
         }
     }
-
 
 
     const renderFreightCards = () => {
@@ -194,7 +199,7 @@ function BatteryPurchasePage() {
                                     freightValues={freightValues}
                                     formCEP={formCEP}
                                     setFormCEP={setFormCEP}
-                                    handleAddBattery={handleAddBattery}
+                                    handleAddBatteryToCart={handleAddBatteryToCart}
                                     handleGetAddressByCep={handleGetAddressByCep}
                                     renderFreightCards={renderFreightCards}
                                 />
@@ -299,7 +304,7 @@ function CardBatteryPurchase(props) {
                 <div>
                     <Button variant='yellow py-2 fw-bold w-100 mb-2'>Comprar</Button>
                     <Button variant='red-outline py-2 fw-bold w-100'
-                        onClick={() => props.handleAddBattery()}>
+                        onClick={() => props.handleAddBatteryToCart()}>
                         Adicionar ao Carrinho
                     </Button>
                 </div>
@@ -335,8 +340,8 @@ function ModalAddressBatteryPurchase(props) {
                     <Card.Body>
                         <Row>
                             <Col>
-                                <span className='text-muted fw-bold'>{address.address}, {address.number},{address?.complement}</span>
-                                {address.neighborhood}, {address.city}-{address.uf}, CEP {address.cep}
+                                <h6 className='text-muted fw-bold mb-0'>{address.address}, {address.number},{address?.complement}</h6>
+                                <span>{address.neighborhood}, {address.city}-{address.uf}, CEP {address.cep} </span>
                             </Col>
 
                             <Col className='col-auto d-flex align-items-center color-red'>
@@ -353,14 +358,14 @@ function ModalAddressBatteryPurchase(props) {
 
 
     return (
-        <Modal show={props.showSelectedAddressModal} onHide={() => props.setShowSelectedAddressModal(false)} >
+        <Modal show={props.showSelectedAddressModal} onHide={() => props.setShowSelectedAddressModal(false)} centered>
             <Modal.Header closeButton className='text-dark text-muted  d-flex justify-content-center'>
                 <Modal.Title className='' >
                     Calcular valor do Frete
                 </Modal.Title>
             </Modal.Header>
 
-            <Modal.Body className='px-5 py-4'>
+            <Modal.Body className='px-3 px-md-5 py-4'>
                 <section>
                     <Form className='d-flex align-items-center'>
                         <Form.Label className='text-muted fw-bold w-100 '>
