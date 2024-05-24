@@ -12,7 +12,7 @@ function GlobalDataProvider({ children }) {
     const [batteriesActive, setBatteriesActive] = useState([]);
     const [isContextLoaded, setIsContextLoaded] = useState(false);
     const [fetchBatteryData, setFetchBatteryData] = useState(false);
-    const [addressValues, setAddressValues] = useState([]);
+    const [address, setAddress] = useState([]);
     const [addressIsLoaded, setAddressIsLoaded] = useState(false);
 
     const fetchBatteries = async () => {
@@ -30,7 +30,7 @@ function GlobalDataProvider({ children }) {
         try {
             if (isLoggedIn && userData?.userId && !addressIsLoaded) {
                 const response = await getAddressByUserId(userData.userId);
-                setAddressValues(response);
+                setAddress(response);
                 setAddressIsLoaded(true);
             }
         } catch (error) {
@@ -49,8 +49,8 @@ function GlobalDataProvider({ children }) {
             setFetchBatteryData,
             fetchAddress,
             addressIsLoaded,
-            addressValues,
-            setAddressValues,
+            address,
+            setAddress
         }}>
             {children}
         </GlobalDataContext.Provider>
@@ -61,4 +61,4 @@ function GlobalDataProvider({ children }) {
 
 export { GlobalDataContext, GlobalDataProvider };
 
-export const useGlobalData = () => useContext(GlobalDataContext);
+export const useGlobalDataProvider = () => useContext(GlobalDataContext);

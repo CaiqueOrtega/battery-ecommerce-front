@@ -3,6 +3,7 @@ import PromotionService from "../services/promotion/PromotionService";
 import UserService from "../services/users/UsersServices";
 import { AuthContext } from "./AuthProvider";
 import BatteryServices from "../services/battery/BatteryServices";
+
 const DashBoardContext = createContext({});
 
 function DashBoardProvider({ children }) {
@@ -49,3 +50,5 @@ function DashBoardProvider({ children }) {
 }
 
 export { DashBoardProvider, DashBoardContext };
+
+export const useDashBoardProvider = () => useContext(DashBoardContext);

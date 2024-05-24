@@ -1,4 +1,4 @@
-import { useEffect, createContext, useState } from "react";
+import { useEffect, createContext, useState, useContext } from "react";
 import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
@@ -126,5 +126,4 @@ function AuthProvider({ children }) {
 }
 export { AuthContext, AuthProvider };
 
-
-
+export const useAuthProvider = () => useContext(AuthContext);

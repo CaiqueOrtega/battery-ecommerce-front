@@ -61,7 +61,7 @@ function NavbarComponent({ setNavbarContent }) {
         </Navbar.Collapse>
 
       </Navbar >
-      
+
       <ModalLogout showLogoutModal={showLogoutModal} setShowLogoutModal={setShowLogoutModal} logout={logout} />
     </>
   );
@@ -94,7 +94,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, VerifyAuth, s
   const LoggedContent = () => (
     <>
       <Col className='col-name-circle-mobile p-3 bg-white flex-fill '>
-        <Link to="/configuracoes" className='d-flex align-items-center mb-1 text-decoration-none text-dark'>
+        <Link to="/configuracoes/minhaconta" className='d-flex align-items-center mb-1 text-decoration-none text-dark'>
           <div className="rounded-circle-navbar-collapse rounded-circle bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center ">
             <span>{userData.initials}</span>
           </div>
@@ -108,14 +108,14 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, VerifyAuth, s
 
 
       <Col className='p-3 bg-light '>
-        <ListGroup  className='list-group-flush'>
+        <ListGroup className='list-group-flush'>
           <ListGroup.Item action className='border-0'>
-            <Link to="/#" className='d-flex align-items-center text-dark text-decoration-none '>
+            <Link to="/configuracoes/pedidos" className='d-flex align-items-center text-dark text-decoration-none '>
               <OrderIcon /> <span className='ms-2'>Pedidos</span>
             </Link>
           </ListGroup.Item >
           <ListGroup.Item action className='border-0'>
-            <Link to="/#" className='d-flex align-items-center text-dark text-decoration-none'>
+            <Link to="/configuracoes/enderecos" className='d-flex align-items-center text-dark text-decoration-none'>
               <MapIcon /> <span className='ms-2'>Endereço</span>
             </Link>
           </ListGroup.Item>
@@ -128,7 +128,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, VerifyAuth, s
             </ListGroup.Item>
           </VerifyAuth>
           <ListGroup.Item action className='border-0'>
-            <Link to="/#" className='d-flex align-items-center text-decoration-none  text-dark'>
+            <Link to="/configuracoes/seguranca" className='d-flex align-items-center text-decoration-none  text-dark'>
               <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
             </Link>
           </ListGroup.Item>
@@ -255,7 +255,7 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, VerifyAuth, setShowLogou
         <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 ' style={{ width: '14em' }}>
           <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
 
-          <Link to="/configuracoes" className='d-flex align-items-center mb-1 dropdown-item'>
+          <Link to="/configuracoes/minhaconta" className='d-flex align-items-center mb-1 dropdown-item'>
             <div className="rounded-circle bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center rounded-circle-navbar ">
               <span>{userData.initials}</span>
             </div>
@@ -267,20 +267,22 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, VerifyAuth, setShowLogou
           </Link>
           <Dropdown.Divider className='mx-3' />
 
-          <Dropdown.Item className='d-flex align-items-center mb-1'>
+          <Link to="/configuracoes/pedidos" className='d-flex align-items-center mb-1 dropdown-item'>
             <OrderIcon /> <span className='ms-2'>Pedidos</span>
-          </Dropdown.Item >
-          <Dropdown.Item className='d-flex align-items-center mb-1'>
+          </Link>
+
+          <Link to="/configuracoes/enderecos" className='d-flex align-items-center mb-1 dropdown-item'>
             <MapIcon /> <span className='ms-2'>Endereço</span>
-          </Dropdown.Item>
+          </Link>
           <VerifyAuth request={false}>
             <Link to="/paineldecontrole" className='dropdown-item d-flex align-items-center' >
               <ControlIcon />
-              <span className='ms-2'>Painel de controle</span></Link>
+              <span className='ms-2'>Painel de controle</span>
+            </Link>
           </VerifyAuth>
-          <Dropdown.Item className='d-flex align-items-center mb-1'>
+          <Link to="/configuracoes/seguranca" className='d-flex align-items-center mb-1 dropdown-item'>
             <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
-          </Dropdown.Item>
+          </Link>
           <Dropdown.Divider className='mx-3' />
           <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>
             <ExitIcon />  <span className='ms-2'>Sair da conta</span>

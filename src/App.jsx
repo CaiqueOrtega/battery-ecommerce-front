@@ -37,7 +37,7 @@ function App() {
           } />
 
 
-          <Route path="/configuracoes" element={
+          <Route path="/configuracoes/:action" element={
             <GlobalDataProvider>
               <Settings />
             </GlobalDataProvider>} />

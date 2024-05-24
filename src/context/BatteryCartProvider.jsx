@@ -77,3 +77,5 @@ function BatteryCartProvider({ children }) {
 }
 
 export { BatteryCartContext, BatteryCartProvider };
+
+export const useBatteryCartProvider = () => useContext(BatteryCartContext);
