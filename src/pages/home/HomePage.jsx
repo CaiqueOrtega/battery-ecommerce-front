@@ -27,8 +27,8 @@ function HomePage() {
       const carouselItems = [];
 
       for (let j = i; j < i + batteriesPerPage * 3 && j < batteriesActive.length; j += batteriesPerPage) {
-        currentPageBatteries = batteriesActive.slice(j, j + batteriesPerPage).map(battery => (
-          <div key={battery.batteryId} className="d-flex justify-content-center p-3 m-0">
+        currentPageBatteries = batteriesActive.slice(j, j + batteriesPerPage).map((battery, index)  => (
+          <div key={battery.batteryId} className={`${index === 4 ? '' : 'container-card-battery'} d-flex justify-content-center`}>
             <BatteryCard
               batteryName={battery.name}
               batteryDescription={battery.description}
@@ -40,11 +40,11 @@ function HomePage() {
         ));
 
         carouselItems.push(
-          <Carousel.Item key={j}>
-            <div className='d-flex justify-content-center '>
-              {currentPageBatteries}
-            </div>
-          </Carousel.Item>
+            <Carousel.Item key={j} className="carousel-item-custom">
+              <div className='d-flex justify-content-center '>
+                {currentPageBatteries}
+              </div>
+            </Carousel.Item>
         );
 
         currentPageBatteries = [];
@@ -58,6 +58,7 @@ function HomePage() {
           prevIcon={<BsArrowLeft />}
           nextIcon={<BsArrowRight />}
           controls={batteriesActive.length >= 6 ? true : false}
+          className="carousel-custom"
         >
           {carouselItems}
         </Carousel>
@@ -70,7 +71,7 @@ function HomePage() {
   return (
     <>
       <ControlledCarousel />
-      <Container className="mt-4">
+      <Container className="container-home mt-4">
         {renderBatteries()}
       </Container>
     </>

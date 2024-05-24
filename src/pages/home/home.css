@@ -10,3 +10,23 @@
     margin-bottom: 3em;
   }
   
+  .container-home{
+    min-width: 78.125em;
+  }
+
+  .container-card-battery{
+    margin-right: 1.1em;
+  }
+
+
+  
+  .carousel-control-prev,
+  .carousel-control-next {
+    width: unset !important;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+  }
+  
+
