@@ -1,6 +1,6 @@
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
 import { Form, Button, Col, Row, Modal, InputGroup } from "react-bootstrap";
-import { DollarIcon, AlertIcon, LockIcon } from "../../../assets/icons/IconsSet";
+import { DollarIcon, AlertIcon, LockIcon, UserIcon, EnvelopeIcon, DocumentIcon } from "../../../assets/icons/IconsSet";
 import { useState, useEffect, useContext } from "react";
 import UserService from "../../../services/users/UsersServices";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
@@ -144,7 +144,7 @@ function AccountContent({ userData }) {
                     <Col md={12}>
                         <Form.Label>Nome completo</Form.Label>
                         <FormGroupWithIcon
-                            icon={<DollarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                            icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'}/>}
                             type='text'
                             placeholder=''
                             value={name}
@@ -158,7 +158,7 @@ function AccountContent({ userData }) {
 
                     <Form.Label>Email</Form.Label>
                     <FormGroupWithIcon
-                        icon={<DollarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                        icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                         type='email'
                         placeholder=''
                         value={email}
@@ -171,7 +171,7 @@ function AccountContent({ userData }) {
                     <Col md={12}>
                         <Form.Label>CPF</Form.Label>
                         <FormGroupWithIcon
-                            icon={<DollarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
+                            icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                             type='text'
                             placeholder=''
                             value={userData ? userData.document : ''}

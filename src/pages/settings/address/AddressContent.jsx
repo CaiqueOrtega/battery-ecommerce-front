@@ -1,5 +1,5 @@
 import { Button, Form, Card, Row, Col } from "react-bootstrap";
-import { AddIcon, ReturnIcon } from "../../../assets/icons/IconsSet"
+import { AddIcon, CityIcon, MapIcon, NeighborHood, NumberIcon, ReturnIcon, StateIcon, StreetIcon, TextBodyIcon } from "../../../assets/icons/IconsSet"
 import { useRef, useState, useEffect } from "react";
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
 import { useAuthProvider } from "../../../context/AuthProvider";
@@ -272,6 +272,7 @@ function AddressForm(props) {
                     <Col className="col-5">
                         <Form.Label className="w-100">CEP
                             <FormGroupWithIcon
+                                icon={<MapIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                                 type={'text'}
                                 placeholder={'XXXXX-XXX'}
                                 value={props.formAddressValues.cep}
@@ -284,6 +285,7 @@ function AddressForm(props) {
                     <Col className="col-md-7">
                         <Form.Label className="w-100">Complemento
                             <FormGroupWithIcon
+                                icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f'/>}
                                 type={'text'}
                                 placeholder={'Digite seu complemento'}
                                 value={props.formAddressValues.complement}
@@ -297,6 +299,7 @@ function AddressForm(props) {
                     <Col className="col-9">
                         <Form.Label className="w-100">Rua
                             <FormGroupWithIcon
+                                icon={<StreetIcon className='position-absolute ms-3' />}
                                 type={'text'}
                                 placeholder={'Digite seu endereço'}
                                 value={props.formAddressValues.address}
@@ -309,6 +312,7 @@ function AddressForm(props) {
                     <Col className="col-md-3">
                         <Form.Label className="w-100">Número
                             <FormGroupWithIcon
+                                icon={<NumberIcon className='position-absolute ms-3' />}
                                 type={'text'}
                                 placeholder={'Digite o número do seu endereço'}
                                 value={props.formAddressValues.number}
@@ -320,6 +324,7 @@ function AddressForm(props) {
                     <Col className="col-5">
                         <Form.Label className="w-100">Bairro
                             <FormGroupWithIcon
+                                icon={<NeighborHood className='position-absolute ms-3' />}
                                 type={'text'}
                                 placeholder={'Digite seu bairro'}
                                 value={props.formAddressValues.neighborhood}
@@ -332,6 +337,7 @@ function AddressForm(props) {
                     <Col className="col-md-4">
                         <Form.Label className="w-100">Cidade
                             <FormGroupWithIcon
+                                icon={<CityIcon className='position-absolute ms-3' />}
                                 type={'text'}
                                 placeholder={'Digite sua cidade'}
                                 value={props.formAddressValues.city}
@@ -343,6 +349,7 @@ function AddressForm(props) {
                     <Col className="col-md-3">
                         <Form.Label className="w-100">UF
                             <FormGroupWithIcon
+                                icon={<StateIcon className='position-absolute ms-3' />}
                                 type={'text'}
                                 placeholder={'Digite a sigla do seu estado'}
                                 value={props.formAddressValues.state}
