@@ -59,9 +59,9 @@ function AuthenticationPage() {
                 <Card className='shadow rounded-5 card-authentication border-0'>
 
                     <Row className='g-0 h-100'>
-                        <Col md={6} className='d-flex align-items-md-center align-items-start position-relative col-form'>
+                        <Col md={6} className={`d-flex align-items-md-center align-items-start position-relative col-form col-login ${action == 'cadastrar' ? 'display-none-mobile' : ''}`}>
                             {showLoginForm && (
-                                <Card.Body className='px-5 py-4'>
+                                <Card.Body className='px-5 py-5'>
                                     <div className="d-flex align-items-center mb-3">
                                         <h4><LoginIcon currentColor='c00d0d' /> Acesse sua conta</h4>
                                         <img className="d-md-none ms-auto mb-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
@@ -72,9 +72,9 @@ function AuthenticationPage() {
                         </Col>
 
 
-                        <Col md={6} className='d-flex align-items-md-center align-items-end  position-relative col-form'>
+                        <Col md={6} className={`d-flex align-items-md-center align-items-end  position-relative col-form col-singup ${action == 'entrar' ? 'display-none-mobile' : ''}`}>
                             {showSignUpForm && (
-                                <Card.Body className='px-5 py-md-5 py-4'>
+                                <Card.Body className='px-5 py-md-5 py-5'>
                                     <div className="d-flex align-items-center">
                                         <h4> <SingUpIcon currentColor='c00d0d' /> Registre uma conta</h4>
                                         <img className="d-md-none ms-auto mb-md-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
@@ -87,8 +87,6 @@ function AuthenticationPage() {
                         <Col md={6} className={`col-image position-absolute d-flex flex-column bg-yellow
                          ${animateImageColumn !== null ? animateImageColumn === 'entrar' ? 'animate-image-column-left' : 'animate-image-column-right' : ''}
                          ${applyRightZero ? 'end-0 bottom-0 rounded-end-5 clip-path-circle-top ' : 'rounded-start-5 clip-path-circle-bottom'}`}>
-
-
 
                             <div className="d-flex align-items-center justify-content-center flex-fill">
                                 <img className='d-md-block d-none mt-5 pt-5' src={logoBgWhite} alt="Logo Baterias jupiter" width='100%' />

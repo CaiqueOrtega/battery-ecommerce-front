@@ -148,6 +148,7 @@ function SignUpForm({ handleToggleForm }) {
 
                             />
                             <p className='fs-6 sw-light color-red text-justify text-start'>* Senha segura: Pelo menos 12 caracteres, incluindo 4 números e 1 caractere especial.</p>
+                            <p className='fs-6 sw-light text-justify text-start'>Ao se cadastrar, concordo com os: <a type="button" href="/termos" className="m-3 ">Termos e Condições</a></p>
                         </div>
 
                     </>

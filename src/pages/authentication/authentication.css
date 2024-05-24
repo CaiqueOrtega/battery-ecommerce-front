@@ -35,7 +35,7 @@
     }
 
     to {
-        transform: translateY(174%);
+        transform: translateY(100%);
     }
 }
 
@@ -74,13 +74,13 @@
     .animate-image-column-right,
     .animate-image-column-left {
         animation: slideUp 0.7s forwards;
-        clip-path: circle(85% at 50% 0%) !important;
+        clip-path: circle(100% at 50% 0%) !important;
 
     }
 
     .animate-image-column-left {
         animation: slideDown 0.7s forwards;
-        clip-path: circle(85% at 50% 100%) !important;
+        clip-path: circle(100% at 50% 100%) !important;
 
     }
 
@@ -93,21 +93,21 @@
     }
 
     .col-image {
-        height: 20em;
+        height: 50vh;
         border-radius: 0 !important;
         
     }
 
     .col-form{
-        height: 25em;
+        height: 50vh;
     }
 
     .clip-path-circle-bottom{
-        clip-path: circle(85% at 50% 0%);
+        clip-path: circle(100% at 50% 0%);
     }
 
     .clip-path-circle-top{
-        clip-path: circle(85% at 50% 100%);
+        clip-path: circle(100% at 50% 100%);
     }
 }
 
@@ -119,6 +119,27 @@
     }
 }
 
+@media(max-height: 890px ) and (max-width: 890px){
+    .col-image{
+        display: none !important;
+    }
+    .col-login{
+        align-items: center !important;
+        height: 100% !important;
+        width: 100% !important;
+    }
+    .col-singup{
+        align-items: center !important;
+        height: 100% !important;
+        width: 100% !important;
+    }
+    .card-authentication{
+        width: auto !important;
+    }
+    .display-none-mobile{
+        display: none !important;
+    }
+}
 
 
 /* animação formulário cadastro */
