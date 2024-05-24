@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import BatteryCartServices from "../services/cart/BatteryCartServices";
 import BatteryServices from "../services/battery/BatteryServices";
 import { AuthContext } from "./AuthProvider";
-
+import { AuthProvider } from "./AuthProvider";
 const BatteryCartContext = createContext({})
 
 function BatteryCartProvider({ children }) {
@@ -21,7 +21,6 @@ function BatteryCartProvider({ children }) {
             }
         }
     };
-
 
     const handleCartNotLogged = async () => {
         try {
@@ -69,11 +68,17 @@ function BatteryCartProvider({ children }) {
         }
     }, [userData, isLoggedIn]);
 
+
+    const resetCartData = () =>{
+        setBatteryCart({})
+    }
     return (
-        <BatteryCartContext.Provider value={{ batteryCart, setBatteryCart }}>
+        <BatteryCartContext.Provider value={{ batteryCart, setBatteryCart, resetCartData }}>
             {children}
         </BatteryCartContext.Provider>
     );
 }
 
 export { BatteryCartContext, BatteryCartProvider };
+
+export const useBatteryCartProvider = () => useContext(BatteryCartContext);

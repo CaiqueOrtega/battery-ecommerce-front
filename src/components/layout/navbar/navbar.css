@@ -39,3 +39,7 @@
     font-size: 1.5rem;
     border: 0.5px solid #3333333b;
 }
+
+.navbar-brand-image{
+    cursor: pointer;
+}

@@ -16,6 +16,10 @@ body {
     background-color: #fec117;
 }
 
+.color-yellow {
+    color: #fec117;
+}
+
 .bg-red {
     background-color: #c00d0d;
 }
@@ -75,5 +79,5 @@ body {
 
 
 .list-group {
-    --bs-list-group-bg: none !important; 
-  }
+    --bs-list-group-bg: none !important;
+}

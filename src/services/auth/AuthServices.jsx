@@ -1,11 +1,14 @@
 import ConnectionAPI from "../ConnectionAPI";
-import { useState, useContext } from "react";
+import { useState, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthProvider";
 
 const AuthServices = () => {
     const [errorMessages, setErrorMessages] = useState({});
-    const { handleLogin } = useContext(AuthContext);
+    const { handleLogin, userData } = useContext(AuthContext);
+    const [hasExecuted, setHasExecuted] = useState(false);
+    const [response, setResponse] = useState(null);
+
 
     const navigate = useNavigate();
 
@@ -28,7 +31,6 @@ const AuthServices = () => {
             return response.status;
         } catch (error) {
             if (request) {
-                navigate('/');
             }
         }
 
@@ -81,9 +83,35 @@ const AuthServices = () => {
     };
 
 
+    const VerifyAuth = ({ children, request }) => {
+        console.log('teste', request )
+        useEffect(() => {
+            if ( !hasExecuted) {
+                async function fetchData() {
+                    const response = await userRoleAuthorization(userData, request);
+                    setResponse(response);
+                    setHasExecuted(true);
+                }
+                fetchData();
+            }
+        }, [userData, request, hasExecuted]);
+
+        return response ? children : null;
+    }
 
 
-    return { errorMessages, setErrorMessages, login, signUp, verifyDataRegister, userRoleAuthorization };
+
+
+
+    return {
+        errorMessages,
+        setErrorMessages,
+        login,
+        signUp,
+        verifyDataRegister,
+        userRoleAuthorization,
+        VerifyAuth
+    };
 };
 
 export default AuthServices;

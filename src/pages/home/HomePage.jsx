@@ -7,10 +7,10 @@ import ControlledCarousel from './carousel/Carousel';
 import './home.css';
 import { useNavigate } from 'react-router-dom';
 import Footer from './footer/Footer';
-import { useGlobalData } from '../../context/GlobalDataProvider'; 
+import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
 
 function HomePage() {
-  const { batteriesActive, setFetchBatteryData }  = useGlobalData();
+  const { batteriesActive, setFetchBatteryData } = useGlobalDataProvider();
   const [batteriesPerPage, setBatteriesPerPage] = useState(5);
   const navigate = useNavigate();
 

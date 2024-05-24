@@ -1,15 +1,16 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import PromotionService from "../services/promotion/PromotionService";
 import UserService from "../services/users/UsersServices";
-import { AuthContext } from "./AuthProvider";
 import BatteryServices from "../services/battery/BatteryServices";
+import AuthServices from "../services/auth/AuthServices";
+
 const DashBoardContext = createContext({});
 
 function DashBoardProvider({ children }) {
+    const { VerifyAuth } = AuthServices()
     const { getPromotions } = PromotionService();
     const { getUsers } = UserService();
-    const {getBatteriesAll} = BatteryServices();
-    const { VerifyAuth } = useContext(AuthContext);
+    const { getBatteriesAll } = BatteryServices();
     const [batteries, setBatteries] = useState([]);
     const [users, setUsers] = useState([]);
     const [promotions, setPromotions] = useState([]);
@@ -49,3 +50,5 @@ function DashBoardProvider({ children }) {
 }
 
 export { DashBoardProvider, DashBoardContext };
+
+export const useDashBoardProvider = () => useContext(DashBoardContext);

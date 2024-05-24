@@ -1,14 +1,11 @@
-import { useEffect, createContext, useState } from "react";
+import { useEffect, createContext, useState, useContext } from "react";
 import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
 import UserService from "../services/users/UsersServices";
-import AuthServices from "../services/auth/AuthServices";
 
 const AuthContext = createContext({});
-
 function AuthProvider({ children }) {
-
   const [token, setToken] = useState(localStorage.getItem('token') || '');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isContextLoaded, setIsContextLoaded] = useState(false);
@@ -58,12 +55,14 @@ function AuthProvider({ children }) {
   }, [token])
 
 
+
   const logout = () => {
     try {
+      setToken('');
       localStorage.removeItem('token');
       setIsLoggedIn(false);
-      setUserData(null);
-      setToken('');
+      setUserData({});
+      setIsLoggedIn(false);
       return true;
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
@@ -75,25 +74,6 @@ function AuthProvider({ children }) {
     setToken(generatedToken);
     localStorage.setItem('token', generatedToken);
     navigate('/');
-  }
-
-
-  function VerifyAuth ({ children, request }) {
-    const { userRoleAuthorization } = AuthServices();
-    const [response, setResponse] = useState(null);
-
-    useEffect(() => {
-      if (isContextLoaded) {
-        async function fetchData() {
-          const response = await userRoleAuthorization(userData, request);
-          setResponse(response);
-        }
-        fetchData();
-      }
-    }, [userData, isContextLoaded, isLoggedIn]);
-
-
-    return response ? children : null;
   }
 
 
@@ -118,7 +98,7 @@ function AuthProvider({ children }) {
   }, [isLoggedIn, token]);
 
   return isContextLoaded ? (
-    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin, VerifyAuth }}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin }}>
       {children}
     </AuthContext.Provider>
   ) : null;
@@ -126,5 +106,4 @@ function AuthProvider({ children }) {
 }
 export { AuthContext, AuthProvider };
 
-
-
+export const useAuthProvider = () => useContext(AuthContext);

@@ -1,23 +1,26 @@
-import { Button, Form, Modal, Card, Row, Col } from "react-bootstrap";
+import { Button, Form, Card, Row, Col } from "react-bootstrap";
 import { AddIcon, ReturnIcon } from "../../../assets/icons/IconsSet"
-import { useRef, useState, useContext, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
-import { AuthContext } from "../../../context/AuthProvider";
+import { useAuthProvider } from "../../../context/AuthProvider";
 import AddressServices from "../../../services/address/AddressServices";
-import { useGlobalData } from "../../../context/GlobalDataProvider";
+import { useGlobalDataProvider } from "../../../context/GlobalDataProvider";
 import FormValidations from "../../../components/common/FormValidation";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
 import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal"
 
 function AddressContent() {
     const { createAddress, getAddressCep, updateAddress, updateMainAddress, deleteAddress, errorMessages, setErrorMessages } = AddressServices()
+    const { fetchAddress, address, setAddress } = useGlobalDataProvider();
+    const { userData } = useAuthProvider();
     const { isEquals } = FormValidations();
+
     const [showAddressForm, setShowAddressForm] = useState(false);
     const [confirmChangesModalData, setConfirmChangesModalData] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [confirmAction, setConfirmAction] = useState(null);
-    const { userData } = useContext(AuthContext);
-    const { fetchAddress, addressValues, setAddressValues } = useGlobalData();
+
+
     const [selectedFormAddressValues, setSelectedFormAddressValues] = useState({});
     const [prevFormAddressValues, setPrevFormAddressValues] = useState({})
     const [formAddressValues, setFormAddressValues] = useState({
@@ -30,6 +33,42 @@ function AddressContent() {
         state: '',
         main: false
     })
+
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchAddress();
+        };
+        if (Object.keys(address).length === 0) {
+            fetchData();
+        }
+
+        console.log('TESTA', address)
+    }, []);
+
+
+    useEffect(() => {
+        if (showAddressForm) {
+            setErrorMessages({});
+            setPrevFormAddressValues({});
+            setFormAddressValues({
+                cep: selectedFormAddressValues.cep || '',
+                address: selectedFormAddressValues.address || '',
+                number: selectedFormAddressValues.number || '',
+                neighborhood: selectedFormAddressValues.neighborhood || '',
+                complement: selectedFormAddressValues.complement || '',
+                city: selectedFormAddressValues.city || '',
+                state: selectedFormAddressValues.state || '',
+                main: selectedFormAddressValues.main || false
+            })
+        }
+        if (selectedFormAddressValues) {
+            const { addressId, ...rest } = selectedFormAddressValues;
+            setPrevFormAddressValues(rest);
+        }
+
+    }, [showAddressForm])
+
 
     const handleAddressActionWithConfirmation = (action, data) => {
         if (action === 'update' && isEquals(data.formAddressValues, prevFormAddressValues, setPrevFormAddressValues, setErrorMessages)) {
@@ -56,17 +95,17 @@ function AddressContent() {
         const actions = {
             'create': async () => {
                 if (!isEquals(data.formAddressValues, prevFormAddressValues, setPrevFormAddressValues, setErrorMessages)) {
-                    if (addressValues.length === 0) {
+                    if (address.length === 0) {
                         data.formAddressValues.main = true;
                     }
 
                     const response = await createAddress(data.formAddressValues, userData.userId);
                     if (response) {
                         const updatedAddressValues = data.formAddressValues.main
-                            ? [...addressValues.map(address => ({ ...address, main: false })), response]
-                            : [...addressValues, response];
+                            ? [...address.map(address => ({ ...address, main: false })), response]
+                            : [...address, response];
 
-                        setAddressValues(updatedAddressValues);
+                        setAddress(updatedAddressValues);
                         setShowAddressForm(false);
                     }
                 }
@@ -74,7 +113,7 @@ function AddressContent() {
             'update': async () => {
                 const response = await updateAddress(data.formAddressValues, data.addressId);
                 if (response) {
-                    setAddressValues(addressValues.map(address =>
+                    setAddress(address.map(address =>
                         address.addressId === response.addressId ? response : address
                     ));
                     setShowAddressForm(false);
@@ -83,7 +122,7 @@ function AddressContent() {
             'delete': async () => {
                 const response = await deleteAddress(data.addressId);
                 if (response) {
-                    setAddressValues(addressValues.filter(address =>
+                    setAddress(address.filter(address =>
                         address.addressId !== data.addressId
                     ));
                 }
@@ -91,7 +130,7 @@ function AddressContent() {
             'update_main': async () => {
                 const response = await updateMainAddress(data.addressId);
                 if (response) {
-                    setAddressValues(addressValues.map(address =>
+                    setAddress(address.map(address =>
                         ({ ...address, main: address.addressId === data.addressId })
                     ));
                 }
@@ -106,42 +145,6 @@ function AddressContent() {
         }
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            await fetchAddress();
-        };
-        if (Object.keys(addressValues).length === 0) {
-            fetchData();
-        }
-
-        console.log('TESTA', addressValues)
-    }, []);
-
-
-
-    useEffect(() => {
-        if (showAddressForm) {
-            setErrorMessages({});
-            setPrevFormAddressValues({});
-            setFormAddressValues({
-                cep: selectedFormAddressValues.cep || '',
-                address: selectedFormAddressValues.address || '',
-                number: selectedFormAddressValues.number || '',
-                neighborhood: selectedFormAddressValues.neighborhood || '',
-                complement: selectedFormAddressValues.complement || '',
-                city: selectedFormAddressValues.city || '',
-                state: selectedFormAddressValues.state || '',
-                main: selectedFormAddressValues.main || false
-            })
-        }
-        if (selectedFormAddressValues) {
-            const { addressId, ...rest } = selectedFormAddressValues;
-            setPrevFormAddressValues(rest);
-        }
-
-    }, [showAddressForm])
-
-
 
     return (
         <>
@@ -155,7 +158,7 @@ function AddressContent() {
                 ) : (
                     <>
                         <h4 className="mb-0">Meus Endereços</h4>
-                        {addressValues?.length != 3 && (
+                        {address?.length != 3 && (
                             <a type="button" className="text-decoration-none text-white"
                                 onClick={() => { setSelectedFormAddressValues({}); setShowAddressForm(true) }}
                             >
@@ -184,10 +187,10 @@ function AddressContent() {
                         errorMessages={errorMessages}
                     />
                 ) : (
-                    addressValues.length !== 0 ? (
+                    address.length !== 0 ? (
                         <UserAddress
-                            addressValues={addressValues}
-                            setAddressValues={setAddressValues}
+                            address={address}
+                            setAddress={setAddress}
                             setSelectedFormAddressValues={setSelectedFormAddressValues}
                             setShowAddressForm={setShowAddressForm}
                             handleAddressAction={handleAddressAction}
@@ -369,22 +372,19 @@ function AddressForm(props) {
 
 
 function UserAddress(props) {
-    if (!Array.isArray(props.addressValues) && props.addressValues.length === 0) {
-        console.error("addressValues não é um array", props.addressValues);
+    if (!Array.isArray(props.address) && props.address.length === 0) {
+        console.error("address não é um array", props.address);
         return null;
     }
 
-    const handleOpenModalUpdate = (address) => {
+    const handleOpenFormUpdate = (address) => {
         props.setSelectedFormAddressValues(address);
         props.setShowAddressForm(true);
     }
-    useEffect(() => {
-        console.log(props.addressValues)
-    }, [props.addressValues])
 
     return (
         <>
-            {props.addressValues.map((address, index) => (
+            {props.address.map((address, index) => (
                 <Card key={index} className={`rounded-3 shadow-sm ${index > 0 ? 'mt-4' : ''}`}>
                     <Card.Header className="d-flex justify-content-between ">
                         <span className="fw-bold text-muted">{address.address}, {address.number}, {address?.complement}</span>
@@ -414,7 +414,7 @@ function UserAddress(props) {
                                 >
                                     Excluir
                                 </Button>
-                                <Button variant="sm btn-yellow ms-2  px-4 fw-bold rounded-4 shadow-sm" onClick={() => handleOpenModalUpdate(address)}>Editar</Button>
+                                <Button variant="sm btn-yellow ms-2  px-4 fw-bold rounded-4 shadow-sm" onClick={() => handleOpenFormUpdate(address)}>Editar</Button>
                             </Col>
                         </Row>
                     </Card.Body>
