@@ -17,37 +17,35 @@ import './navbar.css';
 
 function NavbarComponent({ showNavbarSearch }) {
   const { logout, userData, isLoggedIn, navigate } = useAuthProvider()
-  const { VerifyAuth } = AuthServices();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const { VerifyAuth } = AuthServices();
 
-  const renderLinksDropDown = () => {
-    return (
-      <>
-        <Link to="/configuracoes/pedidos" className='d-flex align-items-center mb-1 dropdown-item'>
-          <OrderIcon /> <span className='ms-2'>Pedidos</span>
-        </Link>
+  const renderLinksDropDown = () => (
+    <>
+      <Dropdown.Item as={Link} to="/configuracoes/pedidos" className="d-flex align-items-center mb-1">
+        <OrderIcon /> <span className="ms-2">Pedidos</span>
+      </Dropdown.Item>
 
-        <Link to="/configuracoes/enderecos" className='d-flex align-items-center mb-1 dropdown-item'>
-          <MapIcon /> <span className='ms-2'>Endereço</span>
-        </Link>
+      <Dropdown.Item as={Link} to="/configuracoes/enderecos" className="d-flex align-items-center mb-1">
+        <MapIcon /> <span className="ms-2">Endereço</span>
+      </Dropdown.Item>
 
-        <VerifyAuth request={false}>
-          <Link to="/paineldecontrole" className='dropdown-item d-flex align-items-center' >
-            <ControlIcon />
-            <span className='ms-2'>Painel de controle</span>
-          </Link>
-        </VerifyAuth>
-
-        <Link to="/configuracoes/seguranca" className='d-flex align-items-center mb-1 dropdown-item'>
-          <LockIconOutline currentColor={'a3a29f'} /> <span className='ms-2'>Segurança</span>
-        </Link>
-        <Dropdown.Divider className='mx-3' />
-        <Dropdown.Item className='text-danger d-flex align-items-center' onClick={() => setShowLogoutModal(true)}>
-          <ExitIcon />  <span className='ms-2'>Sair da conta</span>
+      <VerifyAuth request={false}>
+        <Dropdown.Item as={Link} to="/paineldecontrole" className="d-flex align-items-center mb-1">
+          <ControlIcon />
+          <span className="ms-2">Painel de controle</span>
         </Dropdown.Item>
-      </>
-    )
-  }
+      </VerifyAuth>
+
+      <Dropdown.Item as={Link} to="/configuracoes/seguranca" className="d-flex align-items-center mb-1">
+        <LockIconOutline currentColor={'a3a29f'} /> <span className="ms-2">Segurança</span>
+      </Dropdown.Item>
+      <Dropdown.Divider className="mx-3" />
+      <Dropdown.Item className="text-danger d-flex align-items-center" onClick={() => setShowLogoutModal(true)}>
+        <ExitIcon /> <span className="ms-2">Sair da conta</span>
+      </Dropdown.Item>
+    </>
+  );
 
 
   const navbarSearch = () => {
@@ -91,11 +89,7 @@ function NavbarComponent({ showNavbarSearch }) {
 
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
           </Col>
-
-
         </Row>
-
-
         <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
           <RenderMobileNavbarCollapseContent
             isLoggedIn={isLoggedIn}
@@ -109,10 +103,6 @@ function NavbarComponent({ showNavbarSearch }) {
         showLogoutModal={showLogoutModal}
         setShowLogoutModal={setShowLogoutModal}
         logout={logout} />
-
-
-
-
     </>
   );
 }
@@ -239,8 +229,6 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
 
 function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {
 
-
-
   const UserNotLoggedDropdown = () => (
     <>
       <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
@@ -264,13 +252,12 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {
         <Dropdown.Toggle as={NavLink} className="lh-1 fw-semibold text-white hover-color-red me-3">
           <UndrawProfile size={'40'} />
           {userData.name.includes(' ') ? userData.name.split(' ')[0].slice(0, 12) : userData.name.slice(0, 12)}
-
         </Dropdown.Toggle>
 
         <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 ' style={{ width: '14em' }}>
           <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
 
-          <Link to="/configuracoes/minhaconta" className='d-flex align-items-center mb-1 dropdown-item'>
+          <Dropdown.Item as={Link} to="/configuracoes/minhaconta" className='d-flex align-items-center mb-1 dropdown-item'>
             <div className="rounded-circle bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center rounded-circle-navbar ">
               <span>{userData.initials}</span>
             </div>
@@ -279,7 +266,7 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {
               <span className='fw-semibold '>{userData.name ? userData.name : 'carregando...'}</span>
               <span className='small text-muted'>Minha Conta <ChevronLeftIcon size={'13px'} /> </span>
             </div>
-          </Link>
+          </Dropdown.Item >
           <Dropdown.Divider className='mx-3' />
           {renderLinksDropDown()}
 

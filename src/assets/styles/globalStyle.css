@@ -81,3 +81,8 @@ body {
 .list-group {
     --bs-list-group-bg: none !important;
 }
+
+.dropdown-item.active, .dropdown-item:active {
+    color: black;
+    background-color: #f8f9fa
+  }
