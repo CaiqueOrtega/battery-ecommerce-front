@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup } from 'react-bootstrap';
 import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../../assets/icons/IconsSet'
@@ -19,7 +19,7 @@ function NavbarComponent({ showNavbarSearch }) {
   const { logout, userData, isLoggedIn, navigate } = useAuthProvider()
   const { VerifyAuth } = AuthServices();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-
+  
   const renderLinksDropDown = () => {
     return (
       <>
@@ -171,7 +171,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 
 
 function RenderCartDropdownMenu({ isLoggedIn }) {
-  const { batteryCart } = useGlobalDataProvider;
+  const { batteryCart } = useGlobalDataProvider();
 
 
   const CartEmptyDropdownMenu = () => (
