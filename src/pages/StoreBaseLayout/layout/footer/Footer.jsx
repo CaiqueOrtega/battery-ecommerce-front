@@ -1,4 +1,4 @@
-export default function Footer() {
+function FooterComponent() {
     return (
         <footer className="text-center bg-yellow ">
             <hr />
@@ -13,3 +13,5 @@ export default function Footer() {
         </footer>
     )
 }
+
+export default FooterComponent;

@@ -1,14 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+
+import { MapIcon, DeliveryIcon, MotorcycleIcon} from '../../assets/icons/IconsSet';
 import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Toast, Modal } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
-import { MapIcon, DeliveryIcon } from '../../assets/icons/IconsSet';
 
-import NavbarComponent from '../../components/layout/navbar/Navbar';
-import ImageGallery from './imageGallery';
-
-import { MotorcycleIcon } from '../../assets/icons/IconsSet';
-import { useBatteryCartProvider } from '../../context/BatteryCartProvider';
+import ImageGalleryComponent from './image/imageGallery';
 
 import BatteryCartServices from '../../services/cart/BatteryCartServices';
 import AddressServices from '../../services/address/AddressServices';
@@ -24,14 +21,17 @@ function BatteryPurchasePage() {
     const batteryData = location.state;
     const [quantity, setQuantity] = useState(1);
     const { addBattery } = BatteryCartServices();
-    const { batteryCart, setBatteryCart } = useBatteryCartProvider();
-    const [formCEP, setFormCEP] = useState('');
-    const { getFreight, getAddressCep } = AddressServices();
+
+    const { fetchAddress, address, batteryCart, setBatteryCart } = useGlobalDataProvider();
     const { isLoggedIn } = useAuthProvider();
-    const [freightValues, setFreightValues] = useState({});
+
+    const [formCEP, setFormCEP] = useState('');
     const [prevFormCEP, setPrevFormCEP] = useState({})
+
+    const { getFreight, getAddressCep } = AddressServices();
+    const [freightValues, setFreightValues] = useState({});
+
     const [addressValues, setAddressValues] = useState({})
-    const { fetchAddress, address } = useGlobalDataProvider();
     const [showSelectedAddressModal, setShowSelectedAddressModal] = useState(false);
 
     useEffect(() => {
@@ -175,13 +175,12 @@ function BatteryPurchasePage() {
 
     return (
         <>
-            <NavbarComponent setNavbarContent={true} />
             <Container fluid={'xl'} className="purchase-container py-lg-4" >
                 <Card className="border-0 shadow " >
                     <Card.Body>
                         <Row className="d-flex">
                             <Col className='col-auto'>
-                                <ImageGallery />
+                                <ImageGalleryComponent />
                             </Col>
 
                             <Col className='purchase-col-info mt-md-0 mt-4'>

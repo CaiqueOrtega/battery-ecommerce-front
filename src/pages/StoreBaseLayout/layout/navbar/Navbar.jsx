@@ -1,18 +1,22 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup } from 'react-bootstrap';
-import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../assets/icons/IconsSet';
-import logo from '../../../assets/images/logo.png';
-import LoginSignUpButton from '../../common/LoginSignUpButton';
-import './navbar.css';
-import { AuthContext } from '../../../context/AuthProvider';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import ModalLogout from '../../common/ModalLogout';
-import { BatteryCartContext } from '../../../context/BatteryCartProvider';
-import exemploImageCart from '../../../assets/images/exemploImageRegister.png'
-import AuthServices from '../../../services/auth/AuthServices';
+import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup } from 'react-bootstrap';
+import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../../assets/icons/IconsSet'
 
-function NavbarComponent({ setNavbarContent }) {
-  const { logout, userData, isLoggedIn, navigate } = useContext(AuthContext);
+import LoginSignUpButton from '../../../../components/common/LoginSignUpButton';
+import ModalLogout from '../../../../components/common/ModalLogout';
+
+import AuthServices from '../../../../services/auth/AuthServices';
+import { useAuthProvider } from '../../../../context/AuthProvider';
+import { useGlobalDataProvider } from '../../../../context/GlobalDataProvider';
+
+import exemploImageCart from '../../../../assets/images/exemploImageRegister.png'
+import logo from '../../../../assets/images/logo.png'
+import './navbar.css';
+
+
+function NavbarComponent({ showNavbarSearch }) {
+  const { logout, userData, isLoggedIn, navigate } = useAuthProvider()
   const { VerifyAuth } = AuthServices();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -46,8 +50,7 @@ function NavbarComponent({ setNavbarContent }) {
   }
 
 
-
-  const navbarContent = () => {
+  const navbarSearch = () => {
     return (
       <>
         <Col md={6} className='order-last order-md-0 mt-3 mt-md-0'>
@@ -57,20 +60,6 @@ function NavbarComponent({ setNavbarContent }) {
               <SearchIcon currentColor={"c00d0d"} size={"28"} />
             </a>
           </form>
-        </Col>
-
-        <Col className='col-auto d-flex order-md-0 order-first '>
-
-
-          <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} />
-
-          <RenderUserDropdownMenu
-            userData={userData}
-            isLoggedIn={isLoggedIn}
-            VerifyAuth={VerifyAuth}
-            setShowLogoutModal={setShowLogoutModal}
-            renderLinksDropDown={renderLinksDropDown}
-            />
         </Col>
       </>
     )
@@ -87,18 +76,30 @@ function NavbarComponent({ setNavbarContent }) {
             </Navbar.Brand>
           </Col>
 
-          {setNavbarContent ? navbarContent() : null}
+          {showNavbarSearch ? navbarSearch() : null}
+
+          <Col className='col-auto d-flex order-md-0 order-first '>
+            <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} />
+
+            <RenderUserDropdownMenu
+              userData={userData}
+              isLoggedIn={isLoggedIn}
+              VerifyAuth={VerifyAuth}
+              setShowLogoutModal={setShowLogoutModal}
+              renderLinksDropDown={renderLinksDropDown}
+            />
+          </Col>
 
         </Row>
 
-       
-          <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
-            <RenderMobileNavbarCollapseContent
-              isLoggedIn={isLoggedIn}
-              userData={userData}
-              renderLinksDropDown={renderLinksDropDown}
-            />
-          </Navbar.Collapse>
+
+        <Navbar.Collapse id="navbarContent" className="flex-grow-0 order-last">
+          <RenderMobileNavbarCollapseContent
+            isLoggedIn={isLoggedIn}
+            userData={userData}
+            renderLinksDropDown={renderLinksDropDown}
+          />
+        </Navbar.Collapse>
       </Navbar >
 
       <ModalLogout
@@ -169,12 +170,8 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 }
 
 
-
-
-
-
 function RenderCartDropdownMenu({ isLoggedIn }) {
-  const { batteryCart } = useContext(BatteryCartContext);
+  const { batteryCart } = useGlobalDataProvider;
 
 
   const CartEmptyDropdownMenu = () => (
@@ -235,8 +232,6 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
     </Dropdown>
   );
 }
-
-
 
 
 function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {

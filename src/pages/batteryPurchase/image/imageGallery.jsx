@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Carousel } from 'react-bootstrap';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { ZoomInIcon, ZoomOutIcon, ResetZoomIcon } from '../../assets/icons/IconsSet';
+import { ZoomInIcon, ZoomOutIcon, ResetZoomIcon } from '../../../assets/icons/IconsSet';
 
-function ImageGallery() {
+function ImageGalleryComponent() {
     const images = [
         {
             original: 'https://xcitingmedia.com/wp-content/uploads/2016/04/placeholder-800x600.png',
@@ -143,4 +143,4 @@ function ImageGallery() {
     );
 }
 
-export default ImageGallery;
+export default ImageGalleryComponent;

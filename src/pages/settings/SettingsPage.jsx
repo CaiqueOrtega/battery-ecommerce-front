@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from "react";
-import NavbarComponent from "../../components/layout/navbar/Navbar";
 import { Container, Row, Col, Card } from "react-bootstrap";
 import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon, LockIconOutline, BsArrowLeft } from "../../assets/icons/IconsSet";
 import { AuthContext } from "../../context/AuthProvider";
@@ -14,23 +13,24 @@ import { useParams } from "react-router-dom";
 function SettingsPage() {
     const { userData, navigate } = useContext(AuthContext);
     const [mobileVisibleCard, setMobileVisibleCard] = useState(false);
-    const { action } = useParams();
-    const [selectedOption, setSelectedOption] = useState(action || localStorage.getItem('selectedOptionSettings') || 'minhaconta');
+    const { type } = useParams();
+    const [selectedOption, setSelectedOption] = useState(type || sessionStorage.getItem('selectedOptionSettings') || 'minhaconta');
 
 
     useEffect(() => {
-        document.title = "Configurações";
-    }, []);
-
-    useEffect(() => {
+    
         if (selectedOption) {
-            localStorage.setItem('selectedOptionSettings', selectedOption);
-
-            navigate(`/configuracoes/${selectedOption || 'minhaconta'}`);
-            console.log('teste')
+            sessionStorage.setItem('selectedOptionSettings', selectedOption); 
+            navigate(`configuracoes/${selectedOption || 'minhaconta'}`);
+            console.log('entrou',selectedOption )
         }
     }, [selectedOption]);
 
+    useEffect(() => {
+        if (type && type !== selectedOption) {
+            setSelectedOption(type);
+        }
+    }, [type]);
 
     const getContent = useMemo(() => {
         switch (selectedOption) {
@@ -45,8 +45,7 @@ function SettingsPage() {
 
     return (
         <>
-            <div className="d-flex flex-column vh-100">
-                <NavbarComponent setNavbarContent={false} />
+            <div className="d-flex flex-column h-100">
                 <div className="flex-grow-1 d-flex align-items-center justify-content-center">
                     <Container fluid={'lg'} className="h-sm-100 py-md-5">
                         <Row className="h-sm-100">

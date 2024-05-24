@@ -1,5 +1,4 @@
 import { Card, Container } from "react-bootstrap";
-import NavbarComponent from "../../components/layout/navbar/Navbar";
 import { useEffect } from "react";
 import './terms.css'
 
@@ -10,7 +9,6 @@ export default function TermsAndConditions() {
       
     return (
         <>
-            <NavbarComponent />
             <Container className="container-terms py-md-5">
                 <Card className="card-terms rounded-4 text-muted">
                     <Card.Header>
