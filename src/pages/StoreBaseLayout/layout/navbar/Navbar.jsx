@@ -19,7 +19,7 @@ function NavbarComponent({ showNavbarSearch }) {
   const { logout, userData, isLoggedIn, navigate } = useAuthProvider()
   const { VerifyAuth } = AuthServices();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  
+
   const renderLinksDropDown = () => {
     return (
       <>
@@ -88,7 +88,10 @@ function NavbarComponent({ showNavbarSearch }) {
               setShowLogoutModal={setShowLogoutModal}
               renderLinksDropDown={renderLinksDropDown}
             />
+
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
           </Col>
+
 
         </Row>
 
