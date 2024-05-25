@@ -6,7 +6,7 @@ import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIco
 import LoginSignUpButton from '../../../../components/common/LoginSignUpButton';
 import ModalLogout from '../../../../components/common/ModalLogout';
 
-import AuthServices from '../../../../services/auth/AuthServices';
+import { VerifyAuth } from '../../../../services/auth/AuthServices';
 import { useAuthProvider } from '../../../../context/AuthProvider';
 import { useGlobalDataProvider } from '../../../../context/GlobalDataProvider';
 
@@ -18,7 +18,7 @@ import './navbar.css';
 function NavbarComponent({ showNavbarSearch }) {
   const { logout, userData, isLoggedIn, navigate } = useAuthProvider()
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const { VerifyAuth } = AuthServices();
+
 
   const renderLinksDropDown = () => (
     <>
@@ -30,7 +30,7 @@ function NavbarComponent({ showNavbarSearch }) {
         <MapIcon /> <span className="ms-2">Endereço</span>
       </Dropdown.Item>
 
-      <VerifyAuth request={false}>
+      <VerifyAuth>
         <Dropdown.Item as={Link} to="/paineldecontrole" className="d-flex align-items-center mb-1">
           <ControlIcon />
           <span className="ms-2">Painel de controle</span>

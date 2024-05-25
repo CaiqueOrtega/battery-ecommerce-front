@@ -5,12 +5,7 @@ import { AuthContext } from "../../context/AuthProvider";
 
 const AuthServices = () => {
     const [errorMessages, setErrorMessages] = useState({});
-    const { handleLogin, userData } = useContext(AuthContext);
-    const [hasExecuted, setHasExecuted] = useState(false);
-    const [response, setResponse] = useState(null);
-
-
-    const navigate = useNavigate();
+    const { handleLogin } = useContext(AuthContext);
 
     const login = async (emailLogin, passwordLogin) => {
         try {
@@ -25,15 +20,14 @@ const AuthServices = () => {
         }
     };
 
-    const userRoleAuthorization = async (userData, request) => {
+    const userRoleAuthorization = async (userData) => {
         try {
             const response = await ConnectionAPI.get(`auth/${userData.email}`);
             return response.status;
         } catch (error) {
-            if (request) {
-            }
+            console.error("Erro ao obter autorização do usuário:", error);
+            throw error;
         }
-
     }
 
     const signUp = async (singUpData) => {
@@ -83,26 +77,6 @@ const AuthServices = () => {
     };
 
 
-    const VerifyAuth = ({ children, request }) => {
-
-        useEffect(() => {
-            if ( !hasExecuted) {
-                async function fetchData() {
-                    const response = await userRoleAuthorization(userData, request);
-                    setResponse(response);
-                    setHasExecuted(true);
-                }
-                fetchData();
-            }
-        }, [userData, request]);
-
-        return response ? children : null;
-    }
-
-
-
-
-
     return {
         errorMessages,
         setErrorMessages,
@@ -110,8 +84,32 @@ const AuthServices = () => {
         signUp,
         verifyDataRegister,
         userRoleAuthorization,
-        VerifyAuth
     };
 };
 
 export default AuthServices;
+
+
+
+export function VerifyAuth({ children, request }) {
+    const { userRoleAuthorization } = AuthServices();
+    const { userData } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        async function fetchData() {
+            try {
+                await userRoleAuthorization(userData);
+            } catch (error) {
+                console.error("Erro ao verificar autenticação:", error);
+                if (request) {
+                    navigate('/');
+                    return;
+                }
+            }
+        }
+        fetchData();
+    }, [userData, navigate, request]);
+
+    return children;
+};

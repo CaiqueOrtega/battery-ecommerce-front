@@ -2,12 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import PromotionService from "../services/promotion/PromotionService";
 import UserService from "../services/users/UsersServices";
 import BatteryServices from "../services/battery/BatteryServices";
-import AuthServices from "../services/auth/AuthServices";
 
 const DashBoardContext = createContext({});
 
 function DashBoardProvider({ children }) {
-    const { VerifyAuth } = AuthServices()
     const { getPromotions } = PromotionService();
     const { getUsers } = UserService();
     const { getBatteriesAll } = BatteryServices();
@@ -41,11 +39,9 @@ function DashBoardProvider({ children }) {
 
 
     return isContextLoaded ? (
-        <VerifyAuth request={true}>
             <DashBoardContext.Provider value={{ promotions, setPromotions, users, setUsers, batteries, setBatteries, setRenderOptionData }}>
                 {children}
             </DashBoardContext.Provider>
-        </VerifyAuth>
     ) : null;
 }
 
