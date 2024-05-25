@@ -84,7 +84,7 @@ const AuthServices = () => {
 
 
     const VerifyAuth = ({ children, request }) => {
-        console.log('teste', request )
+
         useEffect(() => {
             if ( !hasExecuted) {
                 async function fetchData() {
@@ -94,7 +94,7 @@ const AuthServices = () => {
                 }
                 fetchData();
             }
-        }, [userData, request, hasExecuted]);
+        }, [userData, request]);
 
         return response ? children : null;
     }

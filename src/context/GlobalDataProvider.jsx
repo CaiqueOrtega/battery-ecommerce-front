@@ -8,7 +8,6 @@ const GlobalDataContext = createContext({});
 
 function GlobalDataProvider({ children }) {
     const { isLoggedIn, userData } = useContext(AuthContext);
-    const [isContextLoaded, setIsContextLoaded] = useState(false);
 
     const { getBatteriesActive } = BatteryServices();
     const [fetchBatteryData, setFetchBatteryData] = useState(false);
@@ -28,8 +27,6 @@ function GlobalDataProvider({ children }) {
             setBatteriesActive(batteryData);
         } catch (error) {
             console.error("Erro ao buscar baterias ativas:", error);
-        } finally {
-            setIsContextLoaded(true);
         }
     };
 
@@ -113,7 +110,7 @@ function GlobalDataProvider({ children }) {
         setBatteryCart({})
     }
 
-    return isContextLoaded && (
+    return (
         <GlobalDataContext.Provider value={{
             batteriesActive,
             setFetchBatteryData,

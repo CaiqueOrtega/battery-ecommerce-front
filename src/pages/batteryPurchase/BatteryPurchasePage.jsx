@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { MapIcon, DeliveryIcon, MotorcycleIcon} from '../../assets/icons/IconsSet';
+import { MapIcon, DeliveryIcon, MotorcycleIcon } from '../../assets/icons/IconsSet';
 import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Toast, Modal } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 
@@ -22,7 +22,7 @@ function BatteryPurchasePage() {
     const [quantity, setQuantity] = useState(1);
     const { addBattery } = BatteryCartServices();
 
-    const { fetchAddress, address, batteryCart, setBatteryCart } = useGlobalDataProvider();
+    const { fetchAddress, address, batteryCart, setBatteryCart, addressIsLoaded } = useGlobalDataProvider();
     const { isLoggedIn } = useAuthProvider();
 
     const [formCEP, setFormCEP] = useState('');
@@ -36,31 +36,36 @@ function BatteryPurchasePage() {
 
     useEffect(() => {
         console.log(address);
+
         const fetchAddressData = async () => {
             await fetchAddress();
         };
+
         if (Object.keys(address).length === 0) {
             fetchAddressData();
         } else {
-            const mainAddress = address.find(addr => addr.main === true);
-            console.log('mainAddress', mainAddress)
+            let mainAddress = address.find(addr => addr.main === true);
 
-            if (mainAddress) {
-                handleGetFreightByCep(mainAddress.cep,
-                    {
-                        logradouro: mainAddress.address,
-                        cep: mainAddress.cep,
-                        cidade: mainAddress.city,
-                        complemento: mainAddress.complement,
-                        bairro: mainAddress.neighborhood,
-                        numero: mainAddress.number,
-                        estado: mainAddress.state
-                    }
-                );
+            if (!mainAddress) {
+                mainAddress = address[0];
             }
+
+            console.log('mainAddress', mainAddress);
+
+            handleGetFreightByCep(
+                mainAddress.cep,
+                {
+                    logradouro: mainAddress.address,
+                    cep: mainAddress.cep,
+                    cidade: mainAddress.city,
+                    complemento: mainAddress.complement,
+                    bairro: mainAddress.neighborhood,
+                    numero: mainAddress.number,
+                    estado: mainAddress.state
+                }
+            );
         }
     }, [address]);
-
 
     const handleAddBatteryToCart = async () => {
         if (isLoggedIn && batteryCart) {
