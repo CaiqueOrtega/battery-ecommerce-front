@@ -220,7 +220,7 @@ export const UndrawProfile = ({ size }) => (
     </svg>
 )
 
-export const ChevronLeftIcon = ({ size }) => (
+export const ChevronLeftIcon = ({ size, currentColor }) => (
     <svg width={size || "24px"} height={size || "24px"} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="#666666"><g id="SVGRepo_bgCarrier" strokeWidth="0">
     </g>
         <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
@@ -228,7 +228,7 @@ export const ChevronLeftIcon = ({ size }) => (
             <title></title>
             <g id="Complete">
                 <g id="F-Chevron">
-                    <polyline fill="none" id="Right" points="8.5 5 15.5 12 8.5 19" stroke="#666666" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline>
+                    <polyline fill="none" id="Right" points="8.5 5 15.5 12 8.5 19" stroke={ currentColor || "#666666"} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"></polyline>
                 </g>
             </g>
         </g>

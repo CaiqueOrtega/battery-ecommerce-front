@@ -15,14 +15,20 @@ function SettingsPage() {
     const [mobileVisibleCard, setMobileVisibleCard] = useState(false);
     const { type } = useParams();
     const [selectedOption, setSelectedOption] = useState(type || sessionStorage.getItem('selectedOptionSettings') || 'minhaconta');
+    const [activeCard, setActiveCard] = useState(selectedOption);
+
+    const handleCardClick = (optionCard) => {
+        setSelectedOption(optionCard);
+        setActiveCard(optionCard);
+        setMobileVisibleCard(true);
+    };
 
 
     useEffect(() => {
-    
         if (selectedOption) {
-            sessionStorage.setItem('selectedOptionSettings', selectedOption); 
+            setActiveCard(selectedOption);
+            sessionStorage.setItem('selectedOptionSettings', selectedOption);
             navigate(`configuracoes/${selectedOption || 'minhaconta'}`);
-            console.log('entrou',selectedOption )
         }
     }, [selectedOption]);
 
@@ -50,13 +56,12 @@ function SettingsPage() {
                     <Container fluid={'lg'} className="h-sm-100 py-md-5">
                         <Row className="h-sm-100">
                             <Col md={4} className={`mt-4 mt-md-0 d-md-block ${mobileVisibleCard && 'd-none'}`} id="first-column">
-                                <OptionsCards handleCardClick={(optionCard) => {
-                                    setSelectedOption(optionCard)
-                                    setMobileVisibleCard(true);
-                                }}
+                                <OptionsCards
+                                    handleCardClick={handleCardClick}
                                     userDataName={userData?.name}
                                     userDataInitials={userData?.initials}
                                     navigate={navigate}
+                                    activeCard={activeCard}
                                 />
                             </Col>
 
@@ -76,8 +81,11 @@ function SettingsPage() {
 }
 
 
-const CardOption = ({ icon, title, description, disableArrowLeft, onClick }) => (
-    <Card className="border-0 shadow mb-2 card-option " onClick={onClick}>
+const CardOption = ({ icon, title, description, disableArrowLeft, onClick, isActive }) => (
+    <Card className="border-0 shadow mb-2 card-option d-flex flex-row " onClick={onClick}>
+        {isActive && (
+            <Card.Header className="rounded-start-2 rounded-end-0 border-0 bg-yellow shadow-sm px-1"></Card.Header>
+        )}
         <Card.Body>
             <Row className="g-0">
                 <Col className="col-auto me-3 d-flex align-items-center">
@@ -96,7 +104,7 @@ const CardOption = ({ icon, title, description, disableArrowLeft, onClick }) => 
     </Card>
 );
 
-const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigate }) => (
+const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigate, activeCard }) => (
     <>
         <Card className="shadow mb-4">
             <Card.Body className="d-flex align-items-center">
@@ -123,6 +131,7 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
             title="Dados de Cadastro"
             description="Ver e alterar seus dados"
             onClick={() => handleCardClick('minhaconta')}
+            isActive={activeCard === 'minhaconta'}
         />
 
         <CardOption
@@ -130,6 +139,7 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
             title="Endereços"
             description="Ver e alterar seus endereços"
             onClick={() => handleCardClick('enderecos')}
+            isActive={activeCard === 'enderecos'}
         />
 
         <CardOption
@@ -137,6 +147,7 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
             title="Pedidos"
             description="Acompanhar entrega do produto"
             onClick={() => handleCardClick('pedidos')}
+            isActive={activeCard === 'pedidos'}
         />
 
         <CardOption
@@ -144,6 +155,7 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
             title="Segurança"
             description="Ver e alterar medidas de segurança"
             onClick={() => handleCardClick('seguranca')}
+            isActive={activeCard === 'seguranca'}
         />
 
         <CardOption
@@ -151,6 +163,7 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
             title="Cartões"
             description="Ver ou alterar meios de pagamento"
             onClick={() => handleCardClick('cartoes')}
+            isActive={activeCard === 'cartoes'}
         />
 
         <CardOption
