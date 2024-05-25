@@ -25,7 +25,7 @@ function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick })
                                 <Placeholder xs={12} />
                             </Placeholder>
                         ) : (
-                            <Card.Text className='text-muted mb-5 small'>
+                            <Card.Text className='text-muted small'>
                                 {batteryDescription.length > 50 ? batteryDescription.substring(0, 50) + '...' : batteryDescription.trim()}
                             </Card.Text>
                         )}
