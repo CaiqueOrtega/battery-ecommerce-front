@@ -30,11 +30,14 @@
   width: max-content;
 }
 
-@media (max-width: 415px) {
+@media (max-width: 416px) {
   .container-card-battery {
     width: 190px !important;
     height: 415px !important;
   }
+  .div-carousel-container-home {
+    max-height: 2em !important ;
+  };
 }
 
 .carousel-container-home {
@@ -43,10 +46,25 @@
 }
 
 @media (min-width: 415px) {
-  .div-carousel-container-home {
-    height: 20rem !important ;
-  };
   .carousel-container-home{
     height: auto !important
   }
+}
+
+@media (max-width: 1280px) {
+  .div-carousel-container-home {
+    max-height: 17em !important ;
+  };
+}
+
+@media (max-width: 940px) {
+  .div-carousel-container-home {
+    max-height: 12em !important ;
+  };
+}
+
+@media (max-width: 800px) {
+  .carousel-indicators {
+    display: none !important;
+  };
 }
