@@ -15,7 +15,7 @@ function GlobalDataProvider({ children }) {
 
     const { getAddressByUserId } = AddressServices();
     const [address, setAddress] = useState([]);
-    const [addressIsLoaded, setAddressIsLoaded] = useState(false);
+    const [addressIsLoaded, setAddressIsLoaded] = useState(null);
 
     const [batteryCart, setBatteryCart] = useState({});
     const { getByListBatteries } = BatteryServices();
@@ -35,10 +35,12 @@ function GlobalDataProvider({ children }) {
             if (isLoggedIn && userData?.userId && !addressIsLoaded) {
                 const response = await getAddressByUserId(userData.userId);
                 setAddress(response);
-                setAddressIsLoaded(true);
             }
         } catch (error) {
             console.error("Erro ao buscar endereço:", error);
+        }finally{
+            console.log('BATATA MUITO MAIS DOCE')
+            setAddressIsLoaded(true);
         }
     };
 

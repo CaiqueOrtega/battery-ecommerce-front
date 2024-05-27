@@ -123,7 +123,7 @@ function HomePage() {
   return (
     <>
       <ControlledCarousel />
-      <Container className="mt-4">
+      <Container className=" mt-4">
         {renderBatteries()}
       </Container>
     </>

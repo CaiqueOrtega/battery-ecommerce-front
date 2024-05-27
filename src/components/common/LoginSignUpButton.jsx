@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-function LoginSignupButton({ classNameBtnLogin, classNameBtnSignUp }) {
+function LoginSignUpButton({ classNameBtnLogin, classNameBtnSignUp }) {
   return (
     <>
       <Link to="/autenticacao/entrar" className={`btn ${classNameBtnLogin}`}>
@@ -13,4 +13,4 @@ function LoginSignupButton({ classNameBtnLogin, classNameBtnSignUp }) {
   );
 }
 
-export default LoginSignupButton;
+export default LoginSignUpButton;
