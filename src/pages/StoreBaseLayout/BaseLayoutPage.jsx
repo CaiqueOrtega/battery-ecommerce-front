@@ -8,7 +8,7 @@ import FooterComponent from "./layout/footer/Footer";
 import HomePage from "../home/HomePage";
 import BatteryPurchasePage from "../batteryPurchase/BatteryPurchasePage";
 import SettingsPage from "../settings/SettingsPage";
-
+import CartPage from "../cart/CartPage";
 
 function BaseLayoutPage() {
     const { action, type } = useParams();
@@ -20,23 +20,29 @@ function BaseLayoutPage() {
         let content = null;
         let actionType = action || 'home';
 
-        if(type === 'detalhes') actionType = `${action}/${type}`
+        if (type === 'detalhes') actionType = `${action}/${type}`
 
         switch (actionType) {
             case "home":
-                setContentSettings(prevSettings => ({...prevSettings, showNavbarSearch: true}));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: true }));
                 pageTitle = "Página Inicial";
                 content = <HomePage />;
                 break;
             case `bateria/detalhes`:
-                setContentSettings(prevSettings => ({...prevSettings, showNavbarSearch: false}));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: false }));
                 pageTitle = "Detalhes da Bateria";
                 content = <BatteryPurchasePage />;
                 break;
             case "configuracoes":
-                setContentSettings(prevSettings => ({...prevSettings, showNavbarSearch: false}));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: false }));
                 pageTitle = "Configurações";
                 content = <SettingsPage />;
+                break;
+
+            case "meucarrinho":
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: true }));
+                pageTitle = "Carrinho de Compras";
+                content = <CartPage />;
                 break;
             default:
                 console.log('default');

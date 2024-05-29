@@ -25,7 +25,6 @@ const AuthServices = () => {
             const response = await ConnectionAPI.get(`auth/${userData.email}`);
             return response.status;
         } catch (error) {
-            console.error("Erro ao obter autorização do usuário:", error);
             throw error;
         }
     }
@@ -100,8 +99,8 @@ export function VerifyAuth({ children, request }) {
         async function fetchData() {
             try {
                 await userRoleAuthorization(userData);
+                return children;
             } catch (error) {
-                console.error("Erro ao verificar autenticação:", error);
                 if (request) {
                     navigate('/');
                     return;
@@ -111,5 +110,4 @@ export function VerifyAuth({ children, request }) {
         fetchData();
     }, [userData, navigate, request]);
 
-    return children;
 };

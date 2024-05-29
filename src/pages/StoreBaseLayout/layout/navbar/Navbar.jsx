@@ -206,7 +206,7 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
               <span className='fw-bold'> R$ {batteryCart.totalValue.toFixed(2)}</span>
             </div>
 
-            <Button variant='red btn-sm fw-bold'>Ver Carrinho</Button>
+            <Button as={Link} to="/meucarrinho" variant='red btn-sm fw-bold'>Ver Carrinho</Button>
           </section>
         </>
       )
