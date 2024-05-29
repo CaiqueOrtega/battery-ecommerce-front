@@ -1,72 +1,105 @@
-import { useEffect, useState } from 'react';
-import { BsArrowLeft, BsArrowRight } from '../../assets/icons/IconsSet';
+import { useState } from 'react';
 import BatteryCard from '../../components/common/BatteryCard';
 import { Carousel, Container } from 'react-bootstrap';
-import ControlledCarousel from './carousel/Carousel';
-import './home.css';
 import { useNavigate } from 'react-router-dom';
+import { CarouselIconRight, CarouselIconLeft } from '../../assets/icons/IconsSet';
 import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
+import exampleCarousel1 from '../../assets/images/carousel-images-examples-1.jpg';
+import exampleCarousel2 from '../../assets/images/carousel-images-examples-2.jpg';
+import exampleCarousel3 from '../../assets/images/carousel-images-examples-3.jpg';
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import './home.css';
+
 
 function HomePage() {
-  const { batteriesActive, setFetchBatteryData } = useGlobalDataProvider();
-    const [batteriesPerPage, setBatteriesPerPage] = useState(5);
+  return (
+    <>
+      <ControlledCarouseImages />
+      <RenderSliderBatteries />
+
+    </>
+  );
+}
+
+function RenderSliderBatteries() {
+  const { batteriesActive } = useGlobalDataProvider();
   const navigate = useNavigate();
 
-  const calculateItemsPerPage = () => {
-    const totalItems = batteriesActive.length < 15 ? batteriesActive.length : 15;
-    return Math.ceil(totalItems / 3) * 3;
+
+  const CustomNextArrow = ({ onClick, style, className }) => (
+    <div
+      className={className + ' rounded-circle d-flex justify-content-center align-items-center'}
+      onClick={onClick}
+      style={{ ...style, width: '45px', height: '45px', backgroundColor: '#fff',  zIndex: 1 }}
+    >
+      < CarouselIconLeft size={35} /> 
+    </div>
+  );
+  
+  const CustomPrevArrow = ({ onClick, style, className }) => (
+    <div
+      className={className + ' rounded-circle d-flex justify-content-center align-items-center'}
+      onClick={onClick}
+      style={{ ...style, width: '45px', height: '45px', backgroundColor: '#fff' }}
+    >
+      <CarouselIconRight size={35} /> 
+    </div>
+  );
+
+
+  const settings = {
+    dots: true,
+    infinite: false,
+    speed: 800,
+    slidesToShow: 5,
+    slidesToScroll: 5,
+    initialSlide: 0,
+    responsive: [
+      {
+        breakpoint: 1024,
+        settings: {
+          slidesToShow: 3,
+          slidesToScroll: 3,
+          infinite: true,
+          dots: true
+        }
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+          initialSlide: 2
+        }
+      },
+      {
+        breakpoint: 480,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1
+        }
+      },
+    ],
+    prevArrow: <CustomNextArrow />,
+    nextArrow: <CustomPrevArrow />,
+    appendDots: (dots) => (
+      <ul style={{ display: 'flex', top: '-35px', justifyContent: 'end', height: 'min-content' }}>{dots}</ul>
+
+    ),
+
   };
-
-  const itemsPerPage = calculateItemsPerPage();
-
-
-  useEffect(() => {
-    const handleResize = () => {
-      const newBatteriesPerPage = window.innerWidth <= 420 ? 2 : 5;
-      setBatteriesPerPage(newBatteriesPerPage);
-    };
-
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, []);
-
-  const totalCarousels = batteriesActive.length > 0 ? Math.ceil(batteriesActive.length / itemsPerPage) : 1;
-  const [activeIndexes, setActiveIndexes] = useState(Array(totalCarousels).fill(0));
-
-  useEffect(() => {
-
-    // Reinitialize activeIndexes when batteriesActive changes
-    setActiveIndexes(Array(totalCarousels).fill(0));
-  }, [batteriesActive, totalCarousels]);
 
   const handleBatteryClick = (batteryData) => {
     navigate('/bateria/detalhes', { state: batteryData });
   };
 
-  const handleSelect = (selectedIndex, carouselIndex) => {
-    setActiveIndexes((prevIndexes) => {
-      const newIndexes = [...prevIndexes];
-      newIndexes[carouselIndex] = selectedIndex;
-      return newIndexes;
-    });
-  };
-
-  const renderBatteries = () => {
-    const carousels = [];
-
-    for (let i = 0; i < totalCarousels; i++) {
-      const startIdx = i * itemsPerPage;
-      const endIdx = Math.min(startIdx + itemsPerPage, batteriesActive.length);
-      const carouselItems = [];
-
-      for (let j = startIdx; j < endIdx; j += batteriesPerPage) {
-        const currentPageBatteries = batteriesActive.slice(j, j + batteriesPerPage).map((battery) => (
-          <div key={battery.batteryId} className="container-card-battery d-flex justify-content-center">
+  return (
+    <Container className="slider-container mt-5">
+      <Slider {...settings}>
+        {batteriesActive.map((battery, index) => (
+          <div key={battery.batteryId} className='d-flex '>
             <BatteryCard
               batteryName={battery.name}
               batteryDescription={battery.description}
@@ -75,58 +108,52 @@ function HomePage() {
               onClick={() => handleBatteryClick(battery)}
             />
           </div>
-        ));
+        ))}
+      </Slider>
+    </Container>
+  );
 
-        carouselItems.push(
-          <Carousel.Item key={j} className="carousel-item-custom">
-            <div className="d-flex justify-content-center pb-4 pt-0">{currentPageBatteries}</div>
-          </Carousel.Item>
-        );
-      }
-
-      const activeIndex = activeIndexes[i];
-      const totalSlides = Math.ceil((endIdx - startIdx) / batteriesPerPage);
+}
 
 
-      carousels.push(
-        <Carousel
-          key={i}
-          indicators={false}
-          interval={null}
-          activeIndex={activeIndex}
-          onSelect={(selectedIndex) => handleSelect(selectedIndex, i)}
-          prevIcon={
-            activeIndex > 0 && (
-              <div className="position-absolute start-0 bg-light rounded-circle p-2 carousel-circle-button">
-                <BsArrowLeft size={55} />
-              </div>
-            )
-          }
-          nextIcon={
-            activeIndex < totalSlides - 1 && (
-              <div className="position-absolute end-0 bg-light rounded-circle p-2 carousel-circle-button">
-                <BsArrowRight size={55} />
-              </div>
-            )
-          }
-          controls={totalSlides > 1}
-          className="carousel-custom position-relative mb-4"
-        >
-          {carouselItems}
-        </Carousel>
-      );
-    }
 
-    return carousels;
+function ControlledCarouseImages() {
+  const [index, setIndex] = useState(0);
+
+  const handleSelect = (selectedIndex) => {
+    setIndex(selectedIndex);
   };
 
   return (
-    <>
-      <ControlledCarousel />
-      <Container className=" mt-4">
-        {renderBatteries()}
-      </Container>
-    </>
+    <Container fluid className='carousel-container-home position-relative overflow-hidden z-1'>
+      <Carousel activeIndex={index} onSelect={handleSelect} >
+        <Carousel.Item>
+          <img
+            className="d-block w-100"
+            src={exampleCarousel1}
+            alt="First slide"
+            style={{ height: 'auto' }}
+          />
+        </Carousel.Item>
+        <Carousel.Item>
+          <img
+            className="d-block w-100"
+            src={exampleCarousel2}
+            alt="Second slide"
+            style={{ height: 'auto' }}
+          />
+        </Carousel.Item>
+        <Carousel.Item>
+          <img
+            className="d-block w-100"
+            src={exampleCarousel3}
+            alt="Third slide"
+            style={{ height: 'auto' }}
+          />
+        </Carousel.Item>
+      </Carousel>
+      <div className='gradient position-absolute'></div>
+    </Container>
   );
 }
 

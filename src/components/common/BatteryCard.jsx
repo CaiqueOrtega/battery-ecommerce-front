@@ -5,7 +5,7 @@ import imagemExemploBateria from '../../assets/images/exemploImageRegister.png';
 function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick }) {
     return (
         <>
-            <Card className='shadow rounded-4 border-0' style={{ width: '14.5em', height: '27.125em' }} onClick={onClick}>
+            <Card className='shadow-sm rounded-4 border-0 mb-3' style={{ width: '14.5em', height: '27.125em' }} onClick={onClick}>
                 <div className='p-4 rounded-3' style={{ backgroundColor: '#f8f8f8' }}>
                     <Card.Img className="img-fluid" variant="top" src={imagemExemploBateria} height={160} />
                 </div>

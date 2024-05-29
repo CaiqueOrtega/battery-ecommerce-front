@@ -11,9 +11,9 @@ function FooterComponent() {
     ];
 
     return (
-        <footer className="p-5">
+        <footer className="p-5 mt-5">
             <Card className="rounded-5 shadow" style={{ backgroundColor: '#262626' }}>
-                <Card.Body className="position-relative">
+                <Card.Body className="position-relative mx-3">
                     <Row className="py-4">
                         <Col xs={2} className="d-flex justify-content-start align-items-center">
                             <img src={logoMacDavis} alt="logo MacDavis motos" width={100} />

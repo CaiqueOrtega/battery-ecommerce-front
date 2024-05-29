@@ -1,4 +1,4 @@
-.gradiant {
+.gradient {
   bottom: 0;
   left: 0;
   width: 100%;
@@ -7,64 +7,28 @@
 }
 
 .carousel-indicators {
-  margin-bottom: 3em;
+  margin-bottom: 4em;
 }
 
-.container-home {
-  min-width: 78.125em;
-}
-
-.container-card-battery {
-  margin-right: 1.1em;
-}
-
-.carousel-circle-button:hover {
-  box-shadow: 0px 0px 10px 5px rgba(0, 0, 0, 0.196);
-}
-
-.carousel-control-prev {
-  width: max-content;
-}
-
-.carousel-control-next {
-  width: max-content;
-}
-
-@media (max-width: 416px) {
-  .container-card-battery {
-    width: 190px !important;
-    height: 415px !important;
-  }
-  .div-carousel-container-home {
-    max-height: 2em !important ;
-  };
-}
 
 .carousel-container-home {
   padding: 0 !important;
   max-width: 1920px !important;
 }
 
-@media (min-width: 415px) {
-  .carousel-container-home{
-    height: auto !important
+.slick-prev::before,
+.slick-next::before {
+  font-size: inherit;
+  z-index: 50050 !important;
+}
+
+.slick-prev.slick-disabled, .slick-next.slick-disabled {
+  opacity: 0.2;
+  cursor: default; 
+}
+
+@media(min-width: 1200px){
+  .slider-container{
+    min-width: 1250px;
   }
-}
-
-@media (max-width: 1280px) {
-  .div-carousel-container-home {
-    max-height: 17em !important ;
-  };
-}
-
-@media (max-width: 940px) {
-  .div-carousel-container-home {
-    max-height: 12em !important ;
-  };
-}
-
-@media (max-width: 800px) {
-  .carousel-indicators {
-    display: none !important;
-  };
 }
