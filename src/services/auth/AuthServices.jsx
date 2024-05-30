@@ -88,26 +88,31 @@ const AuthServices = () => {
 
 export default AuthServices;
 
-
-
 export function VerifyAuth({ children, request }) {
     const { userRoleAuthorization } = AuthServices();
     const { userData } = useContext(AuthContext);
     const navigate = useNavigate();
+    const [isAuthorized, setIsAuthorized] = useState(false);
 
     useEffect(() => {
-        async function fetchData() {
+        const checkAuthorization = async () => {
             try {
                 await userRoleAuthorization(userData);
-                return children;
+                setIsAuthorized(true);
             } catch (error) {
-                if (request) {
-                    navigate('/');
-                    return;
-                }
+                setIsAuthorized(false);
             }
-        }
-        fetchData();
-    }, [userData, navigate, request]);
+        };
 
-};
+        checkAuthorization();
+    }, [userData]);
+
+    if (!isAuthorized) {
+        if (request) {
+            navigate('/');
+            return null;
+        }
+    }
+
+    return children;
+}
