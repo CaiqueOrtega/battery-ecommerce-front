@@ -272,7 +272,7 @@ function AddressForm(props) {
                     <Col className="col-5">
                         <Form.Label className="w-100">CEP
                             <FormGroupWithIcon
-                                icon={<MapIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                                icon={<MapIcon className='position-absolute ms-3' currentColor={'#a3a29f'} />}
                                 type={'text'}
                                 placeholder={'XXXXX-XXX'}
                                 value={props.formAddressValues.cep}

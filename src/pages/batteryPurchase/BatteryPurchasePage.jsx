@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-import { MapIcon, DeliveryIcon, MotorcycleIcon } from '../../assets/icons/IconsSet';
+import { MapIcon, DeliveryIcon, MotorcycleIcon, SubtractionIcon, AdditionIcon, ShieldCheckIcon, BackIcon, MedalIcon } from '../../assets/icons/IconsSet';
 import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Placeholder, Modal } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 
@@ -174,24 +174,25 @@ function BatteryPurchasePage() {
         );
     }
 
+
     return (
         <>
-            <Container fluid={'xl'} className="purchase-container py-lg-4" >
+            <Container  className="purchase-container py-lg-4" >
                 <Card className="border-0 shadow " >
                     <Card.Body>
                         <Row className="d-flex">
-                            <Col className='col-auto'>
+                            <Col className='col-12 col-md-auto'>
                                 <ImageGalleryComponent />
                             </Col>
 
-                            <Col className='purchase-col-info mt-md-0 mt-4'>
+                            <Col className='col-12 col-sm-6 col-lg flex-grow-1 mt-lg-0 mt-4'>
                                 <div>
                                     <h4>{batteryData.name}</h4>
                                     <p className="text-muted">{batteryData.description}</p>
                                 </div>
                             </Col>
 
-                            <Col className='col-12 col-md-auto purchase-col-card'>
+                            <Col className='col-12 col-sm-6 col-lg-auto purchase-col-card mt-lg-0 mt-4'>
                                 <CardBatteryPurchase
                                     quantity={quantity}
                                     setQuantity={setQuantity}
@@ -254,8 +255,7 @@ function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, isLoggedIn,
                     estado: mainAddress.state
                 }
             );
-        } else if(addressIsLoaded) {
-            console.log('BATATA MUITO Doce')
+        } else if (addressIsLoaded) {
             const hasLocalAddress = localStorage.getItem('cepAddress');
             if (hasLocalAddress) {
                 handleGetAddressByCep(hasLocalAddress);
@@ -328,7 +328,7 @@ function CardBatteryPurchase(props) {
                         <Card className="d-flex">
                             <Row className='g-0'>
                                 <Col className='col-auto'>
-                                    <Button variant="primary fw-bold rounded-end-0 px-3 " onClick={() => props.setQuantity(prevQuantity => Math.max(1, prevQuantity - 1))}>-</Button>
+                                    <Button variant="white fw-bold rounded-end-0 px-3 " onClick={() => props.setQuantity(prevQuantity => Math.max(1, prevQuantity - 1))}><SubtractionIcon /></Button>
                                 </Col>
                                 <Col className='d-flex align-items-center'>
                                     <FormControl
@@ -345,7 +345,7 @@ function CardBatteryPurchase(props) {
                                     />
                                 </Col>
                                 <Col className='col-auto'>
-                                    <Button variant="primary fw-bold rounded-start-0 px-3 " onClick={() => props.setQuantity(prevQuantity => Math.min(props.batteryData.quantity, prevQuantity + 1))}>+</Button>
+                                    <Button variant="white fw-bold rounded-start-0 px-3 " onClick={() => props.setQuantity(prevQuantity => Math.min(props.batteryData.quantity, prevQuantity + 1))}><AdditionIcon /></Button>
                                 </Col>
                             </Row>
                         </Card>

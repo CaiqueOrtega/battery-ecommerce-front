@@ -15,17 +15,37 @@ const BatteryCartServices = () => {
         }
     }
 
-    const addBattery = async (id, batteryId, quantity) => {
-        try{
-            const response = await ConnectionAPI.put(`cart/${id}/battery/${batteryId}/quantity/${quantity}`)
+    const addBattery = async (userId, batteryId, quantity) => {
+        try {
+            const response = await ConnectionAPI.put(`cart/${userId}/battery/${batteryId}/quantity/${quantity}`)
             console.log(response.data)
             return response.data
-        } catch (error){
+        } catch (error) {
             handleAPIError(error)
         }
     }
 
-    return { getByUser, addBattery }
+    const removeBattery = async (userId, batteryId) => {
+        try {
+            const response = await ConnectionAPI.delete(`cart/${userId}/battery/${batteryId}`)
+            console.log('teste', response)
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
+
+    const  changeBatteryQuantity = async (cartId, cartBatteryId, quantity) => {
+        try {
+            const response = await ConnectionAPI.put(`cart/quantity/${cartId}/${cartBatteryId}/${quantity}`)
+            console.log(response.data)
+            return response.data
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
+
+
+    return { getByUser, addBattery, removeBattery, changeBatteryQuantity }
 }
 
 export default BatteryCartServices
