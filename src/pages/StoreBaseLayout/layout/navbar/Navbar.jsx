@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup } from 'react-bootstrap';
 import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../../assets/icons/IconsSet'
@@ -163,8 +163,22 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 }
 
 
-function RenderCartDropdownMenu({ isLoggedIn }) {
+function RenderCartDropdownMenu() {
   const { batteryCart } = useGlobalDataProvider();
+  const [isScreenSmall, setIsScreenSmall] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsScreenSmall(window.innerWidth <= 768); 
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize); 
+    };
+  }, []);
 
 
   const CartEmptyDropdownMenu = () => (
@@ -216,13 +230,21 @@ function RenderCartDropdownMenu({ isLoggedIn }) {
   );
 
   return (
-    <Dropdown as={NavItem} className="dropdown-no-caret  text-white hover-color-red">
-      <Dropdown.Toggle as={NavLink} className='me-3'>
-        <CartIcon strokeWidth={'0.2'} size={30} />
-      </Dropdown.Toggle>
-      {!batteryCart ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
 
-    </Dropdown>
+    <NavItem className="dropdown-no-caret  text-white hover-color-red">
+    {isScreenSmall ? (
+      <NavLink as={Link} to="/meucarrinho" className='me-3'>
+        <CartIcon strokeWidth={'0.2'} size={30} />
+      </NavLink>
+    ) : (
+      <Dropdown>
+        <Dropdown.Toggle as={NavLink} className='me-3'>
+          <CartIcon strokeWidth={'0.2'} size={30} />
+        </Dropdown.Toggle>
+        {!batteryCart ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
+      </Dropdown>
+    )}
+  </NavItem>
   );
 }
 
