@@ -169,14 +169,14 @@ function RenderCartDropdownMenu() {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsScreenSmall(window.innerWidth <= 768); 
+      setIsScreenSmall(window.innerWidth <= 768);
     };
 
     handleResize();
     window.addEventListener('resize', handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize); 
+      window.removeEventListener('resize', handleResize);
     };
   }, []);
 
@@ -219,8 +219,9 @@ function RenderCartDropdownMenu() {
             <div>Total:
               <span className='fw-bold'> R$ {batteryCart.totalValue.toFixed(2)}</span>
             </div>
-
-            <Button as={Link} to="/meucarrinho" variant='red btn-sm fw-bold'>Ver Carrinho</Button>
+              <Dropdown.Item as={Link} to="/meucarrinho" className='btn btn-red btn-sm fw-bold text-center rounded-2'
+               style={{ width: 'unset'}}
+              >Ver Carrinho</Dropdown.Item >
           </section>
         </>
       )
@@ -232,19 +233,19 @@ function RenderCartDropdownMenu() {
   return (
 
     <NavItem className="dropdown-no-caret  text-white hover-color-red">
-    {isScreenSmall ? (
-      <NavLink as={Link} to="/meucarrinho" className='me-3'>
-        <CartIcon strokeWidth={'0.2'} size={30} />
-      </NavLink>
-    ) : (
-      <Dropdown>
-        <Dropdown.Toggle as={NavLink} className='me-3'>
+      {isScreenSmall ? (
+        <NavLink as={Link} to="/meucarrinho" className='me-3'>
           <CartIcon strokeWidth={'0.2'} size={30} />
-        </Dropdown.Toggle>
-        {!batteryCart ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
-      </Dropdown>
-    )}
-  </NavItem>
+        </NavLink>
+      ) : (
+        <Dropdown>
+          <Dropdown.Toggle as={NavLink} className='me-3'>
+            <CartIcon strokeWidth={'0.2'} size={30} />
+          </Dropdown.Toggle>
+          {!batteryCart ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
+        </Dropdown>
+      )}
+    </NavItem>
   );
 }
 
