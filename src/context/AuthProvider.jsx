@@ -3,6 +3,7 @@ import ConnectionAPI from "../services/ConnectionAPI";
 import { decodeToken } from 'react-jwt';
 import { useNavigate } from "react-router-dom";
 import UserService from "../services/users/UsersServices";
+import AuthServices from "../services/auth/AuthServices";
 
 const AuthContext = createContext({});
 function AuthProvider({ children }) {
@@ -13,6 +14,12 @@ function AuthProvider({ children }) {
   const navigate = useNavigate();
   const { getUserByEmail } = UserService();
   const [userData, setUserData] = useState({});
+
+
+  const { userRoleAuthorization } = AuthServices();
+  const [authorized, setAuthorized] = useState(false);
+  const [verified, setVerified] = useState(false);
+
 
 
   useEffect(() => {
@@ -63,6 +70,7 @@ function AuthProvider({ children }) {
       setIsLoggedIn(false);
       setUserData({});
       setIsLoggedIn(false);
+      setVerified(false);
       return true;
     } catch (error) {
       console.error("Erro ao fazer logout:", error);
@@ -97,8 +105,37 @@ function AuthProvider({ children }) {
     }
   }, [isLoggedIn, token]);
 
+
+   function VerifyAuth({ children, request }) {
+    console.log('request', request)
+    useEffect(() => {
+      console.log ('teste', verified)
+        if (!verified) { 
+            const checkAuthorization = async () => {
+                try {
+                    await userRoleAuthorization(userData);
+                    setAuthorized(true);
+                } catch (error) {
+                  console.log('batata doce')
+                    if (request) {
+                        console.log('entrou');
+                        navigate('/');
+                    }
+                    setAuthorized(false);
+                } finally {
+                    setVerified(true); 
+                }
+            };
+
+            checkAuthorization();
+        }
+    }, [userData]);
+
+    return authorized ? children : null;
+}
+
   return isContextLoaded ? (
-    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin }}>
+    <AuthContext.Provider value={{ isLoggedIn, navigate, userData, logout, handleLogin, VerifyAuth}}>
       {children}
     </AuthContext.Provider>
   ) : null;

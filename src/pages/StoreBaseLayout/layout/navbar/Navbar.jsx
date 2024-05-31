@@ -6,7 +6,7 @@ import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIco
 import LoginSignUpButton from '../../../../components/common/LoginSignUpButton';
 import ModalLogout from '../../../../components/common/ModalLogout';
 
-import { VerifyAuth } from '../../../../services/auth/AuthServices';
+
 import { useAuthProvider } from '../../../../context/AuthProvider';
 import { useGlobalDataProvider } from '../../../../context/GlobalDataProvider';
 
@@ -16,7 +16,7 @@ import './navbar.css';
 
 
 function NavbarComponent({ showNavbarSearch }) {
-  const { logout, userData, isLoggedIn, navigate } = useAuthProvider()
+  const { logout, userData, isLoggedIn, navigate, VerifyAuth } = useAuthProvider()
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 
