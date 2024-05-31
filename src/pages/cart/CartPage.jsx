@@ -4,7 +4,7 @@ import exemploImageCart from "../../assets/images/exemploImageRegister.png";
 import { AdditionIcon, SubtractionIcon } from "../../assets/icons/IconsSet";
 import BatteryCartServices from "../../services/cart/BatteryCartServices";
 import ConfirmChangesModal from "../../components/common/ConfirmChangesModal";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 function CartPage() {
     const { batteryCart, setBatteryCart } = useGlobalDataProvider();
@@ -15,6 +15,7 @@ function CartPage() {
 
 
     const handleCartAction = async (action, data) => {
+        console.log(action, data)
         const actions = {
             'remove': async () => {
                 const response = await removeBattery(batteryCart.cartId, data.batteryId);
@@ -82,54 +83,83 @@ function CartPage() {
         </>
     );
 }
-function RenderCartItemsCard({ batteryCart, setBatteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction }) {
-    
+
+
+function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction }) {
     const handleRemoveBattery = (batteryId) => {
         setShowConfirmChangesModal(true)
         setConfirmChangesModalData({ title: "Remover Bateria", message: "Deseja mesmo Remover a Bateria do Carrinho?" })
-        setConfirmAction({ action: 'remove', data: { batteryId: batteryId } });
+        setConfirmAction({ action: 'remove', data: { batteryId: batteryId }});
     }
 
 
-    const BatteryQuantityControl = ({ quantity, batteryId }) => {
+
+    const handleBlur = (setLocalQuantity) => {
+        let newQuantity = parseInt(e.target.value);
+        if (isNaN(newQuantity) || newQuantity <= 0) {
+            newQuantity = 1;
+        }
+        setLocalQuantity(newQuantity);
+    };
+
+
+    const handleChangeQuantity = (isAddition, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef) => {
+        let newQuantity;
+
+        if (isAddition) {
+            newQuantity = localQuantity + 1;
+            setLocalQuantity(newQuantity);
+        } else {
+            newQuantity = localQuantity > 1 ? localQuantity - 1 : 1;
+            setLocalQuantity(newQuantity);
+        }
+
+        if (timeoutIdRef.current) {
+            clearTimeout(timeoutIdRef.current);
+        }
+        timeoutIdRef.current = setTimeout(() => {
+            console.log('Timer expired', newQuantity, cartBatteryId);
+            handleCartAction('changeQuantity',  { cartBatteryId: cartBatteryId, quantity: newQuantity})
+        }, 1000);
+    };
+
+
+    const BatteryQuantityControl = ({ quantity, cartBatteryId }) => {
         const [localQuantity, setLocalQuantity] = useState(quantity);
+        const timeoutIdRef = useRef(null);
 
-        
-        const handleBlur = (e) => {
-            let newQuantity = parseInt(e.target.value);
-            if (isNaN(newQuantity) || newQuantity <= 0) {
-                newQuantity = 1;
-                setLocalQuantity(1);
-            }
-        };
+        useEffect(() => {
+            return () => {
+                if (timeoutIdRef.current) {
+                    clearTimeout(timeoutIdRef.current);
+                }
+            };
+        }, []);
 
-        const handleAddition = () => {
-            const newQuantity = localQuantity + 1;
-            setLocalQuantity(newQuantity);
-        };
-
-        const handleSubtraction = () => {
-            const newQuantity = localQuantity > 1 ? localQuantity - 1 : 1;
-            setLocalQuantity(newQuantity);
-        };
 
         return (
             <Card style={{ maxWidth: '130px' }}>
                 <Row className='g-0'>
                     <Col className='col-auto'>
-                        <Button variant="white fw-bold rounded-end-0" onClick={handleSubtraction}><SubtractionIcon size={15} /></Button>
+                        <Button variant="white fw-bold rounded-end-0"
+                            onMouseDown={() => handleChangeQuantity(false, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef)}
+                        ><SubtractionIcon size={15} /></Button>
                     </Col>
                     <Col className='d-flex align-items-center'>
                         <FormControl
                             type="text"
                             className="flex-grow-0 text-center py-1 border-0"
                             value={localQuantity}
-                            onChange={andleQuantityChange}
-                            onBlur={handleBlur}
+                            onBlur={(e) => handleBlur(e, localQuantity, setLocalQuantity)}
+                            onChange={(e) => setLocalQuantity(e.target.value)}
                         />
                     </Col>
                     <Col className='col-auto'>
-                        <Button variant="white fw-bold rounded-start-0" onClick={handleAddition}><AdditionIcon size={15} /></Button>
+                        <Button variant="white fw-bold rounded-start-0"
+                            onMouseDown={() => handleChangeQuantity(true, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef)}
+                        >
+                            <AdditionIcon size={15} />
+                        </Button>
                     </Col>
                 </Row>
             </Card>
@@ -157,7 +187,7 @@ function RenderCartItemsCard({ batteryCart, setBatteryCart, setShowConfirmChange
                         </Col>
 
                         <Col className="col-auto d-flex flex-column align-items-center small">
-                            <BatteryQuantityControl quantity={item.quantity} batteryId={item.cart_battery_id} />
+                            <BatteryQuantityControl quantity={item.quantity} cartBatteryId={item.cart_battery_id} />
                             <span className="text-muted small">{item.battery.quantity} unidade{item.battery.quantity > 1 && 's'} </span>
                         </Col>
 
@@ -174,6 +204,7 @@ function RenderCartItemsCard({ batteryCart, setBatteryCart, setShowConfirmChange
         </Card>
     )
 }
+
 
 function RenderCartSummaryCard({ batteryCart }) {
     return (

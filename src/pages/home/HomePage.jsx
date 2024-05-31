@@ -26,7 +26,9 @@ function HomePage() {
 function RenderSliderBatteries() {
   const { batteriesActive } = useGlobalDataProvider();
   const navigate = useNavigate();
-
+  const initialCount = Math.min(5, Object.keys(batteriesActive).length);
+  const slidesToShow = Math.max(1, initialCount); 
+  
 
   const CustomNextArrow = ({ onClick, style, className }) => (
     <div
@@ -53,8 +55,8 @@ function RenderSliderBatteries() {
     dots: true,
     infinite: false,
     speed: 800,
-    slidesToShow: 5,
-    slidesToScroll: 5,
+    slidesToShow: slidesToShow,
+    slidesToScroll: slidesToShow,
     initialSlide: 0,
     responsive: [
       {
