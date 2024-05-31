@@ -39,7 +39,7 @@ const BatteryCartServices = () => {
             const response = await ConnectionAPI.put(`cart/quantity/${cartId}/${cartBatteryId}/${quantity}`)
             return response.data;
         } catch (error) {
-            handleAPIError(error)
+            return false;
         }
     }
 

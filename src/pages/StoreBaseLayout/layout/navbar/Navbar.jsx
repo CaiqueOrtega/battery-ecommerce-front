@@ -15,7 +15,7 @@ import logo from '../../../../assets/images/logo.png'
 import './navbar.css';
 
 
-function NavbarComponent({ showNavbarSearch }) {
+function NavbarComponent({ showNavbarSearch, isCartPage }) {
   const { logout, userData, isLoggedIn, navigate, VerifyAuth } = useAuthProvider()
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -77,7 +77,7 @@ function NavbarComponent({ showNavbarSearch }) {
           {showNavbarSearch ? navbarSearch() : null}
 
           <Col className='col-auto d-flex order-md-0 order-first '>
-            <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} />
+            <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} isCartPage={isCartPage}/>
 
             <RenderUserDropdownMenu
               userData={userData}
@@ -163,8 +163,9 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 }
 
 
-function RenderCartDropdownMenu() {
-  const { batteryCart } = useGlobalDataProvider();
+
+  function RenderCartDropdownMenu({isCartPage}) {
+  const { batteryCart, batteryCartIsLoaded } = useGlobalDataProvider();
   const [isScreenSmall, setIsScreenSmall] = useState(false);
 
   useEffect(() => {
@@ -233,7 +234,7 @@ function RenderCartDropdownMenu() {
   return (
 
     <NavItem className="dropdown-no-caret  text-white hover-color-red">
-      {isScreenSmall ? (
+      {isScreenSmall || isCartPage ? (
         <NavLink as={Link} to="/meucarrinho" className='me-3'>
           <CartIcon strokeWidth={'0.2'} size={30} />
         </NavLink>
@@ -242,7 +243,7 @@ function RenderCartDropdownMenu() {
           <Dropdown.Toggle as={NavLink} className='me-3'>
             <CartIcon strokeWidth={'0.2'} size={30} />
           </Dropdown.Toggle>
-          {!batteryCart ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
+          {batteryCartIsLoaded && batteryCart?.batteries.length === 0 ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
         </Dropdown>
       )}
     </NavItem>

@@ -12,7 +12,7 @@ import CartPage from "../cart/CartPage";
 
 function BaseLayoutPage() {
     const { action, type } = useParams();
-    const [contentSettings, setContentSettings] = useState({ showNavbarSearch: true, footer: true, })
+    const [contentSettings, setContentSettings] = useState({ showNavbarSearch: true, footer: true, isCartPage: false })
 
 
     const handleGetContent = useMemo(() => {
@@ -24,23 +24,23 @@ function BaseLayoutPage() {
 
         switch (actionType) {
             case "home":
-                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: true }));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: true,  isCartPage: false }));
                 pageTitle = "Página Inicial";
                 content = <HomePage />;
                 break;
             case `bateria/detalhes`:
-                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: false }));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: false,  isCartPage: false }));
                 pageTitle = "Detalhes da Bateria";
                 content = <BatteryPurchasePage />;
                 break;
             case "configuracoes":
-                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: false }));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: false,  isCartPage: false }));
                 pageTitle = "Configurações";
                 content = <SettingsPage />;
                 break;
 
             case "meucarrinho":
-                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: true }));
+                setContentSettings(prevSettings => ({ ...prevSettings, showNavbarSearch: true, isCartPage: true }));
                 pageTitle = "Carrinho de Compras";
                 content = <CartPage />;
                 break;
@@ -57,7 +57,7 @@ function BaseLayoutPage() {
     return (
         <Row className="flex-column justify-content-between g-0" style={{ minHeight: '100vh' }}>
             <Col xs={12} className="p-0">
-                <NavbarComponent showNavbarSearch={contentSettings.showNavbarSearch} />
+                <NavbarComponent showNavbarSearch={contentSettings.showNavbarSearch} isCartPage={contentSettings.isCartPage} />
             </Col>
 
             <Col xs={12} className="p-0 flex-grow-1 d-flex flex-column">
