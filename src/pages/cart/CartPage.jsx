@@ -13,25 +13,44 @@ function CartPage() {
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
     const [confirmAction, setConfirmAction] = useState({});
 
-
     const handleCartAction = async (action, data) => {
         console.log(action, data)
         const actions = {
             'remove': async () => {
                 const response = await removeBattery(batteryCart.cartId, data.batteryId);
-                if (response) {
-                    setBatteryCart(batteryCart.filter(item =>
+                if (response && response.totalValue !== undefined) {
+                    const updatedBatteries = batteryCart.batteries.filter(item =>
                         item.battery.batteryId !== data.batteryId
-                    ));
+                    );
+
+                    const newTotalValue = response.totalValue !== undefined ? response.totalValue : 0;
+
+                    const updatedCart = {
+                        ...batteryCart,
+                        batteries: updatedBatteries,
+                        totalValue: newTotalValue
+                    };
+
+                    setBatteryCart(updatedCart);
                 }
             },
             'changeQuantity': async () => {
                 const response = await changeBatteryQuantity(batteryCart.cartId, data.cartBatteryId, data.quantity);
-                if (response) {
-                    setBatteryCart(batteryCart.filter(item =>
-                        item.battery.batteryId !== data.batteryId
-                    ));
+
+
+                if (response && response.totalValue !== undefined) {
+                    setBatteryCart(prevState => ({
+                        ...prevState,
+                        totalValue: response.totalValue,
+                        batteries: prevState.batteries.map(item => {
+                            if (item.cart_battery_id === data.cartBatteryId) {
+                                return { ...item, quantity: data.quantity };
+                            }
+                            return item;
+                        })
+                    }));
                 }
+
             }
         };
 
@@ -89,42 +108,45 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
     const handleRemoveBattery = (batteryId) => {
         setShowConfirmChangesModal(true)
         setConfirmChangesModalData({ title: "Remover Bateria", message: "Deseja mesmo Remover a Bateria do Carrinho?" })
-        setConfirmAction({ action: 'remove', data: { batteryId: batteryId }});
+        setConfirmAction({ action: 'remove', data: { batteryId: batteryId } });
     }
 
-
-
-    const handleBlur = (setLocalQuantity) => {
-        let newQuantity = parseInt(e.target.value);
+    const handleBlur = (localQuantity, setLocalQuantity, cartBatteryId, batteryQuantity) => {
+        let newQuantity = parseInt(localQuantity);
         if (isNaN(newQuantity) || newQuantity <= 0) {
             newQuantity = 1;
+        } else if (newQuantity > batteryQuantity) {
+            newQuantity = batteryQuantity;
         }
+
         setLocalQuantity(newQuantity);
+        handleCartAction('changeQuantity', { cartBatteryId: cartBatteryId, quantity: newQuantity })
     };
 
-
-    const handleChangeQuantity = (isAddition, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef) => {
+    const handleChangeQuantity = (isAddition, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity) => {
         let newQuantity;
 
         if (isAddition) {
-            newQuantity = localQuantity + 1;
-            setLocalQuantity(newQuantity);
+            newQuantity = Math.min(batteryQuantity, localQuantity + 1);
         } else {
-            newQuantity = localQuantity > 1 ? localQuantity - 1 : 1;
-            setLocalQuantity(newQuantity);
+            newQuantity = Math.max(1, localQuantity - 1);
         }
 
-        if (timeoutIdRef.current) {
-            clearTimeout(timeoutIdRef.current);
+        if (newQuantity !== localQuantity) {
+            setLocalQuantity(newQuantity);
+
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+            }
+            timeoutIdRef.current = setTimeout(() => {
+                console.log('Timer expired', newQuantity, cartBatteryId);
+                handleCartAction('changeQuantity', { cartBatteryId: cartBatteryId, quantity: newQuantity })
+            }, 1000);
         }
-        timeoutIdRef.current = setTimeout(() => {
-            console.log('Timer expired', newQuantity, cartBatteryId);
-            handleCartAction('changeQuantity',  { cartBatteryId: cartBatteryId, quantity: newQuantity})
-        }, 1000);
     };
 
 
-    const BatteryQuantityControl = ({ quantity, cartBatteryId }) => {
+    const BatteryQuantityControl = ({ quantity, batteryQuantity, cartBatteryId }) => {
         const [localQuantity, setLocalQuantity] = useState(quantity);
         const timeoutIdRef = useRef(null);
 
@@ -141,7 +163,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
             <Card style={{ maxWidth: '130px' }}>
                 <Row className='g-0'>
                     <Col className='col-auto'>
-                        <Button variant="white fw-bold rounded-end-0"
+                        <Button variant={`white fw-bold rounded-end-0 ${localQuantity === 1 ? 'bg-light' : ''}`}
                             onMouseDown={() => handleChangeQuantity(false, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef)}
                         ><SubtractionIcon size={15} /></Button>
                     </Col>
@@ -150,13 +172,14 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                             type="text"
                             className="flex-grow-0 text-center py-1 border-0"
                             value={localQuantity}
-                            onBlur={(e) => handleBlur(e, localQuantity, setLocalQuantity)}
+                            onBlur={() => handleBlur(localQuantity, setLocalQuantity, cartBatteryId, batteryQuantity)}
                             onChange={(e) => setLocalQuantity(e.target.value)}
                         />
                     </Col>
                     <Col className='col-auto'>
-                        <Button variant="white fw-bold rounded-start-0"
-                            onMouseDown={() => handleChangeQuantity(true, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef)}
+                        <Button variant={`white fw-bold rounded-start-0 ${batteryQuantity === localQuantity ? 'bg-light' : ''}`}
+                            onMouseDown={() => handleChangeQuantity(true, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity)}
+
                         >
                             <AdditionIcon size={15} />
                         </Button>
@@ -173,6 +196,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
             </Card.Header>
 
             <Card.Body className="overflow-auto" style={{ maxHeight: '300px' }}>
+                
                 {batteryCart?.batteries?.map(item => (
                     <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
                         <Col xs={2} md={2} className="p-0">
@@ -187,7 +211,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                         </Col>
 
                         <Col className="col-auto d-flex flex-column align-items-center small">
-                            <BatteryQuantityControl quantity={item.quantity} cartBatteryId={item.cart_battery_id} />
+                            <BatteryQuantityControl quantity={item.quantity} cartBatteryId={item.cart_battery_id} batteryQuantity={item.battery.quantity} />
                             <span className="text-muted small">{item.battery.quantity} unidade{item.battery.quantity > 1 && 's'} </span>
                         </Col>
 

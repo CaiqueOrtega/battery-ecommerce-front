@@ -27,8 +27,8 @@ const BatteryCartServices = () => {
 
     const removeBattery = async (userId, batteryId) => {
         try {
-            const response = await ConnectionAPI.delete(`cart/${userId}/battery/${batteryId}`)
-            console.log('teste', response)
+           const response =  await ConnectionAPI.delete(`cart/${userId}/battery/${batteryId}`)
+            return response.data;
         } catch (error) {
             handleAPIError(error)
         }
@@ -37,8 +37,7 @@ const BatteryCartServices = () => {
     const  changeBatteryQuantity = async (cartId, cartBatteryId, quantity) => {
         try {
             const response = await ConnectionAPI.put(`cart/quantity/${cartId}/${cartBatteryId}/${quantity}`)
-            console.log(response.data)
-            return response.data
+            return response.data;
         } catch (error) {
             handleAPIError(error)
         }
