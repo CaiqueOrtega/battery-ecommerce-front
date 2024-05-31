@@ -18,6 +18,8 @@ function GlobalDataProvider({ children }) {
     const [addressIsLoaded, setAddressIsLoaded] = useState(null);
 
     const [batteryCart, setBatteryCart] = useState({});
+    const [batteryCartIsLoaded, setBatteryCartIsLoaded] = useState(null);
+
     const { getByListBatteries } = BatteryServices();
     const { getByUser } = BatteryCartServices();
 
@@ -39,11 +41,9 @@ function GlobalDataProvider({ children }) {
         } catch (error) {
             console.error("Erro ao buscar endereço:", error);
         }finally{
-            console.log('BATATA MUITO MAIS DOCE')
             setAddressIsLoaded(true);
         }
     };
-
 
     const fetchCartLogged = async (userId) => {
         if (userId) {
@@ -52,6 +52,8 @@ function GlobalDataProvider({ children }) {
                 setBatteryCart(response);
             } catch (error) {
                 console.error("falha ao pegar carrinho:", error);
+            }finally{
+                setBatteryCartIsLoaded(true);
             }
         }
     };
@@ -87,13 +89,14 @@ function GlobalDataProvider({ children }) {
             }
         } catch (error) {
             console.error("Falha ao pegar carrinho (não logado):", error);
+        }finally{
+            setBatteryCartIsLoaded(true);
         }
     };
 
 
     useEffect(() => {
         if(Object.keys(batteryCart).length === 0){
-            console.log('entrou');
             if (userData?.userId && isLoggedIn) {
                 fetchCartLogged(userData.userId);
             } else {
@@ -121,6 +124,7 @@ function GlobalDataProvider({ children }) {
             address,
             setAddress,
             batteryCart, 
+            batteryCartIsLoaded,
             setBatteryCart,
             resetGlobalData
         }}>
