@@ -2,7 +2,8 @@ import { Card, Row, Col } from "react-bootstrap";
 import { WhatsAppIcon, InstagramIcon, FacebookIcon, GoogleMapsICon } from '../../../../assets/icons/IconsSet'
 import logoMacDavis from '../../../../assets/images/logo-macDavis-motos.png'
 import { Link } from "react-router-dom";
-
+import logoAgilePay from '../../../../assets/images/AgilePay-60x60.png'
+import logoBateriasJupiter from '../../../../assets/images/logo.png'
 function FooterComponent() {
     const socialIcons = [
         { Icon: WhatsAppIcon, link: 'https://api.whatsapp.com/send?phone=5544999251012&text=Olá%2C+gostaria+de+saber+mais+sobre+as+baterias!' },
@@ -12,15 +13,31 @@ function FooterComponent() {
 
     return (
         <footer className="p-5 mt-5">
+
             <Card className="rounded-5 shadow" style={{ backgroundColor: '#262626' }}>
-                <Card.Body className="position-relative mx-3">
+                <Card.Body className="position-relative mx-3 mt-1">
                     <Row className="py-4">
                         <Col xs={2} className="d-flex justify-content-start align-items-center">
                             <img src={logoMacDavis} alt="logo MacDavis motos" width={100} />
                         </Col>
-                        <Col className="text-white d-flex flex-column justify-content-center">
-                            <Link className="text-white " to={'/termos'}>Termos e Condições</Link>
-                            <p className="mt-2 small mb-0">CNPJ: n.º 27.414.171/0001-13 |<a className="text-white text-decoration-none" href="https://www.google.com/maps?q=-23.66998215247412,-52.62926123361947" target="_blank" rel="noopener noreferrer"> <GoogleMapsICon /><span className="fw-bold ms-1" style={{ color: '#fc2f30' }}>Encontre a gente</span> no google maps</a></p>
+                        <Col className="text-white d-flex   ">
+
+
+                            <div className="small me-5">
+                                <Link className="small text-light" to={'/termos'}>Termos e Condições</Link>
+
+                                <p className="mt-2 small ">CNPJ: n.º 27.414.171/0001-13 |<a className="text-white text-decoration-none" href="https://www.google.com/maps?q=-23.66998215247412,-52.62926123361947" target="_blank" rel="noopener noreferrer"> <GoogleMapsICon /><span className="fw-bold ms-1" style={{ color: '#fc2f30' }}>Encontre a gente</span> no google maps</a></p>
+
+                                <p className="small mb-0">Empresa Parceira <span className="fw-bold" style={{ color: '#fc2f30' }}>Baterias Jupiter</span></p>
+                            </div>
+
+                            <div className="ms-5 d-flex align-items-center">
+                                <a className="text-white text-decoration-none d-flex align-items-center" href="https://www.instagram.com/agilepaydigital/?utm_source=ig_web_button_share_sheet" target="_blank" rel="noopener noreferrer" >
+                                    <span className="text-white text-decoration-none rounded-circle d-flex justify-content-center align-items-center bg-white" style={{ width: '30px', height: '30px' }}><img src={logoAgilePay} alt="Logo AgilePay " width={20} /></span>
+                                    <span className="ms-2 small">AgilePay</span>
+                                </a>
+                            </div>
+
                         </Col>
 
                         <Col xs={2} className="d-flex align-items-center justify-content-end">
@@ -39,11 +56,9 @@ function FooterComponent() {
 }
 
 const SocialMediaIcon = ({ Icon, link }) => (
-    <div className="ms-2 rounded-circle d-flex justify-content-center align-items-center" style={{ width: '40px', height: '40px', backgroundColor: '#fc2f30' }}>
-        <a type="button" className="text-white" onClick={() => window.open(link, 'blank')}>
-            <Icon />
-        </a>
-    </div>
+    <a type="button" className="text-white ms-2 rounded-circle d-flex justify-content-center align-items-center" target="_blank" rel="noopener noreferrer" href={link} style={{ width: '40px', height: '40px', backgroundColor: '#fc2f30' }}>
+        <Icon />
+    </a>
 );
 
 export default FooterComponent;
