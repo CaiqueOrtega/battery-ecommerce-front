@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { AddCardIcon, ReturnIcon, CardChipIcon, VisaIcon, MasterCardIcon, AmericanExpressIcon, EloIcon, DiscoverIcon, JbcIcon, DinersClub, HipercardIcon, AuraCardIcon } from "../../../assets/icons/IconsSet";
+import { AddCardIcon, ReturnIcon, CardChipIcon, VisaIcon, MasterCardIcon, AmericanExpressIcon, EloIcon, DiscoverIcon, JcbIcon, DinersClubIcon, HipercardIcon, AuraCardIcon } from "../../../assets/icons/IconsSet";
 import { Card, Form, Row, Col, Button } from "react-bootstrap";
 import CardServices from "../../../services/card/CardServices";
 import FormValidations from "../../../components/common/FormValidation";
 import ConfirmChangesModal from "../../../components/common/ConfirmChangesModal";
 import { useGlobalDataProvider } from "../../../context/GlobalDataProvider";
+import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
 import './card.css'
 
 function CardContent() {
@@ -38,7 +39,6 @@ function CardContent() {
     }, []);
 
 
-
     useEffect(() => {
         if (showCardForm) {
             setErrorMessages({});
@@ -57,7 +57,6 @@ function CardContent() {
         }
 
     }, [showCardForm])
-
 
     const handleCardActionWithConfirmation = (action, data) => {
         if (action === 'update' && isEquals(data.formCardValues, prevFormCardValues, setPrevFormCardValues, setErrorMessages)) {
@@ -197,8 +196,8 @@ function UserCard({ card }) {
             'American Express': <AmericanExpressIcon />,
             'Discover': <DiscoverIcon />,
             'Elo': <EloIcon />,
-            'JCB': <JbcIcon />,
-            'Diners Club': <DinersClub />,
+            'JCB': <JcbIcon />,
+            'Diners Club': <DinersClubIcon />,
             'Aura': <AuraCardIcon />,
             'HiperCard': <HipercardIcon />
         }
@@ -242,6 +241,7 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction }) {
     const [isAnimating, setIsAnimating] = useState(false);
     const [cardIcon, setCardIcon] = useState(null);
     const nextColorCardRef = useRef(null);
+    const [debounceTimer, setDebounceTimer] = useState(null);
 
     useEffect(() => {
         if (colorCard.primary !== '' && colorCard.secondary !== '') {
@@ -294,50 +294,105 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction }) {
     };
 
 
-    function getCardType(cardNumber) {
+    function getCardDetails(cardNumber) {
+        let cardDetails = {
+            length: 16, 
+            primaryColor: '#888888',
+            secondaryColor: '#818181',
+            icon: null,
+        };
+
         if (cardNumber.match(/^3[47][0-9]{13}$/)) {
-            setColorCard({ primary: '#4B9CD3', secondary: '#71C5E8' });
-            setCardIcon(<AmericanExpressIcon />)
+            cardDetails = {
+                length: 15,
+                primaryColor: '#4B9CD3',
+                secondaryColor: '#71C5E8',
+                icon: <AmericanExpressIcon />,
+            };
         } else if (cardNumber.match(/^4[0-9]{12}(?:[0-9]{3})?$/)) {
-            setColorCard({ primary: '#1A1F71', secondary: '#4F5BA6' });
-            setCardIcon(<VisaIcon />)
+            cardDetails = {
+                length: 16,
+                primaryColor: '#1A1F71',
+                secondaryColor: '#4F5BA6',
+                icon: <VisaIcon />,
+            };
         } else if (cardNumber.match(/^5[1-5][0-9]{14}$/)) {
-            setColorCard({ primary: '#EB001B', secondary: '#ff9413' });
-            setCardIcon(<MasterCardIcon />)
+            cardDetails = {
+                length: 16,
+                primaryColor: '#EB001B',
+                secondaryColor: '#ff9413',
+                icon: <MasterCardIcon />,
+            };
         } else if (cardNumber.match(/^6(?:011|5[0-9]{2})[0-9]{12}$/)) {
-            setColorCard({ primary: '#86B8CF', secondary: '#B0D1E3' });
-            setCardIcon(<DiscoverIcon />)
+            cardDetails = {
+                length: 16,
+                primaryColor: '#86B8CF',
+                secondaryColor: '#B0D1E3',
+                icon: <DiscoverIcon />,
+            };
         } else if (cardNumber.match(/^4011(78|79)|^43(1274|8935)|^45(1416|7393|763(1|2))|^50(4175|6699|67[0-6][0-9]|677[0-8]|9[0-8][0-9]{2}|99[0-8][0-9]|999[0-9])|^627780|^63(6297|6368|6369)|^65(0(0(3([1-3]|[5-9])|4([0-9])|5[0-1])|4(0[5-9]|[1-3][0-9]|8[5-9]|9[0-9])|5([0-2][0-9]|3[0-8]|4[1-9]|[5-8][0-9]|9[0-8])|7(0[0-9]|1[0-8]|2[0-7])|9(0[1-9]|[1-6][0-9]|7[0-8]))|16(5[2-9]|[6-7][0-9])|50(0[0-9]|1[0-9]|2[1-9]|[3-4][0-9]|5[0-8]))/)) {
-            setColorCard({ primary: '#00A4E0', secondary: '#66C7F4' });
-            setCardIcon(<EloIcon />);
+            cardDetails = {
+                length: 16,
+                primaryColor: '#00A4E0',
+                secondaryColor: '#66C7F4',
+                icon: <EloIcon />,
+            };
         } else if (cardNumber.match(/^3(?:0[0-5]|[68]).*/)) {
-            setColorCard({ primary: '#0079BE', secondary: '#4DA8DA' });
-            setCardIcon(<DinersClub />);
+            cardDetails = {
+                length: 14,
+                primaryColor: '#0079BE',
+                secondaryColor: '#4DA8DA',
+                icon: <DinersClubIcon />,
+            };
         } else if (cardNumber.match(/^606282|^3841(?:[0|4|6]{1})0/)) {
-            setColorCard({ primary: '#B20838', secondary: '#E73561' });
-            setCardIcon(<HipercardIcon />);
+            cardDetails = {
+                length: 16,
+                primaryColor: '#B20838',
+                secondaryColor: '#E73561',
+                icon: <HipercardIcon />,
+            };
         } else if (cardNumber.match(/^(?:2131|1800|35\d{3})\d{11}/)) {
-            setColorCard({ primary: '#1F5CA7', secondary: '#497EC7' });
-            setCardIcon(<JbcIcon />);
+            cardDetails = {
+                length: 16,
+                primaryColor: '#1F5CA7',
+                secondaryColor: '#497EC7',
+                icon: <JcbIcon />,
+            };
         } else if (cardNumber.match(/^((?!504175))^((?!5067))(^50[0-9])/)) {
-            setColorCard({ primary: '#ffff00', secondary: '#fec117' })
-            setCardIcon(<AuraCardIcon />);
-        } else {
-            setCardIcon(null)
-            setColorCard({ primary: '#888888', secondary: '#818181' });
+            cardDetails = {
+                length: 16,
+                primaryColor: '#ffff00',
+                secondaryColor: '#fec117',
+                icon: <AuraCardIcon />,
+            };
         }
+
+        return cardDetails;
     }
 
 
-    useEffect(() => {
-        if (formCardValues.cardNumber !== '' || colorCard.primary !== '') {
-            getCardType(formCardValues.cardNumber);
+    const handleCardNumberChange = (e) => {
+        const newCardNumber = e.target.value;
+        setFormCardValues({ ...formCardValues, cardNumber: newCardNumber });
+    
+        if (debounceTimer) {
+            clearTimeout(debounceTimer);
         }
-    }, [formCardValues.cardNumber]);
-
+    
+        const newTimer = setTimeout(() => {
+            const cardDetails = getCardDetails(newCardNumber);
+            setColorCard({ primary: cardDetails.primaryColor, secondary: cardDetails.secondaryColor });
+            setCardIcon(cardDetails.icon);
+    
+        }, 500);
+    
+        setDebounceTimer(newTimer);
+    };
 
     const formatCardNumberForDisplay = (cardNumber) => {
-        const paddedNumber = cardNumber.padEnd(16, '●');
+        const { length } = getCardDetails(cardNumber);
+
+        const paddedNumber = cardNumber.padEnd(length, '●');
         const chunks = paddedNumber.match(/.{1,4}/g);
         return chunks.join(' ');
     };
@@ -368,20 +423,29 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction }) {
                                 </div>
                             </div>
                             <div className="text-white mt-3">
-                                <p className="m-0" style={{ fontWeight: focusedField === 'cardNumber' ? 'bold' : 'normal' }}>
+                                <p className="m-0" style={{
+                                    fontWeight: focusedField === 'cardNumber' ? 'bold' : 'normal',
+                                    textShadow: focusedField === 'cardNumber' ? '0px 0px 5px rgba(0,0,0,0.5)' : 'none'
+                                }}>
                                     {formatCardNumberForDisplay(formCardValues.cardNumber)}
                                 </p>
 
                                 <Row className="d-flex justify-content-between h-100">
                                     <Col className="align-self-end">
-                                        <p className="m-0" style={{ fontWeight: focusedField === 'cardOwner' ? 'bold' : 'normal' }}>
+                                        <p className="m-0" style={{
+                                            fontWeight: focusedField === 'cardOwner' ? 'bold' : 'normal',
+                                            textShadow: focusedField === 'cardOwner' ? '0px 0px 5px rgba(0,0,0,0.5)' : 'none'
+                                        }}>
                                             {formCardValues.cardOwner || 'NOME DO CARTÃO'}
                                         </p>
                                     </Col>
 
                                     <Col className="text-center validate col-auto align-self-end">
                                         <span>Validade</span>
-                                        <p className="m-0" style={{ fontWeight: focusedField === 'expirationDate' ? 'bold' : 'normal' }}>
+                                        <p className="m-0" style={{
+                                            fontWeight: focusedField === 'expirationDate' ? 'bold' : 'normal',
+                                            textShadow: focusedField === 'expirationDate' ? '0px 0px 5px rgba(0,0,0,0.5)' : 'none'
+                                        }}>
                                             {formCardValues.expirationDate || '12/23'}
                                         </p>
                                     </Col>
@@ -400,7 +464,10 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction }) {
                                     <rect x="0" y="25" width="240" height="1" fill="rgba(255, 165, 0, 0.3)" />
                                     <rect x="0" y="35" width="240" height="1" fill="rgba(255, 165, 0, 0.3)" />
                                 </svg>
-                                <p className="m-0 position-absolute end-0 me-2 top-50 translate-middle-y" style={{ fontFamily: 'monospace', fontSize: '16px', fontWeight: 'bold' }}>{formCardValues.cvv || '***'}</p>
+                                <p className="m-0 position-absolute end-0 me-2 top-50 translate-middle-y" style={{
+                                    fontFamily: 'monospace', fontSize: '16px',
+                                    fontWeight: focusedField === 'cvv' ? 'bold' : 'normal',
+                                }}>{formCardValues.cvv || '***'}</p>
                             </div>
                         </Card>
                     </div>
@@ -414,6 +481,7 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction }) {
                         handleCardAction={handleCardAction}
                         handleFocus={handleFocus}
                         handleBlur={handleBlur}
+                        handleCardNumberChange={handleCardNumberChange}
                     />
 
                 </Col>
@@ -423,7 +491,7 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction }) {
 
 }
 
-function CardForm({ formCardValues, setFormCardValues, handleCardAction, handleFocus, handleBlur }) {
+function CardForm({ formCardValues, setFormCardValues, handleCardAction, handleFocus, handleBlur, handleCardNumberChange }) {
     const formRef = useRef();
 
 
@@ -439,55 +507,63 @@ function CardForm({ formCardValues, setFormCardValues, handleCardAction, handleF
         <>
 
             <Form ref={formRef}>
+
                 <Form.Group>
                     <Form.Label>Número do Cartão</Form.Label>
-                    <Form.Control
-                        type="text"
+                    <FormGroupWithIcon
+                        type={"text"}
                         value={formCardValues.cardNumber}
-                        onChange={(e) => setFormCardValues({ ...formCardValues, cardNumber: e.target.value })}
-                        onFocus={() => handleFocus('cardNumber')}
-                        onBlur={handleBlur}
-                        maxLength="16"
-                        placeholder="Número do Cartão"
+                        onChange={(e) => handleCardNumberChange(e)}
+                        onFocusData={{ function: handleFocus, param: 'cardNumber' }}
+                        onBlurData={{ function: handleBlur }}
+                        maxLength={"16"}
+                        placeholder={"Número do Cartão"}
+                        required={true}
                     />
                 </Form.Group>
+
                 <Form.Group>
                     <Form.Label>Nome no Cartão</Form.Label>
-                    <Form.Control
-                        type="text"
+                    <FormGroupWithIcon
+                        type={"text"}
                         value={formCardValues.cardOwner}
                         onChange={(e) => setFormCardValues({ ...formCardValues, cardOwner: e.target.value.toUpperCase() })}
-                        onFocus={() => handleFocus('cardOwner')}
-                        onBlur={handleBlur}
-                        placeholder="Nome no Cartão"
+                        onFocusData={{ function: handleFocus, param: 'cardOwner' }}
+                        onBlurData={{ function: handleBlur }}
+                        placeholder={"Nome no Cartão"}
+                        required={true}
                     />
                 </Form.Group>
                 <Row>
                     <Col>
                         <Form.Group>
                             <Form.Label>Data de Validade</Form.Label>
-                            <Form.Control
-                                type="text"
+                            <FormGroupWithIcon
+                                type={"text"}
                                 value={formCardValues.expirationDate}
                                 onChange={(e) => setFormCardValues({ ...formCardValues, expirationDate: e.target.value })}
-                                onFocus={() => handleFocus('expirationDate')}
-                                onBlur={handleBlur}
-                                maxLength="5"
-                                placeholder="MM/AA"
+                                onFocusData={{ function: handleFocus, param: 'expirationDate' }}
+                                onBlurData={{ function: handleBlur }}
+                                pattern={"\d{2}/\d{2}"}
+                                maxLength={"5"}
+                                placeholder={"MM/AA"}
+                                required={true}
                             />
                         </Form.Group>
                     </Col>
                     <Col>
                         <Form.Group>
                             <Form.Label>CVV</Form.Label>
-                            <Form.Control
-                                type="text"
+                            <FormGroupWithIcon
+                                type={"text"}
                                 value={formCardValues.cvv}
                                 onChange={(e) => setFormCardValues({ ...formCardValues, cvv: e.target.value })}
-                                onFocus={() => handleFocus('cvv')}
-                                onBlur={handleBlur}
-                                maxLength="3"
-                                placeholder="CVV"
+                                onFocusData={{ function: handleFocus, param: 'cvv' }}
+                                onBlurData={{ function: handleBlur }}
+                                maxLength={"3"}
+                                pattern={"\d{3,4}"}
+                                placeholder={"CVV"}
+                                required={true}
                             />
                         </Form.Group>
                     </Col>
