@@ -97,10 +97,11 @@ function RenderSliderBatteries() {
     navigate('/bateria/detalhes', { state: batteryData });
   };
 
+  
   return (
     <Container className="slider-container mt-5">
       <Slider {...settings}>
-        {batteriesActive.map((battery, index) => (
+        {Object.keys(batteriesActive).length !== 0 && batteriesActive.map((battery, index) => (
           <div key={battery.batteryId} className='d-flex '>
             <BatteryCard
               batteryName={battery.name}

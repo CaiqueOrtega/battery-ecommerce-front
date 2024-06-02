@@ -3,6 +3,7 @@ import BatteryServices from '../services/battery/BatteryServices';
 import { AuthContext } from "./AuthProvider";
 import AddressServices from '../services/address/AddressServices';
 import BatteryCartServices from "../services/cart/BatteryCartServices";
+import CardServices from "../services/card/CardServices";
 
 const GlobalDataContext = createContext({});
 
@@ -22,6 +23,10 @@ function GlobalDataProvider({ children }) {
 
     const { getByListBatteries } = BatteryServices();
     const { getByUser } = BatteryCartServices();
+
+    const { getAllCardByUser } = CardServices();
+    const[card, setCard] = useState([]);
+    const [cardIsLoaded, setCardIsLoaded] = useState(null);
 
     const fetchBatteries = async () => {
         try {
@@ -85,7 +90,6 @@ function GlobalDataProvider({ children }) {
                     promotion: cartData.promotion || null,
                     batteries: updatedBatteries
                 });
-                console.log('Carrinho de Bateria (não logado):', updatedBatteries);
             }
         } catch (error) {
             console.error("Falha ao pegar carrinho (não logado):", error);
@@ -94,6 +98,17 @@ function GlobalDataProvider({ children }) {
         }
     };
 
+    
+    const fetchCard= async () => {
+        try {
+            const cardData = await getAllCardByUser(userData.userId);
+            setCard(cardData);
+        } catch (error) {
+            console.error("Erro ao buscar baterias ativas:", error);
+        }finally{
+            setCardIsLoaded(true);
+        }
+    };
 
     useEffect(() => {
         if(Object.keys(batteryCart).length === 0){
@@ -126,7 +141,12 @@ function GlobalDataProvider({ children }) {
             batteryCart, 
             batteryCartIsLoaded,
             setBatteryCart,
-            resetGlobalData
+            card,
+            setCard,
+            fetchCard,
+            cardIsLoaded,
+            resetGlobalData, 
+            userData
         }}>
             {children}
         </GlobalDataContext.Provider>

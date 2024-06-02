@@ -1,0 +1,89 @@
+.credit-card-container {
+    position: relative;
+    perspective: 1000px;
+    width: 380px;
+    height: 233px;
+}
+
+.credit-card {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    transition: transform 0.6s;
+    background-image: linear-gradient(-45deg, #888888 55%, #818181 50%);
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+}
+
+
+.credit-card-front {
+    z-index: 2;
+    transform: rotateY(0deg);
+}
+
+.credit-card-back {
+    z-index: 1;
+    transform: rotateY(180deg);
+}
+
+.credit-card p {
+    font-size: 20px;
+    font-family: monospace
+}
+
+.validate p,
+.validate span {
+    font-size: 14px;
+}
+
+.credit-card-container.flipped .credit-card-front {
+    transform: rotateY(180deg);
+}
+
+.credit-card-container.flipped .credit-card-back {
+    transform: rotateY(360deg);
+}
+
+.size-credit-chip {
+    width: 64px;
+    height: 64px;
+}
+
+@media(max-width: 1366px) {
+    .credit-card-container {
+        width: 330px;
+        height: 213px;
+    }
+
+    .credit-card p {
+        font-size: 16px;
+        font-family: monospace
+    }
+
+    .validate p,
+    .validate span {
+        font-size: 12px;
+    }
+
+    .size-credit-chip {
+        width: 54px !important;
+        height: 54px !important;
+    }
+}
+
+.credit-card-animation {
+    background-image: 
+        linear-gradient(-45deg, var(--color-card-primary, #888888) 55%, var(--color-card-secondary, #818181) 50%), 
+        linear-gradient(-45deg, var(--new-color-card-primary) 55%, var(--new-color-card-secondary) 50%) !important; 
+    animation: changeColor 1s forwards; 
+}
+
+@keyframes changeColor {
+    0% {
+        background-position: 0 0, 0 0;
+    }
+    100% {
+        background-position: -100% 0, 0 0; 
+    }
+}

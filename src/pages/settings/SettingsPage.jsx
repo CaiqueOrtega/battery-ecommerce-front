@@ -7,6 +7,7 @@ import AccountContent from "./account/AccountContent";
 import AddressContent from "./address/AddressContent";
 import './settings.css'
 import { useParams } from "react-router-dom";
+import CardContent from "./card/CardContent";
 
 
 
@@ -44,8 +45,15 @@ function SettingsPage() {
                 return <AccountContent userData={userData} />;
             case 'enderecos':
                 return <AddressContent />;
+
+                case 'cartoes':
+                return <CardContent />;
             default:
-                return null;
+                return (
+                    <div className="d-flex align-items-center justify-content-center h-100">
+                        <p>Ops... Essa funcionalidade ainda não foi implementada. Por favor aguarde.</p>
+                    </div>
+                );
         }
     }, [selectedOption]);
 

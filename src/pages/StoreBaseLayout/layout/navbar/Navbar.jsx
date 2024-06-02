@@ -243,7 +243,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
           <Dropdown.Toggle as={NavLink} className='me-3'>
             <CartIcon strokeWidth={'0.2'} size={30} />
           </Dropdown.Toggle>
-          {batteryCartIsLoaded && batteryCart?.batteries.length === 0 ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
+          {batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
         </Dropdown>
       )}
     </NavItem>
