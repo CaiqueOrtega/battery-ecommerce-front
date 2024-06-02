@@ -2,7 +2,7 @@ import { FormControl, Form, InputGroup } from "react-bootstrap";
 import { useEffect, useState, useRef } from 'react';
 import { AlertIcon } from "../../assets/icons/IconsSet";
 
-const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, bgBorder, disable, className, disableRequired, maxLength }) => {
+const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, bgBorder, disable, className, disableRequired, maxLength, onBlurData, onFocusData, pattern }) => {
     const inputRef = useRef(null);
     const [isFocused, setIsFocused] = useState(false);
 
@@ -13,6 +13,24 @@ const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedb
         }
     }, [feedback]);
 
+    const onBlur = () =>{
+        console.log('teste blur', onBlurData)
+        if(onBlurData && Object.keys(onBlurData).length !== 0){
+            onBlurData.function();
+        }
+
+            setIsFocused(false)
+    }
+
+    const onFocus = () =>{
+        console.log('teste focus', onFocusData)
+        if(onFocusData && Object.keys(onFocusData).length !== 0){
+            onFocusData.function(onFocusData.param);
+        }
+
+            setIsFocused(true)
+    }
+    
     return (
         <>
             {
@@ -28,11 +46,12 @@ const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedb
                     placeholder={placeholder}
                     className={`ps-5 py-2 ${className} ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''}`}
                     ref={inputRef}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    required={disableRequired == true ? false : true}
+                    onFocus={onFocus}
+                    onBlur={onBlur}
+                    required={disableRequired === true ? false : true}
                     disabled={disable}
                     maxLength={maxLength}
+                    pattern={pattern}
                 />
                 {icon}
             </div>
