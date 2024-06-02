@@ -78,11 +78,9 @@ function UserIndex({ users, setUsers }) {
                                 setErrorMessages({ role: 'O usuário já possuí o cargo selecionado' })
                                 return;
                             }
-
-                            console.log('teste')
+                            
                             setConfirmChangesModalData({ title: 'Alterar Permissão', message: 'Deseja realmente Alterar a permissão desse usuário?' });
                             setShowConfirmChangesModal(true);
-                            console.log(showConfirmChangesModal)
                         }}>
                             Confirmar
                         </Button>

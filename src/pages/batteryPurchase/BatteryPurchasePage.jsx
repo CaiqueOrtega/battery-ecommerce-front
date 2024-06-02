@@ -45,7 +45,6 @@ function BatteryPurchasePage() {
 
     const addBatteryToServerCart = async () => {
         const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity);
-        console.log('response', response);
         setBatteryCart(response);
     }
 
@@ -89,8 +88,6 @@ function BatteryPurchasePage() {
     }
 
     const handleGetAddressByCep = async (formCEP, requestModal) => {
-        console.log(formCEP);
-
         if (Object.keys(address).length === 0) {
             localStorage.setItem('cepAddress', formCEP);
         }
@@ -112,7 +109,7 @@ function BatteryPurchasePage() {
     const handleGetFreightByCep = async (formCEP, addressValues, requestModal) => {
         setFreightValues({});
         setAddressValues({});
-        const response = await getFreight(formCEP);
+        const response = await getFreight(formCEP, quantity);
         if (response) {
             setFreightValues(response);
             setAddressValues(addressValues);

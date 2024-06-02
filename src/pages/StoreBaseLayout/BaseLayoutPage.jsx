@@ -45,7 +45,11 @@ function BaseLayoutPage() {
                 content = <CartPage />;
                 break;
             default:
-                console.log('default');
+                return (
+                    <div className="d-flex align-items-center justify-content-center h-100">
+                        <p>Ops... Essa funcionalidade ainda não foi implementada. Por favor aguarde.</p>
+                    </div>
+                );
                 break;
         }
 

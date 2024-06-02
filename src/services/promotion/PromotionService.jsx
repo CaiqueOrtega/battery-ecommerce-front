@@ -15,8 +15,6 @@ const PromotionService = () => {
     }
 
     const updatePromotion = async (promotionId, promotion) => {
-        console.log("ID", promotionId)
-        console.log("Promotion", promotion)
         try {
             const response = await ConnectionAPI.patch(`promotion/${promotionId}`, {
                 expirationDate: promotion.expirationDate,
@@ -67,7 +65,7 @@ const PromotionService = () => {
             const response = await ConnectionAPI.get(`promotion/report/${report}`)
             return response.data
         } catch (error){
-            console.error("MINHA NOSSA NOSSA NOSSA")
+            console.error(error)
         }
     }
 

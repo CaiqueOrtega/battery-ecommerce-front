@@ -22,12 +22,11 @@ const BatteryServices = () => {
     }
 
     const getByListBatteries = async (batteriesIds) => {
-        console.log(batteriesIds)
         try {
             const response = await ConnectionAPI.post('battery/list', batteriesIds)
             return response.data
         } catch (error) {
-            console.log('erro get ', error)
+            console.error(error)
         }
     }
     
@@ -87,7 +86,7 @@ const BatteryServices = () => {
             const response = await ConnectionAPI.get(`battery/report/${report}`)
             return response.data
         } catch (error){
-            console.log("NOSSA")
+            console.error(error)
         }
     }
 

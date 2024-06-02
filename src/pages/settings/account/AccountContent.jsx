@@ -43,10 +43,8 @@ const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleC
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowModal(false)}>Fechar</Button>
                 <Button variant="red" onClick={async (e) => {
-                    console.log('entrou', prevValues)
                     if (prevValues.password == verifyPassword && prevValues.confirmPassword == verifyConfirmPassword){
                         setErrorMessages({general: "Os dados não foram alterados"})
-                        console.log('errormessages', errorMessages)
                         return
                     }
                     if (verifyPassword !== verifyConfirmPassword) {

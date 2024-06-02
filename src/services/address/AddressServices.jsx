@@ -6,7 +6,6 @@ const AddressServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
 
     const createAddress = async (formAddressValues, userId) => {
-        console.log('teste', formAddressValues.main )
         try {
             const response = await ConnectionAPI.post('address', {
                 address: formAddressValues.address,
@@ -47,7 +46,6 @@ const AddressServices = () => {
     const deleteAddress = async (addressId) => {
         try {
             const response = await ConnectionAPI.delete(`address/${addressId}`)
-            console.log('response delete', response.status)
             return response.status;
         } catch (error) {
             handleAPIError(error)
@@ -55,10 +53,8 @@ const AddressServices = () => {
     }
 
      const updateMainAddress = async (addressId) =>{
-        console.log('teste', addressId)
         try {
             const response = await ConnectionAPI.patch(`address/main/${addressId}`)
-            console.log('response update main', response)
             return response.data;
         } catch (error) {
             handleAPIError(error)
@@ -74,11 +70,9 @@ const AddressServices = () => {
         }
     }
 
-    const getFreight = async (cep) => {
+    const getFreight = async (cep, quantity) => {
         try {
-            console.log('AAA', cep)
-            const response = await ConnectionAPI.get(`freight/${cep}`)
-            console.log(response)
+            const response = await ConnectionAPI.get(`freight/${cep}/${quantity}`)
             return response.data
         } catch (error) {
             handleAPIError(error)
@@ -88,10 +82,9 @@ const AddressServices = () => {
     const getAddressCep = async (cep) => {
         try {
             const response = await ViaCepAPI.get(`${cep}/json/`)
-            console.log(response.data)
             return response.data
         } catch (error) {
-            console.error('erro no cep')
+            console.error(error)
         }
     }
 

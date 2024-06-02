@@ -103,7 +103,6 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     };
 
     const handleConfirmChangesModal = async () => {
-        console.log(selectedPromotion);
         let response;
         if (action === 'update') {
             response = await updatePromotion(selectedPromotion.promotionId, promotionValues);
@@ -112,8 +111,6 @@ export default function PromotionIndex({ promotions, setPromotions }) {
         } else if (action === 'reactive') {
             response = await reactivePromotion(selectedPromotion.promotionId, promotionValues.expirationDate);
         }
-
-        console.log(response);
 
         if (response) {
             const updatedPromotion = promotions.map(promotion => {
@@ -142,9 +139,6 @@ export default function PromotionIndex({ promotions, setPromotions }) {
     };
 
     const isEquals = (prevPromotionValues, promotionValues) => {
-        console.log(prevPromotionValues)
-        console.log(promotionValues)
-
         if (prevPromotionValues) {
             const keys = new Set([...Object.keys(prevPromotionValues), ...Object.keys(promotionValues)]);
             const isEqual = Array.from(keys).every(key => prevPromotionValues[key] === promotionValues[key]);

@@ -46,11 +46,11 @@ function AuthProvider({ children }) {
             }
           }
         } catch (error) {
-          console.log("Erro durante a leitura do token", error);
+          console.error("Erro durante a leitura do token", error);
         }
       } else {
         setUserData(null);
-        console.log(" Erro ao chegar o token", token)
+        console.error(" Erro ao chegar o token", token)
         setIsLoggedIn(false);
 
       }
@@ -107,18 +107,14 @@ function AuthProvider({ children }) {
 
 
    function VerifyAuth({ children, request }) {
-    console.log('request', request)
     useEffect(() => {
-      console.log ('teste', verified)
         if (!verified) { 
             const checkAuthorization = async () => {
                 try {
                     await userRoleAuthorization(userData);
                     setAuthorized(true);
                 } catch (error) {
-                  console.log('batata doce')
                     if (request) {
-                        console.log('entrou');
                         navigate('/');
                     }
                     setAuthorized(false);

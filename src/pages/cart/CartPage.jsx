@@ -15,7 +15,6 @@ function CartPage() {
     const [confirmAction, setConfirmAction] = useState({});
 
     const handleCartAction = async (action, data) => {
-        console.log(action, data)
         const actions = {
             'remove': async () => {
                 const response = await removeBattery(batteryCart.cartId, data.batteryId);
@@ -59,8 +58,6 @@ function CartPage() {
 
         if (actions[action]) {
             await actions[action]();
-        } else {
-            console.log('Ação inválida:', action);
         }
     }
 
@@ -140,7 +137,6 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                 clearTimeout(timeoutIdRef.current);
             }
             timeoutIdRef.current = setTimeout(() => {
-                console.log('Timer expired', newQuantity, cartBatteryId);
                 handleCartAction('changeQuantity', { cartBatteryId: cartBatteryId, quantity: newQuantity })
             }, 1000);
         }
@@ -201,7 +197,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
 
                 {!batteryCartIsLoaded ? (
                     <div className="d-flex flex-grow-1 align-items-center justify-content-center">
-                        <span class="loader"></span>
+                        <span className="loader"></span>
                     </div>
                 ) : (
                     <>

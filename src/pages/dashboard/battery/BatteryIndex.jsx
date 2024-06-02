@@ -63,13 +63,11 @@ function BatteryIndex({ batteries, setBatteries }) {
                         setBatteryValues(updatedBatteryValues);
                         setSuccessMessage('Bateria Cadastrada com Sucesso!');
                         setBatteries([...batteries, response]);
-                        console.log(successMessage)
                     }
                 }
             },
             update: {
                 handler: () => {
-                    console.log(errorMessages)
                     setAction('update');
                     setConfirmChangesModalData({ title: 'Editar', message: 'Tem certeza que deseja editar os dados?' })
                     setPrevBatteryValues({});
@@ -130,7 +128,6 @@ function BatteryIndex({ batteries, setBatteries }) {
 
             setBatteries(updatedBatteries);
             setShowConfirmChangesModal(false);
-            console.log(successMessage)
         } else {
             setShowConfirmChangesModal(false);
             setPrevBatteryValues(batteryValues);
@@ -138,9 +135,6 @@ function BatteryIndex({ batteries, setBatteries }) {
     };
 
     const isEquals = (prevBatteryValues, batteryValues) => {
-        console.log(prevBatteryValues)
-        console.log(batteryValues)
-
         if (prevBatteryValues) {
             const keys = new Set([...Object.keys(prevBatteryValues), ...Object.keys(batteryValues)]);
             const isEqual = Array.from(keys).every(key => prevBatteryValues[key] === batteryValues[key]);
@@ -155,8 +149,6 @@ function BatteryIndex({ batteries, setBatteries }) {
             return isEqual;
         }
     };
-
-    console.log('batteries', batteries)
 
     const renderBatteryFormModal = () => (
         <>

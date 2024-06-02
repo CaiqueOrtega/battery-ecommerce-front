@@ -1,5 +1,5 @@
 import { Button, Form, Card, Row, Col } from "react-bootstrap";
-import { AddIcon, CityIcon, MapIcon, NeighborHood, NumberIcon, ReturnIcon, StateIcon, StreetIcon, TextBodyIcon } from "../../../assets/icons/IconsSet"
+import { AddAddressIcon, CityIcon, MapIcon, NeighborHood, NumberIcon, ReturnIcon, StateIcon, StreetIcon, TextBodyIcon } from "../../../assets/icons/IconsSet"
 import { useRef, useState, useEffect } from "react";
 import FormGroupWithIcon from "../../../components/common/FormGroupWithIcon";
 import { useAuthProvider } from "../../../context/AuthProvider";
@@ -42,8 +42,6 @@ function AddressContent() {
         if (Object.keys(address).length === 0) {
             fetchData();
         }
-
-        console.log('TESTA', address)
     }, []);
 
 
@@ -140,15 +138,13 @@ function AddressContent() {
 
         if (actions[action]) {
             await actions[action]();
-        } else {
-            console.log('Ação inválida:', action);
         }
     };
 
 
     return (
         <>
-            <div className="d-flex justify-content-between px-5 py-3 bg-yellow text-white fw-bold">
+            <div className="d-flex justify-content-between align-items-center px-5 py-3 bg-yellow text-white fw-bold">
 
                 {showAddressForm ? (
                     <div className="d-flex justify-content-between align-items-center w-100">
@@ -162,7 +158,7 @@ function AddressContent() {
                             <a type="button" className="text-decoration-none text-white"
                                 onClick={() => { setSelectedFormAddressValues({}); setShowAddressForm(true) }}
                             >
-                                <AddIcon />
+                                <AddAddressIcon />
                                 <span className="ms-2">Adicionar novo Endereço</span>
                             </a>
                         )}
@@ -380,7 +376,6 @@ function AddressForm(props) {
 
 function UserAddress(props) {
     if (!Array.isArray(props.address) && props.address.length === 0) {
-        console.error("address não é um array", props.address);
         return null;
     }
 
@@ -434,4 +429,4 @@ function UserAddress(props) {
 
 
 
-export default AddressContent
+export default AddressContent;

@@ -45,12 +45,8 @@ function ImageGalleryComponent() {
 
                 const handleWheel = (event) => {
                     if (event.deltaY > 0) {
-                        // Rola para baixo, diminui o zoom
-                        console.log('Rolou para baixo');
                         setZoomLevel(prevZoom => Math.max(prevZoom - 0.0857143, 1));
                     } else {
-                        // Rola para cima, aumenta o zoom
-                        console.log('Rolou para cima');
                         setZoomLevel(prevZoom => Math.min(prevZoom + 0.0857143, 6));
                     }
                 };

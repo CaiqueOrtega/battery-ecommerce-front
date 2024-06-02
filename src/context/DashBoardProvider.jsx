@@ -31,7 +31,7 @@ function DashBoardProvider({ children }) {
 
                 setIsContextLoaded(true);
             } catch (error) {
-                console.log("Erro ao buscar dados:", error);
+                console.error(error);
             }
         };
         fetchData();

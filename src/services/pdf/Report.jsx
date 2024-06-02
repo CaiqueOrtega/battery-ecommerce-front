@@ -468,12 +468,6 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
         ]
     };
 
-    useEffect(() => {
-        console.log('teste filtro', selectedFilter)
-    }, [selectedFilter])
-
-
-
     return (
         <>
             <Modal show={showsModalPDF} onHide={() => setShowModalPDF(false)} backdrop='false' centered>
