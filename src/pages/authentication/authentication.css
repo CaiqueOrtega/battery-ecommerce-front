@@ -44,8 +44,8 @@
     .animate-image-column-left {
         animation: slideLeft 0.7s forwards;
 
-        border-top-right-radius: 2em ;
-        border-bottom-right-radius: 2em ;
+        border-top-right-radius: 2em;
+        border-bottom-right-radius: 2em;
         border-top-left-radius: 0 !important;
         border-bottom-left-radius: 0 !important;
     }
@@ -53,7 +53,7 @@
     .animate-image-column-right {
         animation: slideRight 0.7s forwards;
 
-        border-top-left-radius: 2em ;
+        border-top-left-radius: 2em;
         border-bottom-left-radius: 2em;
         border-top-right-radius: 0 !important;
         border-bottom-right-radius: 0 !important;
@@ -71,6 +71,7 @@
 
 /* Estilos para telas menores  */
 @media (max-width: 760px) {
+
     .animate-image-column-right,
     .animate-image-column-left {
         animation: slideUp 0.7s forwards;
@@ -88,30 +89,30 @@
         width: 100% !important;
         border-radius: 0 !important;
         left: 0 !important;
-        overflow-y: auto; 
+        overflow-y: auto;
         height: 100%;
     }
 
     .col-image {
         height: 50vh;
         border-radius: 0 !important;
-        
+
     }
 
-    .col-form{
+    .col-form {
         height: 50vh;
     }
 
-    .clip-path-circle-bottom{
+    .clip-path-circle-bottom {
         clip-path: circle(100% at 50% 0%);
     }
 
-    .clip-path-circle-top{
+    .clip-path-circle-top {
         clip-path: circle(100% at 50% 100%);
     }
 }
 
-@media(max-width: 500px){
+@media(max-width: 500px) {
     .container-authentication {
         padding: 0 !important;
         margin: 0 !important;
@@ -119,24 +120,28 @@
     }
 }
 
-@media(max-height: 890px ) and (max-width: 890px){
-    .col-image{
+@media(max-height: 890px) and (max-width: 890px) {
+    .col-image {
         display: none !important;
     }
-    .col-login{
+
+    .col-login {
         align-items: center !important;
         height: 100% !important;
         width: 100% !important;
     }
-    .col-singup{
+
+    .col-singup {
         align-items: center !important;
         height: 100% !important;
         width: 100% !important;
     }
-    .card-authentication{
+
+    .card-authentication {
         width: auto !important;
     }
-    .display-none-mobile{
+
+    .display-none-mobile {
         display: none !important;
     }
 }
@@ -157,6 +162,7 @@
         opacity: 0;
         transform: translateX(-100%);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
@@ -169,11 +175,24 @@
         opacity: 0;
         transform: translateX(100%);
     }
+
     to {
         opacity: 1;
         transform: translateX(0);
     }
 }
 
+.input-create-password:focus-within .input-progress-container {
+    display: flex !important;
+}
 
-
+.popover::after {
+    content: '';
+    position: absolute;
+    top: -23px;
+    right: -1%;
+    transform: translateX(-50%);
+    border-width: 15px;
+    border-style: solid;
+    border-color: transparent transparent #e9ecef transparent;
+}

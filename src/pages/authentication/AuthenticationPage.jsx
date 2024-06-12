@@ -24,13 +24,11 @@ function AuthenticationPage() {
         }
     }, [isLoggedIn]);
 
-
-
     const handleToggleForm = ({ singUpEmail }) => {
         const newAction = action === 'entrar' ? 'cadastrar' : 'entrar';
         setApplyRightZero(false);
 
-        if(singUpEmail){
+        if (singUpEmail) {
             setEmailSingUp(singUpEmail);
         }
 
@@ -51,8 +49,6 @@ function AuthenticationPage() {
         }, timeoutDuration);
     };
 
-
-
     return (
         <div className='vh-100 bg-main'>
             <Container className='h-100 d-flex align-items-center justify-content-center container-authentication '>
@@ -62,22 +58,21 @@ function AuthenticationPage() {
                         <Col md={6} className={`d-flex align-items-md-center align-items-start position-relative col-form col-login ${action == 'cadastrar' ? 'display-none-mobile' : ''}`}>
                             {showLoginForm && (
                                 <Card.Body className='px-5 py-5'>
-                                    <div className="d-flex align-items-center mb-3">
-                                        <h4><LoginIcon currentColor='c00d0d' /> Acesse sua conta</h4>
+                                    <div className="d-flex align-items-center">
+                                        <h4 className='mb-0'><LoginIcon currentColor='c00d0d' /> Acesse sua conta</h4>
                                         <img className="d-md-none ms-auto mb-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
                                     </div>
-                                    <LoginForm emailSingUp={emailSingUp}/>
+                                    <LoginForm emailSingUp={emailSingUp} />
                                 </Card.Body>
                             )}
                         </Col>
 
-
                         <Col md={6} className={`d-flex align-items-md-center align-items-end  position-relative col-form col-singup ${action == 'entrar' ? 'display-none-mobile' : ''}`}>
                             {showSignUpForm && (
-                                <Card.Body className='px-5 py-md-5 py-5'>
+                                <Card.Body className='p-5'>
                                     <div className="d-flex align-items-center">
-                                        <h4> <SingUpIcon currentColor='c00d0d' /> Registre uma conta</h4>
-                                        <img className="d-md-none ms-auto mb-md-3" src={logo} alt="Logo Baterias Jupiter" width="100px" />
+                                        <h4 className="mb-0"><SingUpIcon currentColor='c00d0d' /> Registre uma conta</h4>
+                                        <img className="d-md-none ms-auto" src={logo} alt="Logo Baterias Jupiter" width="100px" />
                                     </div>
                                     <SignUpForm handleToggleForm={handleToggleForm} />
                                 </Card.Body>
@@ -99,8 +94,6 @@ function AuthenticationPage() {
                                 </Button>
                             </div>
                         </Col>
-
-
                     </Row>
                 </Card>
             </Container>

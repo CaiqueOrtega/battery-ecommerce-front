@@ -1,17 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import {Form, Button} from 'react-bootstrap';
-import { LockIcon, EnvelopeIcon, AlertIcon } from '../../../assets/icons/IconsSet.jsx';
+import { Form, Button } from 'react-bootstrap';
+import { LockIcon, EnvelopeIcon } from '../../../assets/icons/IconsSet.jsx';
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon.jsx';
 import AuthServices from '../../../services/auth/AuthServices.jsx';
-
-
+import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess.jsx';
 
 function LoginForm({ emailSingUp }) {
   const [emailLogin, setEmailLogin] = useState('');
   const [passwordLogin, setPasswordLogin] = useState('');
   const { errorMessages, setErrorMessages, login } = AuthServices();
   const [prevFormDataLogin, setPrevFormDataLogin] = useState('');
-  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,50 +22,44 @@ function LoginForm({ emailSingUp }) {
     setPrevFormDataLogin({ email: emailLogin, password: passwordLogin });
   }
 
-
   useEffect(() => {
-    if (emailSingUp ) {
+    if (emailSingUp) {
       setEmailLogin(emailSingUp);
     }
   }, [emailSingUp]);
 
   return (
-    <>
-      {errorMessages.general || errorMessages.serverError ? (
-        <div className='msg alert alert-danger mb-0'>
-          <AlertIcon size={"16"} currentColor={"#74373e"} />
-          <span className='ms-2'>
-            {errorMessages.general ? errorMessages.general : errorMessages.serverError}
-          </span>
-        </div>
-      ) : null}
-
+    <section className={`${errorMessages && errorMessages?.general || errorMessages?.serverError ? '' : 'mt-5'}`}>
       <Form onSubmit={handleSubmit}>
-        <Form.Label className='mt-3 w-100' htmlFor='emailLogin'>Endereço de E-mail</Form.Label>
-        <FormGroupWithIcon
-          bgBorder={true}
-          value={emailLogin}
-          onChange={(e) => setEmailLogin(e.target.value)}
-          icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-          type='email' placeholder='exemplo@gmail.com' mb={'mb-3'}
-          feedback={errorMessages.email}
-        />
+        <AlertErrorOrSuccess errorMessages={errorMessages} />
+        <Form.Label className='w-100' htmlFor='emailLogin'>Endereço de E-mail
+          <FormGroupWithIcon
+            bgBorder={true}
+            value={emailLogin}
+            onChange={(e) => setEmailLogin(e.target.value)}
+            icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+            type='email' placeholder='exemplo@gmail.com'
+            feedback={errorMessages.email}
+          />
+        </Form.Label>
 
-        <Form.Label htmlFor='passwordLogin' className='w-100'>Senha</Form.Label>
-        <FormGroupWithIcon
-          bgBorder={true}
-          value={passwordLogin}
-          onChange={(e) => setPasswordLogin(e.target.value)}
-          icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-          type='password' placeholder='•••••••••'
-          feedback={errorMessages.password}
-        />
+        <Form.Label htmlFor='passwordLogin' className=' mt-2 w-100'>Senha
+          <FormGroupWithIcon
+            bgBorder={true}
+            value={passwordLogin}
+            onChange={(e) => setPasswordLogin(e.target.value)}
+            icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+            type='password' placeholder='•••••••••'
+            feedback={errorMessages.password}
+          />
+        </Form.Label>
+
         <a type='button' className='text-muted small'>Esqueceu sua Senha?</a>
         <div className='d-flex justify-content-center mt-5'>
           <Button variant='red' className='flex-grow-1' type='submit'>Entrar</Button>
         </div>
       </Form>
-    </>
+    </section>
   );
 }
 
