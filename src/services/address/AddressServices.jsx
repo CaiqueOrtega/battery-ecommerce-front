@@ -1,6 +1,6 @@
 import ConnectionAPI from "../ConnectionAPI"
 import ErrorServices from "../error/ErrorServices";
-import ViaCepAPI from "../ViaCepAPI"
+import ViaCepAPI from "./viaCep/ViaCepAPI"
 
 const AddressServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
@@ -84,7 +84,7 @@ const AddressServices = () => {
             const response = await ViaCepAPI.get(`${cep}/json/`)
             return response.data
         } catch (error) {
-            console.error(error)
+            return false
         }
     }
 
