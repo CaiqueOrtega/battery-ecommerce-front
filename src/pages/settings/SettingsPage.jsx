@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon, LockIconOutline, BsArrowLeft } from "../../assets/icons/IconsSet";
+import { CartIcon, UserIconCropped, MapIcon, OrderIcon, ChevronLeftIcon, LockIconOutline, BsArrowLeft, CardIcon } from "../../assets/icons/IconsSet";
 import { AuthContext } from "../../context/AuthProvider";
 import { useContext } from "react";
 import AccountContent from "./account/AccountContent";
@@ -167,7 +167,7 @@ const OptionsCards = ({ handleCardClick, userDataName, userDataInitials, navigat
         />
 
         <CardOption
-            icon={<CartIcon size={22} />}
+            icon={<CardIcon size={22} />}
             title="Cartões"
             description="Ver ou alterar meios de pagamento"
             onClick={() => handleCardClick('cartoes')}

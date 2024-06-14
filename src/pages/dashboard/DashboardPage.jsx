@@ -11,8 +11,6 @@ import ModalLogout from '../../components/common/ModalLogout';
 import { Link } from 'react-router-dom';
 import { DashBoardContext } from '../../context/DashBoardProvider';
 
-
-
 function DashboardPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const { setRenderOptionData, promotions, setPromotions, batteries, setBatteries, users, setUsers } = useContext(DashBoardContext);

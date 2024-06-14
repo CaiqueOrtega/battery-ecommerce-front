@@ -110,7 +110,6 @@ function RenderSliderBatteries() {
               batteryQuantity={battery.quantity}
               onPlaceholder={true}
               onClick={() => handleBatteryClick(battery)}
-
             />
           </div>
         ))}
