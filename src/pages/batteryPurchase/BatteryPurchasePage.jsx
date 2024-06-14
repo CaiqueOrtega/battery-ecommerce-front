@@ -1,27 +1,27 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { MapIcon, DeliveryIcon, MotorcycleIcon, SubtractionIcon, AdditionIcon, ShieldCheckIcon, BackIcon, MedalIcon } from '../../assets/icons/IconsSet';
-import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Placeholder, Modal } from 'react-bootstrap';
+import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Placeholder } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 
 import ImageGalleryComponent from './image/imageGallery';
-import LoginSignUpButton from '../../components/common/LoginSignUpButton';
-
+import ModalSelectedAddress from '../../components/common/ModalAddress';
 import BatteryCartServices from '../../services/cart/BatteryCartServices';
 import AddressServices from '../../services/address/AddressServices';
 
 import { useAuthProvider } from '../../context/AuthProvider';
 import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
 import './batteryPurchasePage.css';
+import FormValidations from '../../components/common/FormValidation';
 
 function BatteryPurchasePage() {
     const location = useLocation();
     const batteryData = location.state;
-    const [quantity, setQuantity] = useState(1);
-    const { addBattery } = BatteryCartServices();
+    const [quantity, setQuantity] = useState('1');
+    const { addBattery, errorMessages, setErrorMessages } = BatteryCartServices();
 
-    const { fetchAddress, address, batteryCart, setBatteryCart, addressIsLoaded } = useGlobalDataProvider();
+    const { fetchAddress, address, batteryCart, setBatteryCart, addressIsLoaded, } = useGlobalDataProvider();
     const { isLoggedIn } = useAuthProvider();
 
     const [formCEP, setFormCEP] = useState('');
@@ -34,7 +34,6 @@ function BatteryPurchasePage() {
     const [showSelectedAddressModal, setShowSelectedAddressModal] = useState(false);
 
 
-
     const handleAddBatteryToCart = async () => {
         if (isLoggedIn && batteryCart) {
             await addBatteryToServerCart();
@@ -45,68 +44,105 @@ function BatteryPurchasePage() {
 
     const addBatteryToServerCart = async () => {
         const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity);
-        setBatteryCart(response);
+        if (response) {
+            setBatteryCart(response);
+        }
     }
 
     const addBatteryToLocalCart = () => {
         let batteriesAddCart = [];
-        let totalPrice = 0;
+        let totalValue = 0;
 
         const storedCart = localStorage.getItem('batteryCart');
+        const cartData = JSON.parse(storedCart);
+        console.log(cartData)
+        const isBatteryInCart = cartData?.batteries?.some(battery => battery.batteryId === batteryData.batteryId);
 
-        if (storedCart) {
-            const cartData = JSON.parse(storedCart);
-            totalPrice = cartData.totalPrice + (batteryData.value * quantity);
-            batteriesAddCart = cartData.batteries;
+        if (!isBatteryInCart) {
+            if (storedCart) {
+                batteriesAddCart = cartData.batteries;
+                totalValue = cartData.totalValue + (batteryData.value * quantity);
 
-            if (batteriesAddCart.some(battery => battery.batteryId === batteryData.batteryId)) {
-                batteriesAddCart.forEach(battery => {
-                    if (battery.batteryId === batteryData.batteryId) {
-                        battery.quantity += quantity;
-                    }
-                });
+                if (batteriesAddCart.some(battery => battery.batteryId === batteryData.batteryId)) {
+                    batteriesAddCart.forEach(battery => {
+                        if (battery.batteryId === batteryData.batteryId) {
+                            battery.quantity += quantity;
+                        }
+                    });
+                } else {
+                    batteriesAddCart.push({
+                        cart_battery_id: Math.floor(Math.random() * 1000000),
+                        batteryId: batteryData.batteryId,
+                        quantity: quantity
+                    });
+                }
+
             } else {
+                totalValue = batteryData.value * quantity;
                 batteriesAddCart.push({
+                    cart_battery_id: Math.floor(Math.random() * 1000000),
                     batteryId: batteryData.batteryId,
                     quantity: quantity
                 });
             }
+
+            const newItem = {
+                cartId: Math.floor(Math.random() * 1000000),
+                totalValue: totalValue,
+                batteries: batteriesAddCart
+            };
+
+            try {
+                localStorage.setItem('batteryCart', JSON.stringify(newItem));
+
+                setBatteryCart({
+                    cardId: newItem.cartId,
+                    totalValue: newItem.totalValue || 0,
+                    promotion: null,
+                    batteries: [
+                        ...(batteryCart?.batteries || []),
+                        {
+                            cart_battery_id: (batteriesAddCart.length > 0 ? batteriesAddCart[batteriesAddCart.length - 1].cart_battery_id : null),
+                            quantity: quantity,
+                            battery: batteryData
+                        }
+                    ]
+                });
+            } catch (e) {
+                if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
+                    console.error("Não há espaço suficiente no localStorage para adicionar a bateria.");
+
+                } else {
+                    console.error("Ocorreu um erro ao tentar adicionar a bateria ao carrinho:", e);
+
+                }
+            }
+
         } else {
-            totalPrice = batteryData.value * quantity;
-            batteriesAddCart.push({
-                batteryId: batteryData.batteryId,
-                quantity: quantity
-            });
+            console.log("A bateria ja esta no carrinho")
         }
-
-        const newItem = {
-            totalPrice: totalPrice,
-            batteries: batteriesAddCart
-        };
-
-        localStorage.setItem('batteryCart', JSON.stringify(newItem));
     }
 
-    const handleGetAddressByCep = async (formCEP, requestModal) => {
-        if (Object.keys(address).length === 0) {
-            localStorage.setItem('cepAddress', formCEP);
+    const handleGetAddressByCep = async (event, formCEP, isRequestModal) => {
+        if (event instanceof Object && event !== null && event.preventDefault) {
+            event.preventDefault();
         }
-
 
         if (formCEP != prevFormCEP) {
             const response = await getAddressCep(formCEP);
             if (response) {
-                setPrevFormCEP(formCEP);
-                handleGetFreightByCep(formCEP, response);
-
-                if (requestModal) {
-                    setShowSelectedAddressModal(false)
+                if (Object.keys(address).length === 0) {
+                    localStorage.setItem('cepAddress', formCEP);
                 }
+                setPrevFormCEP(formCEP);
+                handleGetFreightByCep(formCEP, response, isRequestModal, quantity);
+            } else {
+                setErrorMessages({ cep: 'CEP inválido ou não encontrado' })
             }
         }
     }
 
-    const handleGetFreightByCep = async (formCEP, addressValues, requestModal) => {
+    const handleGetFreightByCep = async (formCEP, addressValues, isRequestModal, quantity) => {
         setFreightValues({});
         setAddressValues({});
         const response = await getFreight(formCEP, quantity);
@@ -114,7 +150,7 @@ function BatteryPurchasePage() {
             setFreightValues(response);
             setAddressValues(addressValues);
 
-            if (requestModal) {
+            if (isRequestModal) {
                 setShowSelectedAddressModal(false)
             }
         }
@@ -126,7 +162,10 @@ function BatteryPurchasePage() {
                 <Card.Header type='button' className='small px-2 text-decoration-underline' onClick={() => setShowSelectedAddressModal(true)} >
                     {Object.keys(addressValues).length != 0 ? (
                         <>
-                            <MapIcon size={'15px'} /> {addressValues.logradouro}, {addressValues.bairro}
+                            <MapIcon size={'15px'} />
+                            <span className='ms-1'>
+                                {addressValues?.logradouro || addressValues?.localidade}, {addressValues?.bairro || addressValues?.uf}
+                            </span>
                         </>
                     ) : (
                         <Placeholder as='span' animation="glow" className="text-muted small">
@@ -136,26 +175,20 @@ function BatteryPurchasePage() {
                     }
                 </Card.Header>
                 <Card.Body className='card-body-freight pt-1'>
-                    {Array.isArray(freightValues) && freightValues.length > 0 ? (
-                        freightValues.map((freight, index) => (
-                            <div key={index} className={`${index > 0 ? 'mt-2 pt-1' : ''}`}>
-                                {freight.discountPercentage > 0 && (
-                                    <span className='text-muted small'>
-                                        Frete: <del>R${freight.defaultValue.toFixed(2)}</del><sup style={{ fontSize: '0.7em' }}>{freight.discountPercentage}%</sup>  <span className='text-success'>R${freight.contractValue.toFixed(2)}</span> ({freight.providerMethod})
-                                    </span>
-                                )}
-                                {freight.discountPercentage === 0 && (
-                                    <span className='text-muted small'>
-                                        Frete: R${freight.defaultValue.toFixed(2)} ({freight.providerMethod})
-                                    </span>
-                                )}
-                                <br />
-                                <span className='text-muted small'><DeliveryIcon size={'18px'} /> Você receberá em até {freight.estimateDays} dia{freight.estimateDays > 1 ? 's' : ''}</span>
-                                <hr className='mb-0' />
-                            </div>
-                        ))
+
+                    {freightValues && Object.keys(freightValues).length > 0 ? (
+                        <section>
+                            <span className='text-muted small'>
+                                Frete: R${freightValues.totalFreightCost.toFixed(2)} (SEDEX)
+                            </span>
+                            <br />
+                            <span className='text-muted small'>
+                                <DeliveryIcon size={'18px'} /> Você receberá em até {freightValues.estimateDays} dia{freightValues.estimateDays > 1 ? 's' : ''}
+                            </span>
+                            <hr className='mb-0' />
+                        </section>
                     ) : (
-                        <div>
+                        <section>
                             <Placeholder as='span' animation="glow" className="text-muted small">
                                 <Placeholder xs={12} />
                             </Placeholder>
@@ -164,19 +197,18 @@ function BatteryPurchasePage() {
                                 <Placeholder xs={9} />
                             </Placeholder>
                             <hr className='mb-0' />
-                        </div>
+                        </section>
                     )}
                 </Card.Body>
             </Card>
         );
     }
 
-
     return (
         <>
-            <Container  className="purchase-container py-lg-4" >
+            <Container className="purchase-container py-lg-5" >
                 <Card className="border-0 shadow " >
-                    <Card.Body>
+                    <Card.Body className="py-4">
                         <Row className="d-flex">
                             <Col className='col-12 col-md-auto'>
                                 <ImageGalleryComponent />
@@ -184,7 +216,7 @@ function BatteryPurchasePage() {
 
                             <Col className='col-12 col-sm-6 col-lg flex-grow-1 mt-lg-0 mt-4'>
                                 <div>
-                                    <h4>{batteryData.name}</h4>
+                                    <h4 className='text-muted'>{batteryData.name}</h4>
                                     <p className="text-muted">{batteryData.description}</p>
                                 </div>
                             </Col>
@@ -204,16 +236,16 @@ function BatteryPurchasePage() {
                                     addressIsLoaded={addressIsLoaded}
                                     address={address}
                                     isLoggedIn={isLoggedIn}
+                                    errorMessages={errorMessages}
+                                    addressValues={addressValues}
                                 />
                             </Col>
                         </Row>
-
-
                     </Card.Body>
                 </Card>
             </Container >
 
-            <ModalAddressBatteryPurchase
+            <ModalSelectedAddress
                 address={address}
                 setShowSelectedAddressModal={setShowSelectedAddressModal}
                 showSelectedAddressModal={showSelectedAddressModal}
@@ -222,75 +254,72 @@ function BatteryPurchasePage() {
                 setFormCEP={setFormCEP}
                 handleGetAddressByCep={handleGetAddressByCep}
                 isLoggedIn={isLoggedIn}
+                quantity={quantity}
             />
         </>
     );
-
 }
 
+function CardBatteryPurchase(props) {
+    const timeoutIdRef = useRef(null);
+    const [prevQuantity, setPrevQuantity] = useState(props.quantity);
+    const { ExtractNumericValue } = FormValidations()
+    useEffect(() => {
+        return () => {
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
+            }
+        };
+    }, []);
 
-function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, isLoggedIn, handleGetAddressByCep, handleGetFreightByCep, renderFreightCards, formCEP, setFormCEP }) {
 
-    const initialize = async () => {
-
-        if (!addressIsLoaded) {
-            await fetchAddress();
+    const handleQuantityChange = (isAddition) => {
+        let newQuantity;
+        let currentQuantity = parseInt(props.quantity)
+        if (isAddition) {
+            newQuantity = Math.min(props.batteryData.quantity, currentQuantity + 1);
+        } else {
+            newQuantity = Math.max(1, currentQuantity - 1);
         }
 
-        if (address && Object.keys(address).length !== 0) {
-            let mainAddress = address.find(addr => addr.main === true) || address[0];
+        if (newQuantity !== currentQuantity) {
+            props.setQuantity(newQuantity.toString());
 
-            handleGetFreightByCep(
-                mainAddress.cep,
-                {
-                    logradouro: mainAddress.address,
-                    cep: mainAddress.cep,
-                    cidade: mainAddress.city,
-                    complemento: mainAddress.complement,
-                    bairro: mainAddress.neighborhood,
-                    numero: mainAddress.number,
-                    estado: mainAddress.state
-                }
-            );
-        } else if (addressIsLoaded) {
-            const hasLocalAddress = localStorage.getItem('cepAddress');
-            if (hasLocalAddress) {
-                handleGetAddressByCep(hasLocalAddress);
+            if (timeoutIdRef.current) {
+                clearTimeout(timeoutIdRef.current);
             }
+            timeoutIdRef.current = setTimeout(() => {
+                if (props.addressValues && Object.keys(props.addressValues).length > 0) {
+                    props.handleGetFreightByCep(props.addressValues.cep, props.addressValues, false, newQuantity)
+                }
+                setPrevQuantity(ExtractNumericValue(newQuantity))
+            }, 1000);
         }
     };
 
-
-    useEffect(() => {
-        initialize();
-    }, [addressIsLoaded]);
-
-    if (address && Object.keys(address).length !== 0 || localStorage.getItem('cepAddress')) {
-        return renderFreightCards();
-    } else {
-        return (
-            <section>
-                <span>Calcular frete</span>
-                <Form className='d-flex align-items-center'>
-                    <InputGroup className='flex-nowrap'>
-                        <FormGroupWithIcon
-                            icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
-                            type={'text'}
-                            placeholder={'Digite o CEP'}
-                            value={formCEP}
-                            onChange={(e) => setFormCEP(e.target.value)}
-                        />
-                        <Button variant="red" onClick={() => handleGetAddressByCep(formCEP)}>ok</Button>
-                    </InputGroup>
-                </Form>
-            </section>
-        );
+    const handleChange = (e) => {
+        let newQuantity = parseInt(e.target.value);
+        console.log(newQuantity);
+        if (newQuantity <= 0 ) {
+            newQuantity = 1;
+        } else if (newQuantity > props.batteryData.quantity) {
+            newQuantity = props.batteryData.quantity;
+        }
+        props.setQuantity(ExtractNumericValue(newQuantity))
     }
 
-}
-
-
-function CardBatteryPurchase(props) {
+    const handleBlur = (e) => {
+        if (prevQuantity !== e.target.value) {
+            if (e.target.value.trim() !== '' && e.target.value !== '0') {
+                setPrevQuantity(props.quantity)
+                if (props.addressValues && Object.keys(props.addressValues).length > 0) {
+                    props.handleGetFreightByCep(props.addressValues.cep, props.addressValues, false, props.quantity)
+                }
+            } else {
+                props.setQuantity(prevQuantity);
+            }
+        }
+    }
 
     return (
         <Card className='card-value-purchase shadow-sm h-100'>
@@ -313,6 +342,8 @@ function CardBatteryPurchase(props) {
                     formCEP={props.formCEP}
                     setFormCEP={props.setFormCEP}
                     handleGetFreightByCep={props.handleGetFreightByCep}
+                    errorMessages={props.errorMessages}
+                    quantity={props.quantity}
                 />
 
                 <div className='h-100 d-flex flex-column justify-content-between'>
@@ -325,29 +356,23 @@ function CardBatteryPurchase(props) {
                         <Card className="d-flex">
                             <Row className='g-0'>
                                 <Col className='col-auto'>
-                                    <Button variant="white fw-bold rounded-end-0 px-3 " onClick={() => props.setQuantity(prevQuantity => Math.max(1, prevQuantity - 1))}><SubtractionIcon /></Button>
+                                    <Button variant="white fw-bold rounded-end-0 px-3 " onClick={() => handleQuantityChange(false)}><SubtractionIcon /></Button>
                                 </Col>
                                 <Col className='d-flex align-items-center'>
                                     <FormControl
                                         type="text"
                                         className="flex-grow-0 text-center py-1 border-0"
-                                        value={props.quantity}
-                                        onChange={(e) => {
-                                            let value = Number(e.target.value);
-                                            if (isNaN(value) || value < 1) {
-                                                value = 1;
-                                            }
-                                            props.setQuantity(Math.min(props.batteryData.quantity, value));
-                                        }}
+                                        value={props.quantity.toString()}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
                                     />
                                 </Col>
                                 <Col className='col-auto'>
-                                    <Button variant="white fw-bold rounded-start-0 px-3 " onClick={() => props.setQuantity(prevQuantity => Math.min(props.batteryData.quantity, prevQuantity + 1))}><AdditionIcon /></Button>
+                                    <Button variant="white fw-bold rounded-start-0 px-3 " onClick={() => handleQuantityChange(true)}><AdditionIcon /></Button>
                                 </Col>
                             </Row>
                         </Card>
                     </section>
-
                 </div>
 
                 <div>
@@ -363,110 +388,69 @@ function CardBatteryPurchase(props) {
     )
 }
 
-function ModalAddressBatteryPurchase(props) {
 
-    const RenderLoggedAddressContent = () => (
-        <>
-            {props.isLoggedIn ? (
-                <>
-                    <span className='text-muted fw-bold'>Ou escolha um endereço cadastrado</span>
-                    {
-                        props.address.map((address, index) => (
-                            <Card key={index}
-                                className={`${index > 0 ? 'mt-2' : ''} card-modal-select-address shadow-sm d-flex flex-row `}
-                                onClick={() =>
-                                    props.handleGetFreightByCep(address.cep,
-                                        {
-                                            logradouro: address.address,
-                                            cep: address.cep,
-                                            cidade: address.city,
-                                            complemento: address.complement,
-                                            bairro: address.neighborhood,
-                                            numero: address.number,
-                                            estado: address.state
-                                        },
-                                        true
-                                    )
-                                } >
-                                <Card.Header className="px-2 border rounded-0 rounded-start-2"></Card.Header>
-                                <Card.Body>
-                                    <Row>
-                                        <Col>
-                                            <h6 className='text-muted fw-bold mb-0'>{address.address}, {address.number},{address?.complement}</h6>
-                                            <span>{address.neighborhood}, {address.city}-{address.uf}, CEP {address.cep} </span>
-                                        </Col>
+function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, handleGetAddressByCep, handleGetFreightByCep, renderFreightCards, formCEP, setFormCEP, errorMessages, isLoggedIn, quantity }) {
 
-                                        <Col className='col-auto d-flex align-items-center color-red'>
-                                            <MapIcon size={'30px'} />
-                                        </Col>
-                                    </Row>
-                                </Card.Body>
-                            </Card>
-                        ))
-                    }
-                </>
-            ) : (
-                <Card className="shadow-sm d-flex flex-row mt-4">
-                    <Card.Header className="px-2 border rounded-0 rounded-start-2"></Card.Header>
-                    <Card.Body as={Row} className="justify-content-between">
-                        <Col xs={9}>
-                            <span className="text-muted">Visualize seus endereços ao fazer login ou se cadastrar.</span>
+    const initialize = async () => {
+        if (!addressIsLoaded) {
+            await fetchAddress();
+        }
+        if (address && Object.keys(address).length !== 0) {
+            let mainAddress = address.find(addr => addr.main === true) || address[0];
 
-                            <div className="d-flex mt-3">
-                                <LoginSignUpButton
-                                    classNameBtnLogin="btn-yellow w-100 me-3"
-                                    classNameBtnSignUp="btn-red-outline w-100" />
-                            </div>
-                        </Col>
+            handleGetFreightByCep(
+                mainAddress.cep,
+                {
+                    logradouro: mainAddress.address,
+                    cep: mainAddress.cep,
+                    cidade: mainAddress.city,
+                    complemento: mainAddress.complement,
+                    bairro: mainAddress.neighborhood,
+                    numero: mainAddress.number,
+                    estado: mainAddress.state
+                },
+                false,
+                quantity
+            );
+        } else if (addressIsLoaded) {
+            const hasLocalAddress = localStorage.getItem('cepAddress');
+            if (hasLocalAddress) {
+                handleGetAddressByCep(null, hasLocalAddress, false);
+            }
+        }
+    };
 
-                        <Col xs={3} className=' color-red d-flex align-items-center justify-content-center'>
-                            <MapIcon size={'40px'} />
-                        </Col>
-
-                    </Card.Body>
-                </Card>
-            )}
-
-        </>
-    );
+    useEffect(() => {
+        initialize();
+    }, [addressIsLoaded]);
 
 
+    if (address && Object.keys(address).length !== 0 || localStorage.getItem('cepAddress')) {
+        return renderFreightCards();
+    } else {
+        return (
+            <section>
+                <span>Calcular frete</span>
+                <Form onSubmit={(e) => handleGetAddressByCep(e, formCEP, false)}>
+                    <InputGroup className='input-group-cep-container flex-nowrap'>
+                        <FormGroupWithIcon
+                            icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
+                            type={'text'}
+                            placeholder={'Digite o CEP'}
+                            value={formCEP}
+                            onChange={(e) => setFormCEP(e.target.value)}
+                            feedback={errorMessages.cep}
+                            className={"input-group-cep"}
+                        />
+                        <Button type="submit" variant={`red ${errorMessages?.cep ? 'input-group-btn-cep-margin-top' : ''}`}>ok</Button>
 
-    return (
-        <Modal show={props.showSelectedAddressModal} onHide={() => props.setShowSelectedAddressModal(false)} centered>
-            <Modal.Header closeButton className=' text-white text-muted  d-flex justify-content-center'>
-                <Modal.Title >
-                    Calcular valor do Frete
-                </Modal.Title>
-            </Modal.Header>
-
-            <Modal.Body className='px-3 px-md-5 py-5'>
-                <section>
-                    <Form className='d-flex align-items-center'>
-                        <Form.Label className='text-muted fw-bold w-100 '>
-                            Digite um CEP
-                            <FormGroupWithIcon
-                                icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
-                                type={'text'}
-                                placeholder={'__-___-___'}
-                                value={props.formCEP}
-                                onChange={(e) => props.setFormCEP(e.target.value)}
-                            />
-                        </Form.Label>
-                        <Button variant='red ms-2 mt-3'
-                            onClick={() => {
-                                props.handleGetAddressByCep(props.formCEP, true);
-                            }}>Consultar</Button>
-                    </Form>
-                </section>
-
-                <div className='mt-3'>
-                    <RenderLoggedAddressContent />
-                </div>
-            </Modal.Body>
-        </Modal>
-    )
+                    </InputGroup>
+                </Form>
+            </section>
+        );
+    }
 }
+
 
 export default BatteryPurchasePage;
 
