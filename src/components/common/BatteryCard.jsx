@@ -2,10 +2,10 @@ import React from 'react';
 import { Card, Placeholder } from 'react-bootstrap';
 import imagemExemploBateria from '../../assets/images/exemploImageRegister.png';
 
-function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick, onPlaceholder }) {
+function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick, onPlaceholder, sizeWidth, sizeHeight}) {
     return (
         <>
-            <Card className='shadow-sm rounded-4 border-0 mb-3' style={{ width: '14.5em', height: '27.125em' }} onClick={onClick}>
+            <Card className='shadow-sm rounded-4 border-0 mb-3' style={{ width: `${sizeWidth}`, height: `${sizeHeight}` }} onClick={onClick}>
                 <div className='p-4 rounded-3' style={{ backgroundColor: '#f8f8f8' }}>
                     <Card.Img className="img-fluid" variant="top" src={imagemExemploBateria} height={160} />
                 </div>

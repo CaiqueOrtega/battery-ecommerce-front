@@ -50,7 +50,6 @@ function RenderSliderBatteries() {
     </div>
   );
 
-
   const settings = {
     dots: true,
     infinite: false,
@@ -109,6 +108,8 @@ function RenderSliderBatteries() {
               batteryPrice={battery.value}
               batteryQuantity={battery.quantity}
               onPlaceholder={true}
+              sizeWidth={'14.5em'}
+              sizeHeight={'27.125em'}
               onClick={() => handleBatteryClick(battery)}
             />
           </div>

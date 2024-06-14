@@ -1,22 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup, DropdownToggle } from 'react-bootstrap';
-import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../../assets/icons/IconsSet'
+import {CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../../assets/icons/IconsSet'
 
 import LoginSignUpButton from '../../../../components/common/LoginSignUpButton';
 import ModalLogout from '../../../../components/common/ModalLogout';
 
-
 import { useAuthProvider } from '../../../../context/AuthProvider';
 import { useGlobalDataProvider } from '../../../../context/GlobalDataProvider';
-
 import exemploImageCart from '../../../../assets/images/exemploImageRegister.png'
 import logo from '../../../../assets/images/logo.png'
+import NavbarSearch from '../../../batterySearch/BatterySearchPage';
 import './navbar.css';
 
 
 function NavbarComponent({ showNavbarSearch, isCartPage }) {
   const { logout, userData, isLoggedIn, navigate, VerifyAuth } = useAuthProvider()
+  const { batteriesActive, batteryCart, batteryCartIsLoaded } = useGlobalDataProvider();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
 
@@ -48,24 +48,8 @@ function NavbarComponent({ showNavbarSearch, isCartPage }) {
   );
 
 
-  const navbarSearch = () => {
-    return (
-      <>
-        <Col md={6} className='order-last order-md-0 mt-3 mt-md-0'>
-          <form className="position-relative">
-            <Form.Control className="py-2 input-search-size" type="text" placeholder="Pesquise rapidamente a bateria ideal e energize..." />
-            <a type="button" className="position-absolute top-50 end-0 translate-middle-y bg-white border-start ps-2 me-2">
-              <SearchIcon currentColor={"c00d0d"} size={"28"} />
-            </a>
-          </form>
-        </Col>
-      </>
-    )
-  };
-
   return (
     <>
-
       <Navbar expand="lg" className="bg-yellow shadow pb-0" variant="dark">
         <Row className="d-flex flex-fill pb-2 g-0 px-2 px-lg-4 align-items-center justify-content-between">
           <Col className='col-auto order-first ms-md-3'>
@@ -74,10 +58,16 @@ function NavbarComponent({ showNavbarSearch, isCartPage }) {
             </Navbar.Brand>
           </Col>
 
-          {showNavbarSearch ? navbarSearch() : null}
+          {showNavbarSearch ? <NavbarSearch batteriesActive={batteriesActive} navigate={navigate} /> : null}
 
           <Col className='col-auto d-flex order-md-0 order-first '>
-            <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} isCartPage={isCartPage} />
+            <RenderCartDropdownMenu 
+            userData={userData} 
+            isLoggedIn={isLoggedIn} 
+            isCartPage={isCartPage} 
+            batteryCartIsLoaded={batteryCartIsLoaded}
+            batteryCart={batteryCart} 
+            />
 
             <RenderUserDropdownMenu
               userData={userData}
@@ -164,8 +154,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 
 
 
-function RenderCartDropdownMenu({ isCartPage }) {
-  const { batteryCart, batteryCartIsLoaded } = useGlobalDataProvider();
+function RenderCartDropdownMenu({ isCartPage, batteryCartIsLoaded, batteryCart  }) {
   const [isScreenSmall, setIsScreenSmall] = useState(false);
 
   useEffect(() => {

@@ -23,8 +23,8 @@ export const UserCircleIcon = ({ className }) => (
 
 );
 
-export const CaretUpIcon = ({ className }) => (
-    <svg className={className} fill="#ffffff" width="25px" height="25px" viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)">
+export const CaretUpIcon = ({ className, size }) => (
+    <svg className={className} fill="#ffffff" width={size || "25px"} height={size || "25px"} viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg" transform="rotate(180)">
         <path d="M213.65674,101.657l-80,79.99976a7.99945,7.99945,0,0,1-11.31348,0l-80-79.99976A8,8,0,0,1,48,88H208a8,8,0,0,1,5.65674,13.657Z"></path>
     </svg>
 );
