@@ -67,63 +67,63 @@ function AddressContent() {
 
     }, [showAddressForm])
 
-
-    const handleAddressActionWithConfirmation = (action, data) => {
-        if (action === 'update' && isEquals(data.formAddressValues, prevFormAddressValues, setPrevFormAddressValues, setErrorMessages)) {
-            return;
-        }
-
-        setConfirmChangesModalData({
-            title: `${action === 'update' ? 'Editar' : 'Deletar'} Endereço`,
-            message: `Deseja realmente ${action === 'update' ? 'editar' : 'deletar'} o endereço?`
-        });
-        setConfirmAction({ action, data });
-        setShowConfirmChangesModal(true);
-        setPrevFormAddressValues({});
-    };
-
     const handleConfirmChangesModal = async () => {
-        if (confirmAction) {
-            const { action, data } = confirmAction;
-            await handleAddressAction(action, data);
+
+        const getUpdateAddressData = async () => {
+            if (confirmAction.action === 'update') {
+                const response = await updateAddress(confirmAction.data.formAddressValues, confirmAction.data.addressId);
+                if (response) {
+                    setShowAddressForm(false);
+                    return (address.map(address => address.addressId === response.addressId ? response : address));
+                }
+            } else if (confirmAction.action === 'delete') {
+                const response = await deleteAddress(confirmAction.data.addressId);
+                if (response) {
+                    return (address.filter(address =>
+                        address.addressId !== confirmAction.data.addressId
+                    ));
+                }
+            }
+            return undefined;
+        };
+
+        const updatedAddressData = await getUpdateAddressData();
+
+        if (updatedAddressData !== undefined) {
+            setAddress(updatedAddressData);
+        } else {
+            setPrevFormAddressValues(confirmAction.data.formAddressValues);
         }
     };
 
-    const handleAddressAction = async (action, data) => {
+    const handleAddressAction = async (e, action, data) => {
+        e.preventDefault();
         const actions = {
             'create': async () => {
-                if (!isEquals(data.formAddressValues, prevFormAddressValues, setPrevFormAddressValues, setErrorMessages)) {
-                    if (address.length === 0) {
-                        data.formAddressValues.main = true;
-                    }
-
-                    const response = await createAddress(data.formAddressValues, userData.userId);
-                    if (response) {
-                        const updatedAddressValues = data.formAddressValues.main
-                            ? [...address.map(address => ({ ...address, main: false })), response]
-                            : [...address, response];
-
-                        setAddress(updatedAddressValues);
-                        setShowAddressForm(false);
-                    }
+                if (address.length === 0) {
+                    data.formAddressValues.main = true;
                 }
-            },
-            'update': async () => {
-                const response = await updateAddress(data.formAddressValues, data.addressId);
+
+                const response = await createAddress(data.formAddressValues, userData.userId);
                 if (response) {
-                    setAddress(address.map(address =>
-                        address.addressId === response.addressId ? response : address
-                    ));
+                    const updatedAddressValues = data.formAddressValues.main
+                        ? [...address.map(address => ({ ...address, main: false })), response]
+                        : [...address, response];
+
+                    setAddress(updatedAddressValues);
                     setShowAddressForm(false);
                 }
             },
+            'update': async () => {
+                setShowConfirmChangesModal(true);
+                setConfirmChangesModalData({ title: 'Editar Endereço', message: 'Deseja realmente editar o Endereço?' });
+                setConfirmAction({ action, data });
+                setPrevFormAddressValues({});
+            },
             'delete': async () => {
-                const response = await deleteAddress(data.addressId);
-                if (response) {
-                    setAddress(address.filter(address =>
-                        address.addressId !== data.addressId
-                    ));
-                }
+                setShowConfirmChangesModal(true);
+                setConfirmChangesModalData({ title: 'Deletar Endereço', message: 'Deseja realmente editar o Endereço?' });
+                setConfirmAction({ action, data });
             },
             'update_main': async () => {
                 const response = await updateMainAddress(data.addressId);
@@ -135,12 +135,12 @@ function AddressContent() {
             }
         };
 
+        const isValid = action !== 'update_main' && action !== 'delete' ? !isEquals(data.formAddressValues, prevFormAddressValues, setPrevFormAddressValues, setErrorMessages) : true
 
-        if (actions[action]) {
+        if (actions[action] && isValid) {
             await actions[action]();
         }
     };
-
 
     return (
         <>
@@ -166,9 +166,7 @@ function AddressContent() {
                 )}
             </div >
 
-
             <div className="h-100 py-5 px-md-5 px-4 d-flex-justify-content-center" >
-
                 {showAddressForm ? (
                     <AddressForm
                         setShowAddressForm={setShowAddressForm}
@@ -177,7 +175,6 @@ function AddressContent() {
                         setFormAddressValues={setFormAddressValues}
                         isUpdateId={selectedFormAddressValues?.addressId}
                         handleAddressAction={handleAddressAction}
-                        handleAddressActionWithConfirmation={handleAddressActionWithConfirmation}
                         setPrevFormAddressValues={setPrevFormAddressValues}
                         getAddressCep={getAddressCep}
                         errorMessages={errorMessages}
@@ -190,7 +187,6 @@ function AddressContent() {
                             setSelectedFormAddressValues={setSelectedFormAddressValues}
                             setShowAddressForm={setShowAddressForm}
                             handleAddressAction={handleAddressAction}
-                            handleAddressActionWithConfirmation={handleAddressActionWithConfirmation}
                         />
                     ) : (
                         <div className="d-flex justify-content-center align-items-center h-100">
@@ -198,10 +194,7 @@ function AddressContent() {
                         </div>
                     )
                 )}
-
             </div>
-
-
             <ConfirmChangesModal
                 showConfirmChangesModal={showConfirmChangesModal}
                 setShowConfirmChangesModal={setShowConfirmChangesModal}
@@ -214,7 +207,6 @@ function AddressContent() {
 }
 
 function AddressForm(props) {
-    const formRef = useRef(null);
 
     async function handleCepChange(cep) {
         const cleanedCep = cep.replace(/\D/g, '');
@@ -238,29 +230,25 @@ function AddressForm(props) {
         }
     }
 
-    const handleSubmit = () => {
-        if (formRef.current.reportValidity()) {
-            if (props.isUpdateId) {
-                props.handleAddressActionWithConfirmation('update', {
-                    addressId: props.isUpdateId,
-                    formAddressValues: props.formAddressValues
-                });
-            } else {
-                props.handleAddressAction('create', { formAddressValues: props.formAddressValues })
-            }
-
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (props.isUpdateId) {
+            props.handleAddressAction(e, 'update', {
+                addressId: props.isUpdateId,
+                formAddressValues: props.formAddressValues
+            });
+        } else {
+            props.handleAddressAction(e, 'create', { formAddressValues: props.formAddressValues })
         }
-    }
 
+    }
 
     return (
         <section>
             <h3>{props.isUpdateId ? 'Editar o' : 'Cadastro de'} Endereço</h3>
             <button className='btn-close btn-close-white' onClick={() => props.setShowAddressForm(false)} />
 
-
-            <AlertErrorOrSuccess errorMessages={props.errorMessages} />
-            <Form ref={formRef}>
+            <Form onSubmit={handleSubmit}>
                 <Row>
                     <Col className="col-5">
                         <Form.Label className="w-100">CEP
@@ -271,6 +259,7 @@ function AddressForm(props) {
                                 value={props.formAddressValues.cep}
                                 onChange={(e) => handleCepChange(e.target.value)}
                                 maxLength={8}
+                                feedback={props.errorMessages.CEP}
                             />
                         </Form.Label>
                     </Col>
@@ -278,16 +267,16 @@ function AddressForm(props) {
                     <Col className="col-md-7">
                         <Form.Label className="w-100">Complemento
                             <FormGroupWithIcon
-                                icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f'/>}
+                                icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                                 type={'text'}
                                 placeholder={'Digite seu complemento'}
                                 value={props.formAddressValues.complement}
                                 onChange={(e) => props.setFormAddressValues({ ...props.formAddressValues, complement: e.target.value })}
                                 disableRequired={true}
+                                feedback={props.errorMessages.complement}
                             />
                         </Form.Label>
                     </Col>
-
 
                     <Col className="col-9">
                         <Form.Label className="w-100">Rua
@@ -297,10 +286,10 @@ function AddressForm(props) {
                                 placeholder={'Digite seu endereço'}
                                 value={props.formAddressValues.address}
                                 onChange={(e) => props.setFormAddressValues({ ...props.formAddressValues, address: e.target.value })}
+                                feedback={props.errorMessages.address}
                             />
                         </Form.Label>
                     </Col>
-
 
                     <Col className="col-md-3">
                         <Form.Label className="w-100">Número
@@ -310,6 +299,8 @@ function AddressForm(props) {
                                 placeholder={'Digite o número do seu endereço'}
                                 value={props.formAddressValues.number}
                                 onChange={(e) => props.setFormAddressValues({ ...props.formAddressValues, number: e.target.value })}
+                                feedback={props.errorMessages.number}
+
                             />
                         </Form.Label>
                     </Col>
@@ -322,10 +313,10 @@ function AddressForm(props) {
                                 placeholder={'Digite seu bairro'}
                                 value={props.formAddressValues.neighborhood}
                                 onChange={(e) => props.setFormAddressValues({ ...props.formAddressValues, neighborhood: e.target.value })}
+                                feedback={props.errorMessages.neighborhood}
                             />
                         </Form.Label>
                     </Col>
-
 
                     <Col className="col-md-4">
                         <Form.Label className="w-100">Cidade
@@ -335,6 +326,7 @@ function AddressForm(props) {
                                 placeholder={'Digite sua cidade'}
                                 value={props.formAddressValues.city}
                                 onChange={(e) => props.setFormAddressValues({ ...props.formAddressValues, city: e.target.value })}
+                                feedback={props.errorMessages.city}
                             />
                         </Form.Label>
                     </Col>
@@ -347,6 +339,7 @@ function AddressForm(props) {
                                 placeholder={'Digite a sigla do seu estado'}
                                 value={props.formAddressValues.state}
                                 onChange={(e) => props.setFormAddressValues({ ...props.formAddressValues, state: e.target.value })}
+                                feedback={props.errorMessages.uf}
                             />
                         </Form.Label>
                     </Col>
@@ -362,14 +355,20 @@ function AddressForm(props) {
                     ) : null}
 
                 </Row>
+                <Col xs={12} className="d-flex justify-content-between">
+                    <div className="d-flex align-items-end flex-grow-1">
+                        <AlertErrorOrSuccess errorMessages={props.errorMessages} />
+                    </div>
+                    <div className="d-flex justify-content-end mt-5 flex-grow-1">
+                        <Button variant="yellow float-end mt-5"
+                            type="submit">{props.isUpdateId ? 'Editar' : 'Cadastrar'} Endereço</Button>
+                    </div>
+                </Col>
+
             </Form>
-            <Button variant="yellow float-end mt-5"
-                onClick={() => handleSubmit()}>{props.isUpdateId ? 'Editar' : 'Cadastrar'} Endereço</Button>
         </section >
     );
 }
-
-
 
 function UserAddress(props) {
     if (!Array.isArray(props.address) && props.address.length === 0) {
@@ -394,7 +393,7 @@ function UserAddress(props) {
                             <Form.Check type={'radio'} className={`ms-2`}
                                 checked={address.main}
                                 readOnly={address.main}
-                                onChange={() => !address.main && props.handleAddressAction('update_main', { addressId: address.addressId })}
+                                onChange={(e) => !address.main && props.handleAddressAction(e, 'update_main', { addressId: address.addressId })}
                             />
                         </Form.Label>
 
@@ -409,7 +408,7 @@ function UserAddress(props) {
                             <Col className="col-auto align-self-end ">
                                 <Button
                                     variant="sm btn-red-outline px-4 fw-bold rounded-4 shadow-sm"
-                                    onClick={() => props.handleAddressActionWithConfirmation('delete', { addressId: address.addressId })}
+                                    onClick={(e) => props.handleAddressAction(e, 'delete', { addressId: address.addressId })}
                                 >
                                     Excluir
                                 </Button>
