@@ -165,6 +165,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                                 batteryDescription={batteryValues.description}
                                 batteryPrice={batteryValues.value}
                                 batteryQuantity={batteryValues.quantity}
+                                onPlaceholder={false}
                             />
                         </Col>
                         <Col>

@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, Placeholder } from 'react-bootstrap';
 import imagemExemploBateria from '../../assets/images/exemploImageRegister.png';
 
-function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick }) {
+function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick, onPlaceholder }) {
     return (
         <>
             <Card className='shadow-sm rounded-4 border-0 mb-3' style={{ width: '14.5em', height: '27.125em' }} onClick={onClick}>
@@ -11,38 +11,36 @@ function BatteryCard({ batteryName, batteryDescription, batteryPrice, onClick })
                 </div>
                 <Card.Body className='d-flex flex-column justify-content-between'>
                     <div>
-                        {!batteryName ? (
+                        {!batteryName && onPlaceholder? (
                             <Placeholder as={Card.Title} animation="glow">
                                 <Placeholder xs={12} />
                             </Placeholder>
                         ) : (
                             <Card.Title as="h6" className='fw-bold '>
-                                {batteryName.length > 20 ? batteryName.substring(0, 20) + '...' : batteryName.trim()}
+                                {batteryName.length > 20 ? batteryName.substring(0, 20) + '...' : batteryName.trim() || 'Nome Exemplo de Bateria'}
                             </Card.Title>
                         )}
-                        {!batteryDescription ? (
+                        {!batteryDescription && onPlaceholder? (
                             <Placeholder as={Card.Text} animation="glow">
                                 <Placeholder xs={12} />
                             </Placeholder>
                         ) : (
                             <Card.Text className='text-muted small'>
-                                {batteryDescription.length > 50 ? batteryDescription.substring(0, 50) + '...' : batteryDescription.trim()}
+                                {batteryDescription.length > 50 ? batteryDescription.substring(0, 50) + '...' : batteryDescription.trim() || 'Descrição Exemplo de Bateria'}
                             </Card.Text>
                         )}
                     </div>
 
                     <div>
-                        {!batteryDescription ? (
+                        {!batteryDescription && onPlaceholder ? (
                             <Placeholder as={Card.Title} animation="glow">
                                 <Placeholder xs={6} />
                             </Placeholder>
                         ) : (
                             <h6 className='fw-bold '>
-                                R$ {batteryPrice.toString().replace('.', ',')}
+                                R$ {batteryPrice.toString().replace('.', ',') || '000,00'}
                             </h6>
                         )}
-
-
                     </div>
                 </Card.Body>
             </Card>
