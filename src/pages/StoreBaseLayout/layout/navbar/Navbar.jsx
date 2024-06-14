@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup } from 'react-bootstrap';
+import { Navbar, Form, Dropdown, NavItem, NavLink, Row, Col, Button, ListGroup, DropdownToggle } from 'react-bootstrap';
 import { SearchIcon, CartIcon, UserCircleIcon, CaretUpIcon, UserCircleOutlineIcon, ExitIcon, ChevronLeftIcon, OrderIcon, MapIcon, UndrawProfile, ControlIcon, LockIconOutline } from '../../../../assets/icons/IconsSet'
 
 import LoginSignUpButton from '../../../../components/common/LoginSignUpButton';
@@ -77,7 +77,7 @@ function NavbarComponent({ showNavbarSearch, isCartPage }) {
           {showNavbarSearch ? navbarSearch() : null}
 
           <Col className='col-auto d-flex order-md-0 order-first '>
-            <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} isCartPage={isCartPage}/>
+            <RenderCartDropdownMenu userData={userData} isLoggedIn={isLoggedIn} isCartPage={isCartPage} />
 
             <RenderUserDropdownMenu
               userData={userData}
@@ -164,7 +164,7 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 
 
 
-  function RenderCartDropdownMenu({isCartPage}) {
+function RenderCartDropdownMenu({ isCartPage }) {
   const { batteryCart, batteryCartIsLoaded } = useGlobalDataProvider();
   const [isScreenSmall, setIsScreenSmall] = useState(false);
 
@@ -183,69 +183,65 @@ function RenderMobileNavbarCollapseContent({ isLoggedIn, userData, renderLinksDr
 
 
   const CartEmptyDropdownMenu = () => (
-    <Dropdown.Menu className="dropdown-menu-size rounded-4 shadow border-0 dropdown-menu-end mt-2 py-5 px-4 text-center">
-      <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
+    <Dropdown.Menu className="dropdown-menu-size mt-2 rounded-4 shadow border-0 dropdown-menu-end mt-2 py-5 px-4 text-center">
+      <CaretUpIcon className="position-absolute caret-menuDropdown-position-cart-empty" />
       <h5 className='text-muted '>Seu Carrinho esta Vazio</h5>
     </Dropdown.Menu>
   );
 
-
   const CartDropdownMenu = () => (
-    <Dropdown.Menu className="dropdown-menu-cart-size rounded-4 shadow border-0 dropdown-menu-end mt-2 py-3 px-4">
+    <Dropdown.Menu className="dropdown-menu-cart-size rounded-4 shadow border-0 dropdown-menu-end mt-3 py-3">
       <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
-      {Object.keys(batteryCart).length === 0 ? (
-        <h5 className="text-center text-muted">Seu carrinho está vazio</h5>
-      ) : (
-        <>
-          <h6 className='text-muted fw-bold text-center mb-0'>Meu Carrinho</h6>
-          <Dropdown.Divider />
-          <section className='battery-cart-dropdown'>
-            {batteryCart.batteries.map(item => (
-              <div key={item.cart_battery_id} className="mb-3 d-flex align-items-center">
-                <img src={exemploImageCart} height={60} className="mr-3" />
-                <div className='ms-3 lh-md flex-fill'>
-                  <h6 className="fw-bold mb-0 text-wrap">{item.battery.name.length > 47 ? item.battery.name.substring(0, 47) + "..." : item.battery.name}</h6>
-                  <div className="d-flex justify-content-between w-100">
-                    <span className="small text-muted">Quantidade: {item.quantity}</span>
-                    <span className="ms-auto small">R$ {item.battery.value.toFixed(2)}</span>
-                  </div>
-                </div>
-
+      <h6 className='text-muted fw-bold text-center mb-0'>Meu Carrinho</h6>
+      <Dropdown.Divider className='mb-0'/>
+      <section className='battery-cart-dropdown custom-scrollbar p-3'>
+        {batteryCart.batteries.map(item => (
+          <div key={item.cart_battery_id} className="mb-3 d-flex align-items-center">
+            <img src={exemploImageCart} height={60} className="mr-3" />
+            <div className='ms-3 lh-md flex-fill'>
+              <h6 className="fw-bold mb-0 text-wrap">{item.battery.name.length > 47 ? item.battery.name.substring(0, 47) + "..." : item.battery.name}</h6>
+              <div className="d-flex justify-content-between w-100">
+                <span className="small text-muted">Quantidade: {item.quantity}</span>
+                <span className="ms-auto small">R$ {item.battery.value.toFixed(2).replace('.', ',')}</span>
               </div>
-            ))}
-          </section>
-          <Dropdown.Divider />
-
-          <section className='d-flex justify-content-between  align-items-center py-2'>
-            <div>Total:
-              <span className='fw-bold'> R$ {batteryCart.totalValue.toFixed(2)}</span>
             </div>
-              <Dropdown.Item as={Link} to="/meucarrinho" className='btn btn-red btn-sm fw-bold text-center rounded-2'
-               style={{ width: 'unset'}}
-              >Ver Carrinho</Dropdown.Item >
-          </section>
-        </>
-      )
-
-      }
+          </div>
+        ))}
+      </section>
+      <Dropdown.Divider className='mt-0'/>
+      <section className='d-flex justify-content-between  align-items-center py-2 px-3'>
+        <div>Total:
+          <span className='fw-bold'> R$ {batteryCart.totalValue.toFixed(2).replace('.', ',')}</span>
+        </div>
+        <Dropdown.Item as={Link} to="/meucarrinho" className='btn btn-red btn-sm fw-bold text-center rounded-2'
+          style={{ width: 'unset' }}
+        >Ver Carrinho</Dropdown.Item >
+      </section>
     </Dropdown.Menu >
   );
 
   return (
-
     <NavItem className="dropdown-no-caret  text-white hover-color-red">
-      {isScreenSmall || isCartPage ? (
-        <NavLink as={Link} to="/meucarrinho" className='me-3'>
-          <CartIcon strokeWidth={'0.2'} size={30} />
-        </NavLink>
-      ) : (
-        <Dropdown>
-          <Dropdown.Toggle as={NavLink} className='me-3'>
+      <Dropdown>
+        {isScreenSmall || isCartPage ? (
+          <Dropdown.Toggle as={Link} to="/meucarrinho" className='me-3 text-decoration-none text-white'>
             <CartIcon strokeWidth={'0.2'} size={30} />
+            <span className="position-absolute top-0  translate-middle badge rounded-pill bg-red custom-font-size">
+              {batteryCartIsLoaded && batteryCart?.batteries?.length > 0 && batteryCart?.batteries?.length}
+            </span>
           </Dropdown.Toggle>
-          {batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? <CartEmptyDropdownMenu /> : <CartDropdownMenu />}
-        </Dropdown>
-      )}
+        ) : (
+          <>
+            <Dropdown.Toggle as={NavLink} className='me-3'>
+              <CartIcon strokeWidth={'0.2'} size={30} />
+              <span className="position-absolute top-0  translate-middle badge rounded-pill bg-red custom-font-size ">
+                {batteryCartIsLoaded && batteryCart?.batteries?.length > 0 && batteryCart?.batteries?.length} 
+              </span>
+            </Dropdown.Toggle>
+            {batteryCartIsLoaded && batteryCart?.batteries?.length > 0 ? <CartDropdownMenu /> : <CartEmptyDropdownMenu />}
+          </>
+        )}
+      </Dropdown>
     </NavItem>
   );
 }
@@ -278,7 +274,7 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {
           {userData.name.includes(' ') ? userData.name.split(' ')[0].slice(0, 12) : userData.name.slice(0, 12)}
         </Dropdown.Toggle>
 
-        <Dropdown.Menu className='shadow dropdown-menu-end border-0 mt-2 ' style={{ width: '14em' }}>
+        <Dropdown.Menu className='shadow dropdown-menu-end border-0 m ' style={{ width: '14em' }}>
           <CaretUpIcon className="position-absolute caret-menuDropdown-position" />
 
           <Dropdown.Item as={Link} to="/configuracoes/minhaconta" className='d-flex align-items-center mb-1 dropdown-item'>
@@ -309,7 +305,5 @@ function RenderUserDropdownMenu({ userData, isLoggedIn, renderLinksDropDown }) {
   )
 
 }
-
-
 
 export default NavbarComponent;

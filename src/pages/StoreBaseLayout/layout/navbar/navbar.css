@@ -1,7 +1,11 @@
 .caret-menuDropdown-position {
     top: -15px;
     left: calc(90% - 0.6em);
+}
 
+.caret-menuDropdown-position-cart-empty{
+    top: -15px;
+    left: calc(87% - 0.6em);
 }
 
 .dropdown-menu-size {
@@ -9,7 +13,7 @@
 }
 
 .dropdown-menu-cart-size {
-    width: 21.875em;
+    width: 19.875em;
 }
 
 .battery-cart-dropdown {
@@ -43,4 +47,6 @@
 .navbar-brand-image{
     cursor: pointer;
 }
-
+.custom-font-size {
+    font-size: 11px !important; 
+  }
