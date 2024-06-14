@@ -42,7 +42,7 @@ const BatteryCartServices = () => {
     }
 
 
-    return { getByUser, addBattery, removeBattery, changeBatteryQuantity }
+    return { getByUser, addBattery, removeBattery, changeBatteryQuantity, errorMessages, setErrorMessages }
 }
 
 export default BatteryCartServices

@@ -45,6 +45,11 @@
     transform: rotateY(360deg);
 }
 
+.size-mini-credit-chip {
+    width: 25px !important;
+    height: 25px !important;
+}
+
 .size-credit-chip {
     width: 64px;
     height: 64px;

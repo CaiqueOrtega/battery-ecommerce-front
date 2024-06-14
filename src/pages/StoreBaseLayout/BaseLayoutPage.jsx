@@ -13,8 +13,7 @@ import CartPage from "../cart/CartPage";
 function BaseLayoutPage() {
     const { action, type } = useParams();
     const [contentSettings, setContentSettings] = useState({ showNavbarSearch: true, footer: true, isCartPage: false })
-
-
+    
     const handleGetContent = useMemo(() => {
         let pageTitle = "";
         let content = null;
