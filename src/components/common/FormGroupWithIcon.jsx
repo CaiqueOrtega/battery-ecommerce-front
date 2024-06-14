@@ -1,63 +1,90 @@
-import { FormControl, Form, InputGroup } from "react-bootstrap";
+import { FormControl, Form, FloatingLabel } from "react-bootstrap";
 import { useEffect, useState, useRef } from 'react';
 import { AlertIcon } from "../../assets/icons/IconsSet";
 
-const FormGroupWithIcon = ({ icon, type, placeholder, mb, value, onChange, feedback, bgBorder, disable, className, disableRequired, maxLength, onBlurData, onFocusData, pattern }) => {
-    const inputRef = useRef(null);
+function FormGroupWithIcon({ icon, type, placeholder, value, onChange, feedback, bgBorder, disable, className, disableRequired, maxLength, onBlurData, onFocusData, pattern }) {
     const [isFocused, setIsFocused] = useState(false);
 
-    useEffect(() => {
-
-        if (feedback && inputRef.current) {
-            inputRef.current.focus();
-        }
-    }, [feedback]);
-
-    const onBlur = () =>{
-        console.log('teste blur', onBlurData)
-        if(onBlurData && Object.keys(onBlurData).length !== 0){
-            onBlurData.function();
-        }
-
-            setIsFocused(false)
-    }
-
-    const onFocus = () =>{
-        console.log('teste focus', onFocusData)
-        if(onFocusData && Object.keys(onFocusData).length !== 0){
-            onFocusData.function(onFocusData.param);
-        }
-
-            setIsFocused(true)
-    }
-    
     return (
-        <>
-            {
-                feedback && isFocused && (
-                    <span className="text-danger small"><AlertIcon size="14" currentColor={"currentcolor"} /> {feedback} </span>
-                )
-            }
-            <div className={`${mb} align-items-center d-flex position-relative flex-grow-1`} >
-                <FormControl
+        <section className="text-wrap">
+            <div className={`align-items-center d-flex position-relative flex-grow-1`} >
+
+                <RenderInputFormControl
                     value={value}
                     onChange={onChange}
                     type={type}
                     placeholder={placeholder}
-                    className={`ps-5 py-2 ${className} ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''}`}
-                    ref={inputRef}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    required={disableRequired === true ? false : true}
-                    disabled={disable}
+                    className={className}
+                    disableRequired={disableRequired}
+                    disable={disable}
                     maxLength={maxLength}
                     pattern={pattern}
+                    setIsFocused={setIsFocused}
+                    onBlurData={onBlurData}
+                    onFocusData={onFocusData}
+                    bgBorder={bgBorder}
+                    feedback={feedback}
                 />
+                
                 {icon}
             </div>
-        </>
+            {
+                feedback && isFocused && (
+                    <span className="text-danger small mb-5">
+                        <AlertIcon size={"14"} currentColor={"currentcolor"} />
+                        <span className="ms-1">{feedback}</span>
+
+                    </span>
+                )
+            }
+        </section>
     );
 };
 
+
+
+function RenderInputFormControl({ value, onChange, type, placeholder, className, disableRequired, disable, maxLength, pattern, setIsFocused, onBlurData, onFocusData, bgBorder, feedback }) {
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        if (feedback && inputRef.current) {
+            inputRef.current.focus();
+        }
+
+    }, [feedback]);
+
+    const onBlur = () => {
+        if (onBlurData && Object.keys(onBlurData).length !== 0) {
+            onBlurData.function();
+        }
+
+        setIsFocused(false)
+    }
+
+    const onFocus = () => {
+        if (onFocusData && Object.keys(onFocusData).length !== 0) {
+            onFocusData.function(onFocusData.param);
+        }
+
+        setIsFocused(true)
+    }
+
+    return (
+        <FormControl
+            value={value}
+            onChange={onChange}
+            type={type}
+            placeholder={placeholder}
+            className={`ps-5 py-2 ${className} ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''}`}
+            ref={inputRef}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            required={disableRequired === true ? false : true}
+            disabled={disable}
+            maxLength={maxLength}
+            pattern={pattern}
+        />
+    )
+}
 
 export default FormGroupWithIcon;

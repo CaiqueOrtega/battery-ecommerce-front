@@ -1,10 +1,10 @@
 
-function FormValidations(){
-    const isEquals = (currentValues, prevValues, setPrevValues, setErrorMessages ) => {
+function FormValidations() {
+    const isEquals = (currentValues, prevValues, setPrevValues, setErrorMessages) => {
         if (currentValues) {
             const keys = new Set([...Object.keys(currentValues), ...Object.keys(prevValues)]);
             const isEqual = Array.from(keys).every(key => currentValues[key] === prevValues[key]);
-    
+
             if (isEqual) {
                 setErrorMessages(prevErrors => ({
                     ...prevErrors, general: 'Os dados não foram alterados.'
@@ -15,7 +15,12 @@ function FormValidations(){
         }
     };
 
-    return{isEquals}
+    const ExtractNumericValue = (value) => {
+        const numericValue = value.toString().replace(/\D/g, '');
+        return numericValue;
+    };
+
+    return { isEquals, ExtractNumericValue }
 }
 
 export default FormValidations;
