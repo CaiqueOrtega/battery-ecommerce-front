@@ -1,0 +1,16 @@
+.accordion-button::after {
+    margin-left: 0.5em; 
+}
+.accordion-button:focus{
+    box-shadow: none;
+    color: unset;
+}
+
+.accordion-button:not(.collapsed) {
+    background-color: unset;
+    box-shadow: none;
+}
+
+.font-numbers {
+    font-variant-numeric: tabular-nums !important;
+}

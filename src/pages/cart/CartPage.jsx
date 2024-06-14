@@ -1,58 +1,199 @@
-import { Card, Col, Row, Button, FormControl, Container } from "react-bootstrap";
+import { Card, Col, Row, Button, FormControl, Container, Accordion, Placeholder, Spinner } from "react-bootstrap";
 import { useGlobalDataProvider } from "../../context/GlobalDataProvider";
 import exemploImageCart from "../../assets/images/exemploImageRegister.png";
-import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon } from "../../assets/icons/IconsSet";
+import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon } from "../../assets/icons/IconsSet";
 import BatteryCartServices from "../../services/cart/BatteryCartServices";
+import AddressServices from "../../services/address/AddressServices";
 import ConfirmChangesModal from "../../components/common/ConfirmChangesModal";
+import ModalSelectedAddress from "../../components/common/ModalAddress";
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import './cart.css';
+import FormValidations from "../../components/common/FormValidation";
 
 function CartPage() {
-    const { batteryCart, setBatteryCart, batteryCartIsLoaded } = useGlobalDataProvider();
-    const { removeBattery, changeBatteryQuantity } = BatteryCartServices();
+    const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, addressIsLoaded, fetchAddress } = useGlobalDataProvider();
+    const { getAddressCep, getFreight } = AddressServices();
+    const { removeBattery, changeBatteryQuantity, errorMessages, setErrorMessages } = BatteryCartServices();
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
     const [confirmAction, setConfirmAction] = useState({});
+    const [freightValues, setFreightValues] = useState({});
+    const [addressValues, setAddressValues] = useState({})
+    const [formCEP, setFormCEP] = useState('');
+    const [showSelectedAddressModal, setShowSelectedAddressModal] = useState(false);
+    const [totalQuantity, setTotalQuantity] = useState(1);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await fetchAddress();
+        };
+
+        if (!addressIsLoaded) {
+            fetchData();
+        }
+
+        if (address && Object.keys(address).length !== 0 && batteryCartIsLoaded) {
+            let mainAddress = address.find(addr => addr.main === true) || address[0];
+
+            handleGetFreightByCep(
+                mainAddress.cep,
+                {
+                    logradouro: mainAddress.address,
+                    cep: mainAddress.cep,
+                    cidade: mainAddress.city,
+                    complemento: mainAddress.complement,
+                    bairro: mainAddress.neighborhood,
+                    numero: mainAddress.number,
+                    estado: mainAddress.state
+                },
+                false,
+                handleCalculateTotalQuantity(batteryCart)
+            );
+        } else if (addressIsLoaded && batteryCartIsLoaded) {
+            const hasLocalAddress = localStorage.getItem('cepAddress');
+
+            console.log(hasLocalAddress)
+            if (hasLocalAddress) {
+                handleGetAddressByCep(null, hasLocalAddress, false);
+            }
+        }
+    }, [addressIsLoaded, batteryCartIsLoaded]);
+
+
+    const handleGetAddressByCep = async (event, formCEP, isRequestModal) => {
+        console.lo
+        if (event instanceof Object && event !== null && event.preventDefault) {
+            event.preventDefault();
+        }
+        if (formCEP != addressValues.cep) {
+            const response = await getAddressCep(formCEP);
+            if (response) {
+                if (Object.keys(address).length === 0) {
+                    localStorage.setItem('cepAddress', formCEP);
+                }
+                handleGetFreightByCep(formCEP, response, isRequestModal, handleCalculateTotalQuantity(batteryCart));
+            } else {
+                setErrorMessages({ cep: 'CEP inválido ou não encontrado' })
+            }
+        }
+    }
+
+    const handleGetFreightByCep = async (formCEP, addressValues, isRequestModal, totalQuantity) => {
+        setFreightValues({});
+        setAddressValues({});
+        const response = await getFreight(formCEP, totalQuantity);
+        if (response) {
+            setFreightValues(response);
+            setAddressValues(addressValues);
+
+            if (isRequestModal) {
+                setShowSelectedAddressModal(false)
+            }
+        }
+    }
+
+    const handleCalculateTotalQuantity = (updatedBatteryCart) => {
+        const newTotalQuantity = updatedBatteryCart.batteries.reduce((acc, item) => {
+            return acc + item.quantity;
+        }, 0);
+        setTotalQuantity(newTotalQuantity)
+        return newTotalQuantity
+    }
 
     const handleCartAction = async (action, data) => {
         const actions = {
             'remove': async () => {
-                const response = await removeBattery(batteryCart.cartId, data.batteryId);
-                if (response && response.totalValue !== undefined) {
-                    const updatedBatteries = batteryCart.batteries.filter(item =>
-                        item.battery.batteryId !== data.batteryId
-                    );
+                let newTotalValue;
+                try {
+                    if (isLoggedIn) {
+                        const response = await removeBattery(batteryCart.cartId, data.batteryId);
+                        newTotalValue = response?.totalValue !== undefined ? response?.totalValue : 0;
+                    } else {
+                        let localBatteryCart = localStorage.getItem('batteryCart');
+                        if (localBatteryCart) {
+                            localBatteryCart = JSON.parse(localBatteryCart);
 
-                    const newTotalValue = response.totalValue !== undefined ? response.totalValue : 0;
+                            const removedBattery = batteryCart.batteries.find(item => item.battery.batteryId === data.batteryId);
 
-                    const updatedCart = {
+                            const removedBatteryValue = removedBattery ? removedBattery?.battery?.value : 0;
+                            newTotalValue = localBatteryCart.totalValue -= removedBatteryValue;
+
+                            localBatteryCart.batteries = localBatteryCart.batteries.filter(item =>
+                                item.batteryId !== data.batteryId
+                            );
+
+                            if (localBatteryCart?.batteries.length === 0) {
+                                localStorage.removeItem('batteryCart')
+                            } else {
+                                localStorage.setItem('batteryCart', JSON.stringify(localBatteryCart));
+                            }
+
+                        }
+                    }
+
+                    const updatedBatteryCart = {
                         ...batteryCart,
-                        batteries: updatedBatteries,
+                        batteries: batteryCart.batteries.filter(item =>
+                            item.battery.batteryId !== data.batteryId
+                        ),
                         totalValue: newTotalValue
                     };
 
-                    setBatteryCart(updatedCart);
+                    const totalQuantity = handleCalculateTotalQuantity(updatedBatteryCart);
+                    setBatteryCart(updatedBatteryCart);
+                    handleGetFreightByCep(addressValues.cep, addressValues, false, totalQuantity)
+                } catch (e) {
+                    console.log('erro ao remover bateria do carrinho', e)
                 }
             },
             'changeQuantity': async () => {
-                const response = await changeBatteryQuantity(batteryCart.cartId, data.cartBatteryId, data.quantity);
+                try {
+                    let response;
+                    if (isLoggedIn) {
+                        response = await changeBatteryQuantity(batteryCart.cartId, data.cartBatteryId, data.quantity);
+                    } else {
+                        let localBatteryCart = localStorage.getItem('batteryCart');
+                        if (localBatteryCart) {
+                            localBatteryCart = JSON.parse(localBatteryCart);
 
+                            const totalValue = batteryCart.batteries.reduce((accumulator, battery) => {
+                                if (battery.cart_battery_id === data.cartBatteryId) {
+                                    return accumulator + (battery.battery.value * data.quantity);
+                                }
+                                return accumulator + (battery.battery.value * battery.quantity);
+                            }, 0);
 
-                if (response && response.data) {
-                    setBatteryCart(prevState => ({
-                        ...prevState,
+                            localBatteryCart.batteries = localBatteryCart.batteries.map(item => {
+                                if (item.cart_battery_id === data.cartBatteryId) {
+                                    return { ...item, quantity: data.quantity };
+                                }
+                                return item;
+                            });
+
+                            localBatteryCart.totalValue = totalValue;
+
+                            localStorage.setItem('batteryCart', JSON.stringify(localBatteryCart));
+                            response = { totalValue };
+                        }
+                    }
+
+                    const updatedBatteryCart = {
+                        ...batteryCart,
                         totalValue: response.totalValue,
-                        batteries: prevState.batteries.map(item => {
+                        batteries: batteryCart.batteries.map(item => {
                             if (item.cart_battery_id === data.cartBatteryId) {
                                 return { ...item, quantity: data.quantity };
                             }
                             return item;
                         })
-                    }));
-                }else{
-                    
+                    };
+                    const totalQuantity = handleCalculateTotalQuantity(updatedBatteryCart);
+                    setBatteryCart(updatedBatteryCart);
+                    handleGetFreightByCep(addressValues.cep, addressValues, false, totalQuantity)
+                } catch (e) {
+                    console.log('erro ao mudar quantidade de bateria do carrinho', e)
                 }
-
             }
         };
 
@@ -81,15 +222,28 @@ function CartPage() {
                             handleCartAction={handleCartAction}
                             setBatteryCart={setBatteryCart}
                             batteryCartIsLoaded={batteryCartIsLoaded}
+                            address={address}
+                            isLoggedIn={isLoggedIn}
+                            formCEP={formCEP}
+                            setFormCEP={setFormCEP}
+                            handleGetAddressByCep={handleGetAddressByCep}
+                            handleGetFreightByCep={handleGetFreightByCep}
+                            freightValues={freightValues}
+                            addressValues={addressValues}
+                            showSelectedAddressModal={showSelectedAddressModal}
+                            setShowSelectedAddressModal={setShowSelectedAddressModal}
+                            totalQuantity={totalQuantity}
                         />
                     </Col>
 
                     <Col >
-                        <RenderCartSummaryCard batteryCart={batteryCart} batteryCartIsLoaded={batteryCartIsLoaded} />
+                        <RenderCartSummaryCard batteryCart={batteryCart}
+                            batteryCartIsLoaded={batteryCartIsLoaded}
+                            freightValues={freightValues}
+                        />
                     </Col>
                 </Row>
             </Container>
-
 
             <ConfirmChangesModal
                 showConfirmChangesModal={showConfirmChangesModal}
@@ -101,38 +255,49 @@ function CartPage() {
     );
 }
 
+function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, totalQuantity }) {
+    const { ExtractNumericValue } = FormValidations()
 
-function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded }) {
     const handleRemoveBattery = (batteryId) => {
         setShowConfirmChangesModal(true)
         setConfirmChangesModalData({ title: "Remover Bateria", message: "Deseja mesmo Remover a Bateria do Carrinho?" })
         setConfirmAction({ action: 'remove', data: { batteryId: batteryId } });
     }
 
-    const handleBlur = (localQuantity, setLocalQuantity, cartBatteryId, batteryQuantity) => {
-        let newQuantity = parseInt(localQuantity);
-        if (isNaN(newQuantity) || newQuantity <= 0) {
+    const handleChange = (e, setLocalQuantity, batteryQuantity) => {
+        let newQuantity = parseInt(e.target.value);
+        console.log(newQuantity);
+        if (newQuantity <= 0) {
             newQuantity = 1;
         } else if (newQuantity > batteryQuantity) {
             newQuantity = batteryQuantity;
         }
+        setLocalQuantity(ExtractNumericValue(newQuantity))
+    }
 
-        setLocalQuantity(newQuantity);
-        handleCartAction('changeQuantity', { cartBatteryId: cartBatteryId, quantity: newQuantity })
-    };
+    const handleBlur = (localQuantity, setLocalQuantity, cartBatteryId, setPrevQuantity, prevQuantity) => {
+        if (prevQuantity !== localQuantity) {
+            if (localQuantity.trim() !== '' && localQuantity !== '0') {
+                setPrevQuantity(localQuantity)
+                handleCartAction('changeQuantity', { cartBatteryId: cartBatteryId, quantity: localQuantity })
+            } else {
+                setLocalQuantity(prevQuantity);
+            }
+        }
+    }
 
-    const handleChangeQuantity = (isAddition, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity) => {
+    const handleChangeQuantity = (isAddition, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity, setPrevQuantity) => {
         let newQuantity;
-
+        let currentQuantity = parseInt(localQuantity)
         if (isAddition) {
-            newQuantity = Math.min(batteryQuantity, localQuantity + 1);
+            newQuantity = Math.min(batteryQuantity, currentQuantity + 1);
         } else {
-            newQuantity = Math.max(1, localQuantity - 1);
+            newQuantity = Math.max(1, currentQuantity - 1);
         }
 
-        if (newQuantity !== localQuantity) {
-            setLocalQuantity(newQuantity);
-
+        if (newQuantity !== currentQuantity) {
+            setLocalQuantity(ExtractNumericValue(newQuantity));
+            setPrevQuantity(ExtractNumericValue(newQuantity))
             if (timeoutIdRef.current) {
                 clearTimeout(timeoutIdRef.current);
             }
@@ -142,9 +307,10 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
         }
     };
 
-
     const BatteryQuantityControl = ({ quantity, batteryQuantity, cartBatteryId }) => {
-        const [localQuantity, setLocalQuantity] = useState(quantity);
+        const [localQuantity, setLocalQuantity] = useState(quantity.toString());
+        const [prevQuantity, setPrevQuantity] = useState(quantity.toString());
+
         const timeoutIdRef = useRef(null);
 
         useEffect(() => {
@@ -155,13 +321,12 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
             };
         }, []);
 
-
         return (
             <Card style={{ maxWidth: '130px' }}>
                 <Row className='g-0'>
                     <Col className='col-auto'>
                         <Button variant={`white fw-bold rounded-end-0 ${localQuantity === 1 ? 'bg-light' : ''}`}
-                            onMouseDown={() => handleChangeQuantity(false, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef)}
+                            onMouseDown={() => handleChangeQuantity(false, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity, setPrevQuantity)}
                         ><SubtractionIcon size={15} /></Button>
                     </Col>
                     <Col className='d-flex align-items-center'>
@@ -169,14 +334,13 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                             type="text"
                             className="flex-grow-0 text-center py-1 border-0"
                             value={localQuantity}
-                            onBlur={() => handleBlur(localQuantity, setLocalQuantity, cartBatteryId, batteryQuantity)}
-                            onChange={(e) => setLocalQuantity(e.target.value)}
+                            onBlur={() => handleBlur(localQuantity, setLocalQuantity, cartBatteryId, setPrevQuantity, prevQuantity)}
+                            onChange={(e) => handleChange(e, setLocalQuantity, batteryQuantity)}
                         />
                     </Col>
                     <Col className='col-auto'>
                         <Button variant={`white fw-bold rounded-start-0 ${batteryQuantity === localQuantity ? 'bg-light' : ''}`}
-                            onMouseDown={() => handleChangeQuantity(true, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity)}
-
+                            onMouseDown={() => handleChangeQuantity(true, localQuantity, setLocalQuantity, cartBatteryId, timeoutIdRef, batteryQuantity, setPrevQuantity)}
                         >
                             <AdditionIcon size={15} />
                         </Button>
@@ -186,14 +350,133 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
         );
     };
 
+    const getEstimatedArrivalDate = (estimateDays) => {
+        const currentDate = new Date();
+        currentDate.setDate(currentDate.getDate() + estimateDays);
+        const options = { day: 'numeric', month: 'long' };
+        return currentDate.toLocaleDateString('pt-BR', options);
+    };
+
     return (
-        <Card className={`border-0 shadow ${batteryCartIsLoaded && batteryCart?.batteries.length === 0 ? 'bg-light' : ''}`}>
-            <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries.length === 0 ? 'bg-light text-muted' : 'bg-white'}`}>
-                Carrinho de Baterias
+        <>
+            <Card className={`border-0 shadow ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
+                <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`}>
+                    Carrinho de Baterias
+                </Card.Header>
+
+                <Card.Body className="overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
+                    {!batteryCartIsLoaded ? (
+                        <div className="d-flex flex-grow-1 align-items-center justify-content-center">
+                            <span className="loader"></span>
+                        </div>
+                    ) : (
+                        <>
+                            {Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
+                                <>
+                                    {batteryCart?.batteries?.map(item => (
+                                        <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
+                                            <Col xs={2} md={2} className="p-0">
+                                                <img src={exemploImageCart} height={80} className="img-fluid" alt="Battery" />
+                                            </Col>
+
+                                            <Col md={5} xs={9} className="ms-3 lh-md p-0 ">
+                                                <h6 className="mb-0 text-wrap">
+                                                    {item.battery.name.length > 30 ? item.battery.name.substring(0, 30) + "..." : item.battery.name}
+                                                </h6>
+                                                <a type="button" className="small text-muted" onClick={() => handleRemoveBattery(item.battery.batteryId)}>Remover</a>
+                                            </Col>
+
+                                            <Col className="col-auto d-flex flex-column align-items-center small position-relative" >
+                                                <BatteryQuantityControl quantity={item.quantity} cartBatteryId={item.cart_battery_id} batteryQuantity={item.battery.quantity} />
+
+                                                <span className="text-muted small position-absolute" style={{ bottom: -17 }}>
+                                                    {item.battery.quantity} unidade{item.battery.quantity > 1 && 's'}
+                                                </span>
+                                            </Col>
+
+                                            <Col className="d-flex align-items-center">
+                                                <span className="ms-auto font-numbers">R$ {item.battery.value.toFixed(2).replace('.', ',')}</span>
+                                            </Col>
+                                        </Row>
+                                    ))}
+                                </>
+                            ) : (
+                                <>
+                                    <section className="d-flex  align-items-center justify-content-center py-5">
+                                        <div className="d-flex flex-column align-items-center justify-content-center">
+                                            <ShoppingCartIcon />
+                                            <span className="mt-2">Seu carrinho de compras está vazio!</span>
+                                            <span className="text-muted small">Adicione baterias para continuar com sua compra</span>
+
+                                            <Button as={Link} to="/" variant="yellow mt-4 fw-bold w-100 py-2">Ver Baterias Disponíveis</Button>
+                                        </div>
+                                    </section>
+                                </>
+                            )}
+
+                        </>
+                    )}
+                </Card.Body>
+                {batteryCartIsLoaded && batteryCart?.batteries?.length !== 0 && (
+                    <Card.Footer className="bg-light px-4">
+                        {addressValues && Object.keys(addressValues).length > 0 || localStorage.getItem('cepAddress') ? (
+                            <>
+                                {Object.keys(addressValues).length != 0 ? (
+                                    <div className="d-flex justify-content-between">
+                                        <a type="button" className="text-muted small" onClick={() => setShowSelectedAddressModal(true)}>
+                                            <MapIcon size={'15px'} />
+                                            <span className="ms-1">
+                                                {addressValues?.logradouro || addressValues?.localidade}, {addressValues?.bairro || addressValues?.uf}
+                                            </span>
+                                        </a>
+
+                                        <span className="text-muted small d-flex align-items-center"><DeliveryIcon size={18} />
+                                            <span className="mx-1">
+                                                Recebe até
+                                            </span>
+                                            {getEstimatedArrivalDate(freightValues?.estimateDays)}
+                                            <span className="text-success ms-1 font-numbers">
+                                                - R${freightValues?.totalFreightCost.toFixed(2)}
+                                            </span>
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <Placeholder as='span' animation="glow" className="small d-flex justify-content-between">
+                                        <Placeholder xs={5} />
+                                        <Placeholder xs={4} />
+                                    </Placeholder>
+                                )
+                                }
+                            </>
+                        ) : (
+                            <a type="button" className="text-muted" onClick={() => setShowSelectedAddressModal(true)}>Frete</a>
+                        )}
+                    </Card.Footer>
+                )}
+            </Card>
+            <ModalSelectedAddress
+                address={address}
+                setShowSelectedAddressModal={setShowSelectedAddressModal}
+                showSelectedAddressModal={showSelectedAddressModal}
+                handleGetFreightByCep={handleGetFreightByCep}
+                formCEP={formCEP}
+                setFormCEP={setFormCEP}
+                handleGetAddressByCep={handleGetAddressByCep}
+                isLoggedIn={isLoggedIn}
+                quantity={totalQuantity}
+            />
+        </>
+    )
+}
+
+function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues }) {
+
+    return (
+        <Card className={`border-0 shadow h-100  ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
+            <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`} >
+                Resumo da compra
             </Card.Header>
-
-            <Card.Body className="overflow-auto" style={{ maxHeight: '400px' }}>
-
+            <Card.Body className="d-flex flex-column justify-content-between px-4 overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
 
                 {!batteryCartIsLoaded ? (
                     <div className="d-flex flex-grow-1 align-items-center justify-content-center">
@@ -201,110 +484,75 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                     </div>
                 ) : (
                     <>
-                        {batteryCart?.batteries.length != 0 ? (
-                            <>
-                                {batteryCart?.batteries?.map(item => (
-                                    <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
-                                        <Col xs={2} md={2} className="p-0">
-                                            <img src={exemploImageCart} height={80} className="img-fluid" alt="Battery" />
-                                        </Col>
-
-                                        <Col md={5} xs={9} className="ms-3 lh-md p-0 ">
-                                            <h6 className="mb-0 text-wrap">
-                                                {item.battery.name.length > 30 ? item.battery.name.substring(0, 30) + "..." : item.battery.name}
-                                            </h6>
-                                            <a type="button" className="small text-muted" onClick={() => handleRemoveBattery(item.battery.batteryId)}>Remover</a>
-                                        </Col>
-
-                                        <Col className="col-auto d-flex flex-column align-items-center small">
-                                            <BatteryQuantityControl quantity={item.quantity} cartBatteryId={item.cart_battery_id} batteryQuantity={item.battery.quantity} />
-                                            <span className="text-muted small">{item.battery.quantity} unidade{item.battery.quantity > 1 && 's'} </span>
-                                        </Col>
-
-                                        <Col className="d-flex justify-content-end">
-                                            <span className="ms-auto">R$ {item.battery.value.toFixed(2)}</span>
-                                        </Col>
-                                    </Row>
-                                ))}
-                            </>
-                        ) : (
-                            <>
-                                <section className="d-flex  align-items-center justify-content-center py-5">
-                                    <div className="d-flex flex-column align-items-center justify-content-center">
-                                        <ShoppingCartIcon />
-                                        <span className="mt-2">Seu carrinho de compras está vazio!</span>
-                                        <span className="text-muted small">Adicione baterias para continuar com sua compra</span>
-
-                                        <Button as={Link} to="/" variant="yellow mt-4 fw-bold w-100 py-2">Ver Baterias Disponíveis</Button>
-                                    </div>
-                                </section>
-
-                            </>
-                        )}
-
-                    </>
-                )}
-
-
-            </Card.Body>
-
-            {batteryCartIsLoaded && batteryCart?.batteries.length !== 0 && (
-
-                <Card.Footer className="bg-light">
-                    Frete
-                </Card.Footer>
-            )}
-        </Card>
-    )
-}
-
-
-function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded }) {
-
-    return (
-        <Card className={`border-0 shadow h-100  ${batteryCartIsLoaded && batteryCart?.batteries.length === 0 ? 'bg-light' : ''}`}>
-            <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries.length === 0 ? 'bg-light text-muted' : 'bg-white'}`} >
-                Resumo da compra
-            </Card.Header>
-            <Card.Body className="d-flex flex-column justify-content-between px-4">
-
-
-                {!batteryCartIsLoaded ? (
-                    <div className="d-flex flex-grow-1 align-items-center justify-content-center">
-                        <span class="loader"></span>
-                    </div>
-                ) : (
-                    <>
-                        {batteryCart?.batteries.length != 0 ? (
+                        {Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
                             <>
                                 <section>
-                                    <div className="d-flex justify-content-between">
-                                        <span>Produtos({batteryCart?.batteries?.length})</span>
-                                        <span>R$ {batteryCart?.totalValue}</span>
+                                    <Accordion defaultActiveKey="0" flush>
+                                        <Accordion.Item eventKey="0">
+                                            <Accordion.Button className="d-flex justify-content-between p-0">
+                                                <span className="small">
+                                                    Produtos ({batteryCart?.batteries?.length})
+                                                </span>
+                                            </Accordion.Button>
+                                            <Accordion.Body className="p-0 overflow-auto custom-scrollbar" style={{ MaxHeight: 175 }}>
+                                                <hr className="opacity-25" />
+
+                                                {batteryCart?.batteries.map((items, index) => (
+                                                    <div key={items.cart_battery_id} className={`${index > 0 ? 'mt-2' : ''} d-flex justify-content-between align-items-center`}>
+                                                        <span className="small ">
+                                                            {items.battery.name.length > 20 ? items.battery.name.substring(0, 20) + '...' : items.battery.name}
+                                                            <span className="text-muted"> <span className="small">x</span>{items.quantity}</span>
+                                                        </span>
+                                                        <span className="font-numbers small">R${(items.battery.value * items.quantity).toFixed(2).replace('.', ',')}</span>
+                                                    </div>
+                                                ))}
+                                            </Accordion.Body>
+                                        </Accordion.Item>
+                                    </Accordion>
+                                    <hr className="opacity-25" />
+                                    <div className="d-flex justify-content-between small my-1">
+                                        <span>SubTotal</span>
+                                        <span>R${batteryCart.totalValue.toFixed(2).replace('.', ',')}</span>
                                     </div>
 
                                     <div className="d-flex justify-content-between">
-                                        <span>Frete</span>
-                                        <span>R$</span>
+                                        <span className="small">Valor Frete</span>
+                                        <span>
+                                            {freightValues?.totalFreightCost ? (
+                                                <span className="font-numbers small">
+                                                    R$ {freightValues?.totalFreightCost}
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <Spinner size="sm" animation="border" role="status">
+                                                        <span className="visually-hidden">Loading...</span>
+                                                    </Spinner>
+                                                </>
+                                            )}
+                                        </span>
                                     </div>
                                 </section>
 
                                 <section>
-                                    <div className="d-flex justify-content-between">
-                                        <span className="fw-bold fs-5">Total</span>
-                                        <span className="fw-bold fs-5">R$ {batteryCart?.totalValue}</span>
+                                    <div className="d-flex justify-content-between" style={{ fontSize: '18px' }}>
+                                        <span className="fw-bold ">Total</span>
+                                        <span className="fw-bold font-numbers">R$
+                                            <span className="ms-2">
+                                                {((batteryCart?.totalValue || 0) + (freightValues?.totalFreightCost || 0))
+                                                    .toFixed(2)
+                                                    .replace('.', ',')}
+                                            </span>
+                                        </span>
                                     </div>
                                     <Button variant="yellow fw-bold w-100 py-2 mt-2">Continuar a Compra</Button>
                                 </section>
                             </>
                         ) : (
                             <section className="d-flex align-items-center justify-content-center flex-grow-1">
-                               
+
                                 <div className="d-flex flex-column align-items-center justify-content-center">
-                                <PurchaseIcon />
+                                    <PurchaseIcon />
                                     <span className="text-muted small mt-3">Assim que você adicionar produtos ao carrinho, verá aqui o resumo dos valores da sua compra.</span>
-
-
                                 </div>
                             </section>
                         )}

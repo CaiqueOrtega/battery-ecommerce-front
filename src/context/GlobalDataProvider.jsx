@@ -73,7 +73,7 @@ function GlobalDataProvider({ children }) {
 
                 const updatedBatteries = cartData.batteries.map(cartBattery => {
                     const matchingBattery = response.find(battery => battery.batteryId === cartBattery.batteryId);
-                    if (matchingBattery) {
+                    if (matchingBattery) {                        
                         return {
                             cart_battery_id: cartBattery.cart_battery_id,
                             quantity: cartBattery.quantity,
@@ -82,11 +82,10 @@ function GlobalDataProvider({ children }) {
                     }
                     return null;
                 }).filter(battery => battery !== null);
-
-                const totalValue = cartData.totalPrice || 0;
-
+                
                 setBatteryCart({
-                    totalValue: totalValue,
+                    cardId: cartData.cartId,
+                    totalValue: cartData.totalValue || 0,
                     promotion: cartData.promotion || null,
                     batteries: updatedBatteries
                 });
@@ -146,7 +145,8 @@ function GlobalDataProvider({ children }) {
             fetchCard,
             cardIsLoaded,
             resetGlobalData, 
-            userData
+            userData,
+            isLoggedIn
         }}>
             {children}
         </GlobalDataContext.Provider>
