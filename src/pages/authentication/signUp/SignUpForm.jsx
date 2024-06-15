@@ -188,7 +188,6 @@ function SignUpForm({ handleToggleForm }) {
                                             <div className="input-progress-container position-absolute z-1 mt-2" id="meuPopover" style={{position: 'absolute', top: '100%', right: -20, visibility: showPopover ? 'visible' : 'hidden'  }}
                                            
                                             >
-
                                                 <div className="popover" >
                                                     <div className='popover-header '>
                                                         <span className='small'>Dicas de senha segura</span>

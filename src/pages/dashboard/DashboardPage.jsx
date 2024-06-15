@@ -10,10 +10,12 @@ import { AuthContext } from '../../context/AuthProvider'
 import ModalLogout from '../../components/common/ModalLogout';
 import { Link } from 'react-router-dom';
 import { DashBoardContext } from '../../context/DashBoardProvider';
+import SaleIndex from './sale/SaleIndex';
+import DeliveryIndex from './delivery/DeliveryIndex';
 
 function DashboardPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { setRenderOptionData, promotions, setPromotions, batteries, setBatteries, users, setUsers } = useContext(DashBoardContext);
+    const { setRenderOptionData, promotions, setPromotions, batteries, setBatteries, users, setUsers, sales, setSales, deliveries, setDeliveries } = useContext(DashBoardContext);
     const [sidebarSelectedOption, setSidebarSelectedOption] = useState(sessionStorage.getItem('selectedOption') || 'Baterias');
 
     useEffect(() => {
@@ -34,6 +36,10 @@ function DashboardPage() {
                 return <UserIndex users={users} setUsers={setUsers} />;
             case 'Promoções':
                 return <PromotionIndex promotions={promotions} setPromotions={setPromotions} />;
+            case 'Vendas':
+                return <SaleIndex sales={sales} setSales={setSales}/>
+            case 'Entregas':
+                return <DeliveryIndex deliveries={deliveries} setDeliveries={setDeliveries} />
             default:
                 return null;
         }
