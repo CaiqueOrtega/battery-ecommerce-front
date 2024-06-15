@@ -1,7 +1,7 @@
 import { Card, Col, Row, Button, FormControl, Container, Accordion, Placeholder, Spinner } from "react-bootstrap";
 import { useGlobalDataProvider } from "../../context/GlobalDataProvider";
 import exemploImageCart from "../../assets/images/exemploImageRegister.png";
-import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon } from "../../assets/icons/IconsSet";
+import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon, ExclamationCircleIcon } from "../../assets/icons/IconsSet";
 import BatteryCartServices from "../../services/cart/BatteryCartServices";
 import AddressServices from "../../services/address/AddressServices";
 import ConfirmChangesModal from "../../components/common/ConfirmChangesModal";
@@ -10,9 +10,11 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import './cart.css';
 import FormValidations from "../../components/common/FormValidation";
+import SaleServices from '../../services/sale/SaleServices'
+import SaleStepsModal from "../sale/steps/SaleStepsModal";
 
 function CartPage() {
-    const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, addressIsLoaded, fetchAddress } = useGlobalDataProvider();
+    const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, addressIsLoaded, fetchAddress, userData } = useGlobalDataProvider();
     const { getAddressCep, getFreight } = AddressServices();
     const { removeBattery, changeBatteryQuantity, errorMessages, setErrorMessages } = BatteryCartServices();
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
@@ -80,13 +82,12 @@ function CartPage() {
     }
 
     const handleGetFreightByCep = async (formCEP, addressValues, isRequestModal, totalQuantity) => {
-        setFreightValues({});
-        setAddressValues({});
         const response = await getFreight(formCEP, totalQuantity);
         if (response) {
             setFreightValues(response);
-            setAddressValues(addressValues);
-
+            if (Object.keys(addressValues).length !== 0) {
+                setAddressValues(addressValues);
+            }
             if (isRequestModal) {
                 setShowSelectedAddressModal(false)
             }
@@ -142,7 +143,7 @@ function CartPage() {
 
                     const totalQuantity = handleCalculateTotalQuantity(updatedBatteryCart);
                     setBatteryCart(updatedBatteryCart);
-                    handleGetFreightByCep(addressValues.cep, addressValues, false, totalQuantity)
+                    handleGetFreightByCep(addressValues.cep, {}, false, totalQuantity)
                 } catch (e) {
                     console.log('erro ao remover bateria do carrinho', e)
                 }
@@ -190,7 +191,7 @@ function CartPage() {
                     };
                     const totalQuantity = handleCalculateTotalQuantity(updatedBatteryCart);
                     setBatteryCart(updatedBatteryCart);
-                    handleGetFreightByCep(addressValues.cep, addressValues, false, totalQuantity)
+                    handleGetFreightByCep(addressValues.cep, {}, false, totalQuantity)
                 } catch (e) {
                     console.log('erro ao mudar quantidade de bateria do carrinho', e)
                 }
@@ -240,6 +241,11 @@ function CartPage() {
                         <RenderCartSummaryCard batteryCart={batteryCart}
                             batteryCartIsLoaded={batteryCartIsLoaded}
                             freightValues={freightValues}
+                            addressIsLoaded={addressIsLoaded}
+                            address={address}
+                            isLoggedIn={isLoggedIn}
+                            userData={userData}
+                            addressValues={addressValues}
                         />
                     </Col>
                 </Row>
@@ -366,7 +372,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
 
                 <Card.Body className="overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
                     {!batteryCartIsLoaded ? (
-                        <div className="d-flex flex-grow-1 align-items-center justify-content-center">
+                        <div className="d-flex flex-grow-1 align-items-center justify-content-center h-100">
                             <span className="loader"></span>
                         </div>
                     ) : (
@@ -449,7 +455,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                                 }
                             </>
                         ) : (
-                            <a type="button" className="text-muted" onClick={() => setShowSelectedAddressModal(true)}>Frete</a>
+                            <a type="button" className="text-muted" onClick={() => setShowSelectedAddressModal(true)}>Calcular Frete</a>
                         )}
                     </Card.Footer>
                 )}
@@ -469,98 +475,148 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
     )
 }
 
-function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues }) {
+function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues, addressIsLoaded, address, isLoggedIn, userData, addressValues }) {
+    const [showPopover, setShowPopover] = useState(false);
+    const [showSaleStepsModal, setShowSaleStepsModal] = useState();
+    const { createSale } = SaleServices();
+
+    const handleContinueSale = () =>{
+        setShowSaleStepsModal(true);
+    }
 
     return (
-        <Card className={`border-0 shadow h-100  ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
-            <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`} >
-                Resumo da compra
-            </Card.Header>
-            <Card.Body className="d-flex flex-column justify-content-between px-4 overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
+        <>
+            <Card className={`border-0 shadow h-100  ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
+                <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`} >
+                    Resumo da compra
+                </Card.Header>
+                <Card.Body className="d-flex flex-column justify-content-between px-4 overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
 
-                {!batteryCartIsLoaded ? (
-                    <div className="d-flex flex-grow-1 align-items-center justify-content-center">
-                        <span className="loader"></span>
-                    </div>
-                ) : (
-                    <>
-                        {Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
-                            <>
-                                <section>
-                                    <Accordion defaultActiveKey="0" flush>
-                                        <Accordion.Item eventKey="0">
-                                            <Accordion.Button className="d-flex justify-content-between p-0">
-                                                <span className="small">
-                                                    Produtos ({batteryCart?.batteries?.length})
-                                                </span>
-                                            </Accordion.Button>
-                                            <Accordion.Body className="p-0 overflow-auto custom-scrollbar" style={{ MaxHeight: 175 }}>
-                                                <hr className="opacity-25" />
+                    {!batteryCartIsLoaded ? (
+                        <div className="d-flex flex-grow-1 align-items-center justify-content-center">
+                            <span className="loader"></span>
+                        </div>
+                    ) : (
+                        <>
+                            {Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
+                                <>
+                                    <section>
+                                        <Accordion defaultActiveKey="0" flush>
+                                            <Accordion.Item eventKey="0">
+                                                <Accordion.Button className="d-flex justify-content-between p-0">
+                                                    <span className="small">
+                                                        Produtos ({batteryCart?.batteries?.length})
+                                                    </span>
+                                                </Accordion.Button>
+                                                <Accordion.Body className="p-0 overflow-auto custom-scrollbar" style={{ MaxHeight: 175 }}>
+                                                    <hr className="opacity-25" />
 
-                                                {batteryCart?.batteries.map((items, index) => (
-                                                    <div key={items.cart_battery_id} className={`${index > 0 ? 'mt-2' : ''} d-flex justify-content-between align-items-center`}>
-                                                        <span className="small ">
-                                                            {items.battery.name.length > 20 ? items.battery.name.substring(0, 20) + '...' : items.battery.name}
-                                                            <span className="text-muted"> <span className="small">x</span>{items.quantity}</span>
-                                                        </span>
-                                                        <span className="font-numbers small">R${(items.battery.value * items.quantity).toFixed(2).replace('.', ',')}</span>
-                                                    </div>
-                                                ))}
-                                            </Accordion.Body>
-                                        </Accordion.Item>
-                                    </Accordion>
-                                    <hr className="opacity-25" />
-                                    <div className="d-flex justify-content-between small my-1">
-                                        <span>SubTotal</span>
-                                        <span>R${batteryCart.totalValue.toFixed(2).replace('.', ',')}</span>
-                                    </div>
+                                                    {batteryCart?.batteries.map((items, index) => (
+                                                        <div key={items.cart_battery_id} className={`${index > 0 ? 'mt-2' : ''} d-flex justify-content-between align-items-center`}>
+                                                            <span className="small ">
+                                                                {items.battery.name.length > 20 ? items.battery.name.substring(0, 20) + '...' : items.battery.name}
+                                                                <span className="text-muted"> <span className="small">x</span>{items.quantity}</span>
+                                                            </span>
+                                                            <span className="font-numbers small">R${(items.battery.value * items.quantity).toFixed(2).replace('.', ',')}</span>
+                                                        </div>
+                                                    ))}
+                                                </Accordion.Body>
+                                            </Accordion.Item>
+                                        </Accordion>
+                                        <hr className="opacity-25" />
+                                        <div className="d-flex justify-content-between small my-1">
+                                            <span>SubTotal</span>
+                                            <span>R${batteryCart.totalValue.toFixed(2).replace('.', ',')}</span>
+                                        </div>
 
-                                    <div className="d-flex justify-content-between">
-                                        <span className="small">Valor Frete</span>
-                                        <span>
-                                            {freightValues?.totalFreightCost ? (
-                                                <span className="font-numbers small">
-                                                    R$ {freightValues?.totalFreightCost}
-                                                </span>
-                                            ) : (
-                                                <>
-                                                    <Spinner size="sm" animation="border" role="status">
-                                                        <span className="visually-hidden">Loading...</span>
-                                                    </Spinner>
-                                                </>
-                                            )}
-                                        </span>
-                                    </div>
-                                </section>
+                                        <div className="d-flex justify-content-between position-relative">
+                                            <span className="small">Valor Frete</span>
+                                            <span>
+                                                {freightValues?.totalFreightCost ? (
+                                                    <span className="font-numbers small">
+                                                        R$ {freightValues?.totalFreightCost}
+                                                    </span>
+                                                ) : addressIsLoaded && !localStorage.getItem('addressCep') && address?.length === 0 ? (
+                                                    <>
+                                                        <div
+                                                            className="input-progress-container position-absolute z-1 mt-2"
+                                                            style={{
+                                                                position: 'absolute',
+                                                                top: '100%',
+                                                                right: -20,
+                                                                visibility: showPopover ? 'visible' : 'hidden'
+                                                            }}
+                                                        >
+                                                            <div className="popover shadow-sm">
+                                                                <div className='popover-header py-1'>
+                                                                    <span className='small'>Frete Não Calculado</span>
+                                                                </div>
+                                                                <div className="d-flex align-items-center justify-content-center popover-content p-2">
+                                                                    <span>
+                                                                        Por favor, insira um CEP ou selecione um endereço para calcular o valor do frete.
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
 
-                                <section>
-                                    <div className="d-flex justify-content-between" style={{ fontSize: '18px' }}>
-                                        <span className="fw-bold ">Total</span>
-                                        <span className="fw-bold font-numbers">R$
-                                            <span className="ms-2">
-                                                {((batteryCart?.totalValue || 0) + (freightValues?.totalFreightCost || 0))
-                                                    .toFixed(2)
-                                                    .replace('.', ',')}
+                                                        <a
+                                                            className='float-end ms-2 text-muted z-3 position-relative'
+                                                            type="button"
+                                                            onMouseOver={() => setShowPopover(true)}
+                                                            onMouseOut={() => setShowPopover(false)}
+                                                        >
+                                                            <ExclamationCircleIcon />
+                                                        </a>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Spinner size="sm" animation="border" role="status">
+                                                            <span className="visually-hidden">Loading...</span>
+                                                        </Spinner>
+                                                    </>
+                                                )}
                                             </span>
-                                        </span>
+                                        </div>
+                                    </section>
+
+                                    <section>
+                                        <div className="d-flex justify-content-between" style={{ fontSize: '18px' }}>
+                                            <span className="fw-bold ">Total</span>
+                                            <span className="fw-bold font-numbers">R$
+                                                <span className="ms-2">
+                                                    {((batteryCart?.totalValue || 0) + (freightValues?.totalFreightCost || 0))
+                                                        .toFixed(2)
+                                                        .replace('.', ',')}
+                                                </span>
+                                            </span>
+                                        </div>
+                                        <Button variant="yellow fw-bold w-100 py-2 mt-2" onClick={() => handleContinueSale()}>Continuar a Compra</Button>
+                                    </section>
+                                </>
+                            ) : (
+                                <section className="d-flex align-items-center justify-content-center flex-grow-1">
+
+                                    <div className="d-flex flex-column align-items-center justify-content-center">
+                                        <PurchaseIcon />
+                                        <span className="text-muted small mt-3">Assim que você adicionar produtos ao carrinho, verá aqui o resumo dos valores da sua compra.</span>
                                     </div>
-                                    <Button variant="yellow fw-bold w-100 py-2 mt-2">Continuar a Compra</Button>
                                 </section>
-                            </>
-                        ) : (
-                            <section className="d-flex align-items-center justify-content-center flex-grow-1">
+                            )}
+                        </>
+                    )}
 
-                                <div className="d-flex flex-column align-items-center justify-content-center">
-                                    <PurchaseIcon />
-                                    <span className="text-muted small mt-3">Assim que você adicionar produtos ao carrinho, verá aqui o resumo dos valores da sua compra.</span>
-                                </div>
-                            </section>
-                        )}
-                    </>
-                )}
+                </Card.Body>
+            </Card >
 
-            </Card.Body>
-        </Card >
+            <SaleStepsModal
+            showSaleStepsModal={showSaleStepsModal} 
+            setShowSaleStepsModal={setShowSaleStepsModal}
+            isLoggedIn={isLoggedIn}
+            addressValues={addressValues}
+            address={address}
+            userData={userData}
+            />
+        </>
     )
 }
 
