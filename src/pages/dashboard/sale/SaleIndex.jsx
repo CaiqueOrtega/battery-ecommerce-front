@@ -90,11 +90,13 @@ function SaleIndex({ sales, setSales }) {
                 </Card.Body>
             </Card>
 
-            <ModalSale
-                showModalSale={showModalSale}
-                setShowModalSale={setShowModalSale}
-                selectedSale={selectedSale}
-            />
+            {selectedSale && Object.keys(selectedSale).length > 0 && (
+                <ModalSale
+                    showModalSale={showModalSale}
+                    setShowModalSale={setShowModalSale}
+                    selectedSale={selectedSale}
+                />
+            )}
         </>
     );
 }
@@ -104,37 +106,71 @@ function ModalSale({ showModalSale, setShowModalSale, selectedSale }) {
     return (
         <Modal size="lg" show={showModalSale} onHide={() => setShowModalSale(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
             <Modal.Header className='bg-red text-white'>
-                <Modal.Title>Venda </Modal.Title>
+                <Modal.Title>Venda {selectedSale.code}</Modal.Title>
                 <button className='btn-close btn-close-white' onClick={() => setShowModalSale(false)} />
             </Modal.Header>
-            <Modal.Body className="px-5 py-5">
-                <Card>
-                    <Card.Body>
-                        {selectedSale?.cart?.batteries?.map(item => (
-                            <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
-                                <Col xs={2} md={2} className="p-0">
-                                    <img src={exemploImageCart} width={80} className="img-fluid" alt="Battery" />
-                                </Col>
+            <Modal.Body className="px-4 py-5">
+                <Row>
+                    <Col md={8}>
+                        <Card className="h-100">
+                            <Card.Header className="py-3" style={{backgroundColor: '#f8f8f8'}}>
+                                <h6 className="text-muted fw-bold mb-0">Items Da venda</h6>
+                            </Card.Header>
+                            <Card.Body className="h-100">
+                                {selectedSale?.cart?.batteries?.map(item => (
+                                    <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
+                                        <Col xs={2} md={2} className="p-0">
+                                            <img src={exemploImageCart} width={80} className="img-fluid" alt="Battery" />
+                                        </Col>
 
-                                <Col md={4} xs={9} className="ms-3 lh-md p-0 ">
-                                    <h6 className="mb-0 text-wrap">
-                                        {item.battery.name.length > 30 ? item.battery.name.substring(0, 30) + "..." : item.battery.name}
-                                    </h6>
-                                </Col>
+                                        <Col md={4} xs={9} className="ms-3 lh-md p-0 ">
+                                            <h6 className="mb-0 text-wrap">
+                                                {item.battery.name.length > 30 ? item.battery.name.substring(0, 30) + "..." : item.battery.name}
+                                            </h6>
+                                        </Col>
 
-                                <Col className="col-auto d-flex align-items-center justify-content-center" >
-                                    <span className="text-muted small" style={{ bottom: -17 }}>
-                                        {item.quantity} unidade{item.battery.quantity > 1 && 's'}
+                                        <Col className="col-auto d-flex align-items-center justify-content-center" >
+                                            <span className="text-muted small" style={{ bottom: -17 }}>
+                                                {item.quantity} unidade{item.battery.quantity > 1 && 's'}
+                                            </span>
+                                        </Col>
+
+                                        <Col className="d-flex align-items-center">
+                                            <span className="ms-auto font-numbers">R$ {item.battery.value.toFixed(2).replace('.', ',')}</span>
+                                        </Col>
+                                    </Row>
+                                ))}
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                    <Col>
+                        <Card className="h-100">
+                            <Card.Header className="py-3" style={{backgroundColor: '#f8f8f8'}}>
+                                <h6 className="text-muted fw-bold mb-0">Resumo da venda</h6>
+                            </Card.Header>
+                            <Card.Body className="h-100">
+                                <div className="d-flex justify-content-between">
+                                    <span>SubTotal</span>
+                                    <span className="text-muted">R$ {selectedSale.value.toFixed(2).replace('.', ',')}</span>
+                                </div>
+
+                                <div className="d-flex justify-content-between">
+                                    <span>Frete</span>
+                                    <span className="text-muted">R$ {selectedSale.freightValue.toFixed(2).replace('.', ',')}</span>
+                                </div>
+                            </Card.Body>
+                            <Card.Footer className="bg-white">
+                                <div className="d-flex justify-content-between">
+                                    <span className="fw-bold">Total</span>
+                                    <span className="text-muted">
+                                        R$ {((selectedSale.freightValue || 0) + (selectedSale.value || 0)).toFixed(2).toString().replace('.', ',')}
                                     </span>
-                                </Col>
+                                </div>
+                            </Card.Footer>
+                        </Card>
+                    </Col>
+                </Row>
 
-                                <Col className="d-flex align-items-center">
-                                    <span className="ms-auto font-numbers">R$ {item.battery.value.toFixed(2).replace('.', ',')}</span>
-                                </Col>
-                            </Row>
-                        ))}
-                    </Card.Body>
-                </Card>
             </Modal.Body>
         </Modal>
     )
