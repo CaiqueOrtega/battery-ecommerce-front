@@ -19,6 +19,7 @@ function DashboardPage() {
     const [sidebarSelectedOption, setSidebarSelectedOption] = useState(sessionStorage.getItem('selectedOption') || 'Baterias');
 
     useEffect(() => {
+        console.log(sidebarSelectedOption)
         setRenderOptionData(sidebarSelectedOption);
         sessionStorage.setItem('selectedOption', sidebarSelectedOption);
     }, [sidebarSelectedOption]);
@@ -43,7 +44,7 @@ function DashboardPage() {
             default:
                 return null;
         }
-    }, [sidebarSelectedOption, batteries, users, promotions]);
+    }, [sidebarSelectedOption, batteries, users, promotions, sales]);
 
 
     return (

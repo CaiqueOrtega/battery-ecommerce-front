@@ -4,22 +4,60 @@ import ConnectionAPI from "../ConnectionAPI";
 const SaleServices = () => {
     const { setErrorMessages, errorMessages, handleAPIError } = ErrorServices();
 
-    //Função adicionada temporariamente, lembrar de excluir após integração com AgilePay
-    const createSale = async (value, freightValue, addressId, userId, cartId, promotionId) => {
+    const createCreditCardPayment = async (paymentCardValues) => {
+        console.log(paymentCardValues)
         try {
-            const response = await ConnectionAPI.post('sale', {
-                value: value,
-                freightValue: freightValue,
-                addressId: addressId,
-                userId: userId,
-                cartId: cartId,
-                promotionId: promotionId
+            const response = await ConnectionAPI.post(`payment/card`, {
+                fmc_description: 'pagamento via cartão de crédito',
+                cardId: paymentCardValues.cardId,
+                saleData: {
+                    value: paymentCardValues.value,
+                    freightValue: paymentCardValues.freightValue,
+                    addressId: paymentCardValues.addressId,
+                    userId: paymentCardValues.userId,
+                    cartId: paymentCardValues.cartId
+                }
             })
             return response.data
-        } catch (error) {
-            handleAPIError(error)
+        }catch(error){
         }
     }
+
+    const createPixPayment = async (paymentPixValues) => {
+        try {
+            const response = await ConnectionAPI.post(`payment/pix`, {
+                fmp_description: 'pagamento via Pix',
+                saleData: {
+                    value: paymentPixValues.value,
+                    freightValue: paymentPixValues.freightValue,
+                    addressId: paymentPixValues.addressId,
+                    userId: paymentPixValues.userId,
+                    cartId: paymentPixValues.cartId
+                }
+            })
+            console.log(response.data)
+            return response.data;
+        }catch(error){
+        }
+    }
+
+    const createTicketPayment = async (paymentTicketValues) => {
+        try {
+            const response = await ConnectionAPI.post(`payment/ticket`, {
+                fmc_description: 'Pagamento via Boleto',
+                saleData: {
+                    value: paymentTicketValues.value,
+                    freightValue: paymentTicketValues.freightValue,
+                    addressId: paymentTicketValues.addressId,
+                    userId: paymentTicketValues.userId,
+                    cartId: paymentTicketValues.cartId
+                }
+            })
+            return response.data;
+        }catch(error){
+        }
+    }
+
 
     const getAllSales = async () => {
         try {
@@ -39,7 +77,7 @@ const SaleServices = () => {
         }
     }
 
-    return { createSale, getAllSales, getReportData, setErrorMessages, errorMessages }
+    return { createCreditCardPayment, createPixPayment, createTicketPayment, getAllSales, getReportData, setErrorMessages, errorMessages }
 }
 
 export default SaleServices;

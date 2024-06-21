@@ -52,10 +52,8 @@ function BatteryPurchasePage() {
     const addBatteryToLocalCart = () => {
         let batteriesAddCart = [];
         let totalValue = 0;
-
         const storedCart = localStorage.getItem('batteryCart');
         const cartData = JSON.parse(storedCart);
-        console.log(cartData)
         const isBatteryInCart = cartData?.batteries?.some(battery => battery.batteryId === batteryData.batteryId);
 
         if (!isBatteryInCart) {
@@ -89,6 +87,7 @@ function BatteryPurchasePage() {
             const newItem = {
                 cartId: Math.floor(Math.random() * 1000000),
                 totalValue: totalValue,
+                itemsQuantity: batteriesAddCart.reduce((total, battery) => total + parseInt(battery.quantity, 10), 0),
                 batteries: batteriesAddCart
             };
 
@@ -99,6 +98,7 @@ function BatteryPurchasePage() {
                     cardId: newItem.cartId,
                     totalValue: newItem.totalValue || 0,
                     promotion: null,
+                    itemsQuantity: newItem.itemsQuantity,
                     batteries: [
                         ...(batteryCart?.batteries || []),
                         {
@@ -148,6 +148,7 @@ function BatteryPurchasePage() {
         const response = await getFreight(formCEP, quantity);
         if (response) {
             setFreightValues(response);
+            console.log(addressValues)
             setAddressValues(addressValues);
 
             if (isRequestModal) {
@@ -164,7 +165,7 @@ function BatteryPurchasePage() {
                         <>
                             <MapIcon size={'15px'} />
                             <span className='ms-1'>
-                                {addressValues?.logradouro || addressValues?.localidade}, {addressValues?.bairro || addressValues?.uf}
+                                {addressValues?.address || addressValues?.city}, {addressValues?.neighborhood || addressValues?.state}
                             </span>
                         </>
                     ) : (
@@ -300,7 +301,7 @@ function CardBatteryPurchase(props) {
     const handleChange = (e) => {
         let newQuantity = parseInt(e.target.value);
         console.log(newQuantity);
-        if (newQuantity <= 0 ) {
+        if (newQuantity <= 0) {
             newQuantity = 1;
         } else if (newQuantity > props.batteryData.quantity) {
             newQuantity = props.batteryData.quantity;
@@ -397,21 +398,9 @@ function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, handleGetAd
         }
         if (address && Object.keys(address).length !== 0) {
             let mainAddress = address.find(addr => addr.main === true) || address[0];
-
+            console.log('AQUI', mainAddress)
             handleGetFreightByCep(
-                mainAddress.cep,
-                {
-                    logradouro: mainAddress.address,
-                    cep: mainAddress.cep,
-                    cidade: mainAddress.city,
-                    complemento: mainAddress.complement,
-                    bairro: mainAddress.neighborhood,
-                    numero: mainAddress.number,
-                    estado: mainAddress.state
-                },
-                false,
-                quantity
-            );
+                mainAddress.cep, mainAddress, false, quantity);
         } else if (addressIsLoaded) {
             const hasLocalAddress = localStorage.getItem('cepAddress');
             if (hasLocalAddress) {

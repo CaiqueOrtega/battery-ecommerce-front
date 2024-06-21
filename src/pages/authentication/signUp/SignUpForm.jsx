@@ -124,7 +124,7 @@ function SignUpForm({ handleToggleForm }) {
     const renderIcon = (condition) => {
         return passwordStrength.checked.includes(condition) ? <CheckCircleIcon className={`text-success`} /> : <ExclamationCircleIcon className={`text-danger`} />;
     };
-    
+
     return (
         <section className={`${errorMessages && errorMessages?.general || errorMessages?.serverError ? '' : 'mt-5'}`}>
             <Form onSubmit={(e) => handleVerifyInicialData(e)}>
@@ -158,6 +158,7 @@ function SignUpForm({ handleToggleForm }) {
                                 onChange={(e) => setSingUpFormData({ ...singUpFormData, document: e.target.value })} icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                                 type='text' placeholder='CPF'
                                 feedback={errorMessages.document}
+                                mask={'999.999.999-99'}
                             />
                         </Form.Label>
                     </div>
@@ -185,8 +186,8 @@ function SignUpForm({ handleToggleForm }) {
                                                 <ProgressBar variant={passwordStrength?.variant?.type} now={passwordStrength?.strength} label={`${passwordStrength?.variant?.text}`} />
                                             </div>
 
-                                            <div className="input-progress-container position-absolute z-1 mt-2" id="meuPopover" style={{position: 'absolute', top: '100%', right: -20, visibility: showPopover ? 'visible' : 'hidden'  }}
-                                           
+                                            <div className="input-progress-container position-absolute z-1 mt-2" id="meuPopover" style={{ position: 'absolute', top: '100%', right: -20, visibility: showPopover ? 'visible' : 'hidden' }}
+
                                             >
                                                 <div className="popover" >
                                                     <div className='popover-header '>

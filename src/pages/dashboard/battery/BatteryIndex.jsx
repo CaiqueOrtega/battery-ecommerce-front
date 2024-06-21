@@ -157,7 +157,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                     <Modal.Title>{selectedBattery ? 'Editar Produto' : 'Cadastrar Produto'}</Modal.Title>
                     <button className='btn-close btn-close-white' onClick={() => setShowBatteryFormModal(false)} />
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className='px-4'>
                     <Row>
                         <Col xs={12} className='col-lg-auto d-flex justify-content-center'>
                             <BatteryCard
@@ -166,6 +166,8 @@ function BatteryIndex({ batteries, setBatteries }) {
                                 batteryPrice={batteryValues.value}
                                 batteryQuantity={batteryValues.quantity}
                                 onPlaceholder={false}
+                                sizeWidth={'232px'}
+                                sizeHeight={'434px'}
                             />
                         </Col>
                         <Col>

@@ -39,7 +39,9 @@ function DashBoardProvider({ children }) {
                     const batteryData = await getBatteriesAll();
                     setBatteries(batteryData);
                 } else if (renderOptionData === 'Vendas' && !sales.length) {
+                    console.log('entrou')
                     const salesData = await getAllSales();
+                    console.log(salesData)
                     setSales(salesData);
 
                 } else if (renderOptionData === 'Entregas' && !deliveries.length) {

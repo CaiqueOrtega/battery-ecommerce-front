@@ -19,6 +19,7 @@ function NavbarComponent({ showNavbarSearch, isCartPage }) {
   const { batteriesActive, batteryCart, batteryCartIsLoaded } = useGlobalDataProvider();
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  console.log(batteryCart)
 
   const renderLinksDropDown = () => (
     <>

@@ -15,7 +15,7 @@ const AddressServices = () => {
                 city: formAddressValues.city,
                 state: formAddressValues.state,
                 CEP: formAddressValues.cep,
-                main: formAddressValues.main ,
+                main: formAddressValues.main,
                 userId: userId
             })
             return response.data
@@ -52,14 +52,14 @@ const AddressServices = () => {
         }
     }
 
-     const updateMainAddress = async (addressId) =>{
+    const updateMainAddress = async (addressId) => {
         try {
             const response = await ConnectionAPI.patch(`address/main/${addressId}`)
             return response.data;
         } catch (error) {
             handleAPIError(error)
         }
-     } 
+    }
 
     const getAddressByUserId = async (userId) => {
         try {
@@ -82,7 +82,15 @@ const AddressServices = () => {
     const getAddressCep = async (cep) => {
         try {
             const response = await ViaCepAPI.get(`${cep}/json/`)
-            return response.data
+            console.log(response.data)
+            return {
+                address: response.data.logradouro,
+                cep: response.data.cep.replace('-', ''),
+                city: response.data.localidade,
+                complement: response.data.complemento,
+                neighborhood: response.data.bairro,
+                state: response.data.uf,
+            }
         } catch (error) {
             return false
         }

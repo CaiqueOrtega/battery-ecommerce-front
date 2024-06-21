@@ -78,17 +78,28 @@
 }
 
 .credit-card-animation {
-    background-image: 
-        linear-gradient(-45deg, var(--color-card-primary, #888888) 55%, var(--color-card-secondary, #818181) 50%), 
-        linear-gradient(-45deg, var(--new-color-card-primary) 55%, var(--new-color-card-secondary) 50%) !important; 
-    animation: changeColor 1s forwards; 
+    background-image:
+        linear-gradient(-45deg, var(--color-card-primary, #888888) 55%, var(--color-card-secondary, #818181) 50%),
+        linear-gradient(-45deg, var(--new-color-card-primary) 55%, var(--new-color-card-secondary) 50%) !important;
+    animation: changeColor 1s forwards;
 }
 
 @keyframes changeColor {
     0% {
         background-position: 0 0, 0 0;
     }
+
     100% {
-        background-position: -100% 0, 0 0; 
+        background-position: -100% 0, 0 0;
+    }
+}
+
+.m-floating-label {
+    margin-top: 1rem;
+}
+
+@media (min-width: 1400px) {
+    .m-floating-label {
+        margin-top: 1.3rem;
     }
 }

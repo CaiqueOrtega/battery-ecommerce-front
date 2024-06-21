@@ -1,8 +1,7 @@
 import { Card, Row, Col } from "react-bootstrap";
-import { WhatsAppIcon, InstagramIcon, FacebookIcon, GoogleMapsICon } from '../../../../assets/icons/IconsSet'
+import { WhatsAppIcon, InstagramIcon, FacebookIcon, GoogleMapsICon, AgilePayIcon } from '../../../../assets/icons/IconsSet'
 import logoMacDavis from '../../../../assets/images/logo-macDavis-motos.png'
 import { Link } from "react-router-dom";
-import logoAgilePay from '../../../../assets/images/AgilePay-60x60.png'
 import logoBateriasJupiter from '../../../../assets/images/logo.png'
 function FooterComponent() {
     const socialIcons = [
@@ -26,7 +25,9 @@ function FooterComponent() {
 
                                 <p className="small mb-2">Empresa Parceira <span className="fw-bold" style={{ color: '#fc2f30' }}>Baterias Jupiter</span></p>
                                 <a className="text-white text-decoration-none d-flex align-items-center" href="https://www.instagram.com/agilepaydigital/?utm_source=ig_web_button_share_sheet" target="_blank" rel="noopener noreferrer" >
-                                    <span className="text-white text-decoration-none rounded-circle d-flex justify-content-center align-items-center bg-white" style={{ width: '30px', height: '30px' }}><img src={logoAgilePay} alt="Logo AgilePay " width={20} /></span>
+                                    <span className="text-white text-decoration-none rounded-circle d-flex justify-content-center align-items-center bg-white" style={{ width: '30px', height: '30px' }}>
+                                        <AgilePayIcon />
+                                    </span>
                                     <span className="ms-2 small">AgilePay</span>
                                 </a>
                             </div>

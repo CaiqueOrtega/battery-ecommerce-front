@@ -1,0 +1,46 @@
+.filled-circle {
+    animation: fillCircle 0.3s forwards;
+    animation-delay: 0.37s;
+    background: linear-gradient(to right, #007bff 50%, #e9ecef 50%);
+    background-size: 200% 100%;
+    background-position: 100% 0;
+}
+
+@keyframes fillCircle {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+.retrocesso {
+    transition-delay: 0.3s !important;
+}
+
+.filled-reversed-circle {
+    animation: fillCircleReverse 0.3s forwards ease-in;
+    background: linear-gradient(to left, #007bff 50%, #e9ecef 50%);
+    background-size: 200% 100%;
+    background-position: 100% 0;
+}
+
+@keyframes fillCircleReverse {
+    0% {
+        background-position: -100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+.modal-sale {
+    max-width: 555px;
+}
+
+.modal-sale-content{
+    height: 660px !important;
+}

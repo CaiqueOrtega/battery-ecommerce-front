@@ -10,13 +10,12 @@ import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import './cart.css';
 import FormValidations from "../../components/common/FormValidation";
-import SaleServices from '../../services/sale/SaleServices'
-import SaleStepsModal from "../sale/steps/SaleStepsModal";
+import SaleStepsModal from "../sale/SaleStepsModal";
 
 function CartPage() {
-    const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, addressIsLoaded, fetchAddress, userData } = useGlobalDataProvider();
-    const { getAddressCep, getFreight } = AddressServices();
-    const { removeBattery, changeBatteryQuantity, errorMessages, setErrorMessages } = BatteryCartServices();
+    const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, setAddress, addressIsLoaded, fetchAddress, userData } = useGlobalDataProvider();
+    const { getAddressCep, getFreight, errorMessages: addressErrorMessages } = AddressServices();
+    const { removeBattery, changeBatteryQuantity, errorMessages: batteryErrorMessages, setErrorMessages } = BatteryCartServices();
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
     const [confirmAction, setConfirmAction] = useState({});
@@ -24,7 +23,7 @@ function CartPage() {
     const [addressValues, setAddressValues] = useState({})
     const [formCEP, setFormCEP] = useState('');
     const [showSelectedAddressModal, setShowSelectedAddressModal] = useState(false);
-    const [totalQuantity, setTotalQuantity] = useState(1);
+    const [freightIsLoaded, setFreightIsLoaded] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -35,117 +34,111 @@ function CartPage() {
             fetchData();
         }
 
-        if (address && Object.keys(address).length !== 0 && batteryCartIsLoaded) {
+        if (address?.length > 0 && batteryCartIsLoaded) {
             let mainAddress = address.find(addr => addr.main === true) || address[0];
+            handleGetFreightByCep(mainAddress.cep, mainAddress, false, batteryCart?.itemsQuantity);
 
-            handleGetFreightByCep(
-                mainAddress.cep,
-                {
-                    logradouro: mainAddress.address,
-                    cep: mainAddress.cep,
-                    cidade: mainAddress.city,
-                    complemento: mainAddress.complement,
-                    bairro: mainAddress.neighborhood,
-                    numero: mainAddress.number,
-                    estado: mainAddress.state
-                },
-                false,
-                handleCalculateTotalQuantity(batteryCart)
-            );
         } else if (addressIsLoaded && batteryCartIsLoaded) {
+
             const hasLocalAddress = localStorage.getItem('cepAddress');
 
-            console.log(hasLocalAddress)
             if (hasLocalAddress) {
                 handleGetAddressByCep(null, hasLocalAddress, false);
+            } else {
+                setFreightIsLoaded(true);
             }
         }
     }, [addressIsLoaded, batteryCartIsLoaded]);
 
 
     const handleGetAddressByCep = async (event, formCEP, isRequestModal) => {
-        console.lo
-        if (event instanceof Object && event !== null && event.preventDefault) {
+        if (event?.preventDefault) {
             event.preventDefault();
         }
-        if (formCEP != addressValues.cep) {
+
+        if (formCEP !== addressValues.cep) {
             const response = await getAddressCep(formCEP);
             if (response) {
                 if (Object.keys(address).length === 0) {
                     localStorage.setItem('cepAddress', formCEP);
                 }
-                handleGetFreightByCep(formCEP, response, isRequestModal, handleCalculateTotalQuantity(batteryCart));
+
+                let totalQuantity = batteryCart?.itemsQuantity || JSON.parse(localStorage.getItem('batteryCart'))?.itemsQuantity;
+
+                if (totalQuantity) {
+                    handleGetFreightByCep(formCEP, response, isRequestModal, totalQuantity);
+                }else{
+                    setFreightIsLoaded(true);
+                }
             } else {
-                setErrorMessages({ cep: 'CEP inválido ou não encontrado' })
+                setErrorMessages({ cep: 'CEP inválido ou não encontrado' });
             }
         }
-    }
+    };
 
-    const handleGetFreightByCep = async (formCEP, addressValues, isRequestModal, totalQuantity) => {
-        const response = await getFreight(formCEP, totalQuantity);
+    const handleGetFreightByCep = async (formCEP, addressValues, isRequestModal, itemsQuantity) => {
+        const response = await getFreight(formCEP, itemsQuantity);
         if (response) {
             setFreightValues(response);
-            if (Object.keys(addressValues).length !== 0) {
-                setAddressValues(addressValues);
-            }
             if (isRequestModal) {
                 setShowSelectedAddressModal(false)
             }
         }
-    }
-
-    const handleCalculateTotalQuantity = (updatedBatteryCart) => {
-        const newTotalQuantity = updatedBatteryCart.batteries.reduce((acc, item) => {
-            return acc + item.quantity;
-        }, 0);
-        setTotalQuantity(newTotalQuantity)
-        return newTotalQuantity
+        if (Object.keys(addressValues).length !== 0) {
+            setAddressValues({ ...addressValues, selectedAddressCard: true });
+        }
+        setFreightIsLoaded(true)
     }
 
     const handleCartAction = async (action, data) => {
         const actions = {
             'remove': async () => {
-                let newTotalValue;
                 try {
+                    let response = {};
                     if (isLoggedIn) {
-                        const response = await removeBattery(batteryCart.cartId, data.batteryId);
-                        newTotalValue = response?.totalValue !== undefined ? response?.totalValue : 0;
+                        response = await removeBattery(batteryCart.cartId, data.batteryId);
                     } else {
                         let localBatteryCart = localStorage.getItem('batteryCart');
                         if (localBatteryCart) {
                             localBatteryCart = JSON.parse(localBatteryCart);
 
-                            const removedBattery = batteryCart.batteries.find(item => item.battery.batteryId === data.batteryId);
-
-                            const removedBatteryValue = removedBattery ? removedBattery?.battery?.value : 0;
-                            newTotalValue = localBatteryCart.totalValue -= removedBatteryValue;
-
                             localBatteryCart.batteries = localBatteryCart.batteries.filter(item =>
                                 item.batteryId !== data.batteryId
                             );
 
-                            if (localBatteryCart?.batteries.length === 0) {
-                                localStorage.removeItem('batteryCart')
+                            if (localBatteryCart?.batteries?.length === 0) {
+                                localStorage.removeItem('batteryCart');
                             } else {
-                                localStorage.setItem('batteryCart', JSON.stringify(localBatteryCart));
-                            }
+                                const removedBattery = batteryCart.batteries.find(item => item.battery.batteryId === data.batteryId);
 
+                                if (removedBattery) {
+                                    localBatteryCart.totalValue -= (removedBattery.battery.value * removedBattery.quantity);
+                                }
+
+                                localBatteryCart.itemsQuantity = localBatteryCart.batteries.reduce((total, battery) => total + parseInt(battery.quantity, 10), 0);
+
+                                localStorage.setItem('batteryCart', JSON.stringify(localBatteryCart));
+
+                                response = {
+                                    totalValue: localBatteryCart.totalValue,
+                                    itemsQuantity: localBatteryCart.itemsQuantity
+                                };
+                            }
                         }
                     }
-
                     const updatedBatteryCart = {
                         ...batteryCart,
+                        totalValue: response?.totalValue,
+                        itemsQuantity: response?.itemsQuantity,
                         batteries: batteryCart.batteries.filter(item =>
                             item.battery.batteryId !== data.batteryId
-                        ),
-                        totalValue: newTotalValue
+                        )
                     };
 
-                    const totalQuantity = handleCalculateTotalQuantity(updatedBatteryCart);
                     setBatteryCart(updatedBatteryCart);
-                    handleGetFreightByCep(addressValues.cep, {}, false, totalQuantity)
+                    handleGetFreightByCep(addressValues.cep, {}, false, response.itemsQuantity);
                 } catch (e) {
-                    console.log('erro ao remover bateria do carrinho', e)
+                    console.log('Erro ao remover bateria do carrinho', e);
                 }
             },
             'changeQuantity': async () => {
@@ -158,7 +151,7 @@ function CartPage() {
                         if (localBatteryCart) {
                             localBatteryCart = JSON.parse(localBatteryCart);
 
-                            const totalValue = batteryCart.batteries.reduce((accumulator, battery) => {
+                            localBatteryCart.totalValue = batteryCart.batteries.reduce((accumulator, battery) => {
                                 if (battery.cart_battery_id === data.cartBatteryId) {
                                     return accumulator + (battery.battery.value * data.quantity);
                                 }
@@ -172,26 +165,31 @@ function CartPage() {
                                 return item;
                             });
 
-                            localBatteryCart.totalValue = totalValue;
+                            localBatteryCart.itemsQuantity = localBatteryCart.batteries.reduce((total, battery) => total + parseInt(battery.quantity, 10), 0)
+
 
                             localStorage.setItem('batteryCart', JSON.stringify(localBatteryCart));
-                            response = { totalValue };
+                            response = {
+                                totalValue: localBatteryCart.totalValue,
+                                itemsQuantity: localBatteryCart.itemsQuantity
+                            };
                         }
                     }
-
-                    const updatedBatteryCart = {
-                        ...batteryCart,
-                        totalValue: response.totalValue,
-                        batteries: batteryCart.batteries.map(item => {
-                            if (item.cart_battery_id === data.cartBatteryId) {
-                                return { ...item, quantity: data.quantity };
-                            }
-                            return item;
-                        })
-                    };
-                    const totalQuantity = handleCalculateTotalQuantity(updatedBatteryCart);
-                    setBatteryCart(updatedBatteryCart);
-                    handleGetFreightByCep(addressValues.cep, {}, false, totalQuantity)
+                    if (response && Object.keys(response).length > 0) {
+                        const updatedBatteryCart = {
+                            ...batteryCart,
+                            totalValue: response.totalValue,
+                            itemsQuantity: response.itemsQuantity,
+                            batteries: batteryCart.batteries.map(item => {
+                                if (item.cart_battery_id === data.cartBatteryId) {
+                                    return { ...item, quantity: data.quantity };
+                                }
+                                return item;
+                            })
+                        };
+                        setBatteryCart(updatedBatteryCart);
+                        handleGetFreightByCep(addressValues.cep, {}, false, response.itemsQuantity)
+                    }
                 } catch (e) {
                     console.log('erro ao mudar quantidade de bateria do carrinho', e)
                 }
@@ -212,7 +210,7 @@ function CartPage() {
 
     return (
         <>
-            <Container className="py-5">
+            <Container className="py-5" style={{maxWidth: 1140}}>
                 <Row>
                     <Col md={8}>
                         <RenderCartItemsCard
@@ -221,7 +219,6 @@ function CartPage() {
                             setConfirmChangesModalData={setConfirmChangesModalData}
                             setConfirmAction={setConfirmAction}
                             handleCartAction={handleCartAction}
-                            setBatteryCart={setBatteryCart}
                             batteryCartIsLoaded={batteryCartIsLoaded}
                             address={address}
                             isLoggedIn={isLoggedIn}
@@ -233,7 +230,8 @@ function CartPage() {
                             addressValues={addressValues}
                             showSelectedAddressModal={showSelectedAddressModal}
                             setShowSelectedAddressModal={setShowSelectedAddressModal}
-                            totalQuantity={totalQuantity}
+                            freightIsLoaded={freightIsLoaded}
+                            addressErrorMessages={addressErrorMessages}
                         />
                     </Col>
 
@@ -241,11 +239,18 @@ function CartPage() {
                         <RenderCartSummaryCard batteryCart={batteryCart}
                             batteryCartIsLoaded={batteryCartIsLoaded}
                             freightValues={freightValues}
+                            setFreightValues={setFreightValues}
                             addressIsLoaded={addressIsLoaded}
                             address={address}
+                            setAddress={setAddress}
                             isLoggedIn={isLoggedIn}
                             userData={userData}
                             addressValues={addressValues}
+                            freightIsLoaded={freightIsLoaded}
+                            setAddressValues={setAddressValues}
+                            addressErrorMessages={addressErrorMessages}
+                            setBatteryCart={setBatteryCart}
+
                         />
                     </Col>
                 </Row>
@@ -261,8 +266,9 @@ function CartPage() {
     );
 }
 
-function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, totalQuantity }) {
+function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, freightIsLoaded, addressErrorMessages }) {
     const { ExtractNumericValue } = FormValidations()
+    const [showPopover, setShowPopover] = useState(false);
 
     const handleRemoveBattery = (batteryId) => {
         setShowConfirmChangesModal(true)
@@ -317,6 +323,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
         const [localQuantity, setLocalQuantity] = useState(quantity.toString());
         const [prevQuantity, setPrevQuantity] = useState(quantity.toString());
 
+
         const timeoutIdRef = useRef(null);
 
         useEffect(() => {
@@ -370,14 +377,14 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                     Carrinho de Baterias
                 </Card.Header>
 
-                <Card.Body className="overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
+                <Card.Body className="overflow-auto custom-scrollbar" style={{ height: Object.keys(batteryCart).length > 0 && batteryCart?.batteries?.length > 0 ? 350 : 389 }}>
                     {!batteryCartIsLoaded ? (
                         <div className="d-flex flex-grow-1 align-items-center justify-content-center h-100">
                             <span className="loader"></span>
                         </div>
                     ) : (
                         <>
-                            {Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
+                            {Object.keys(batteryCart).length > 0 && batteryCart?.batteries?.length > 0 ? (
                                 <>
                                     {batteryCart?.batteries?.map(item => (
                                         <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
@@ -423,43 +430,92 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                         </>
                     )}
                 </Card.Body>
-                {batteryCartIsLoaded && batteryCart?.batteries?.length !== 0 && (
+                {batteryCartIsLoaded && batteryCart?.batteries?.length > 0 ? (
                     <Card.Footer className="bg-light px-4">
-                        {addressValues && Object.keys(addressValues).length > 0 || localStorage.getItem('cepAddress') ? (
-                            <>
-                                {Object.keys(addressValues).length != 0 ? (
-                                    <div className="d-flex justify-content-between">
+                        <>
+                            {freightIsLoaded ? (
+                                <div className="d-flex justify-content-between">
+                                    {!addressValues?.cep ? (
+                                        <a type="button" className="text-muted" onClick={() => setShowSelectedAddressModal(true)}>Calcular Frete</a>
+                                    ) : (
+
                                         <a type="button" className="text-muted small" onClick={() => setShowSelectedAddressModal(true)}>
+
                                             <MapIcon size={'15px'} />
                                             <span className="ms-1">
-                                                {addressValues?.logradouro || addressValues?.localidade}, {addressValues?.bairro || addressValues?.uf}
+                                                {addressValues?.address},{addressValues?.number} {addressValues?.neighborhood}, {addressValues?.city}, {addressValues?.state}
                                             </span>
                                         </a>
+                                    )}
 
-                                        <span className="text-muted small d-flex align-items-center"><DeliveryIcon size={18} />
-                                            <span className="mx-1">
-                                                Recebe até
-                                            </span>
-                                            {getEstimatedArrivalDate(freightValues?.estimateDays)}
-                                            <span className="text-success ms-1 font-numbers">
-                                                - R${freightValues?.totalFreightCost.toFixed(2)}
-                                            </span>
+                                    <span className="text-muted small d-flex align-items-center"><DeliveryIcon size={18} />
+                                        <span className="mx-1">
+                                            Recebe até
                                         </span>
-                                    </div>
-                                ) : (
-                                    <Placeholder as='span' animation="glow" className="small d-flex justify-content-between">
-                                        <Placeholder xs={5} />
-                                        <Placeholder xs={4} />
-                                    </Placeholder>
-                                )
-                                }
-                            </>
-                        ) : (
-                            <a type="button" className="text-muted" onClick={() => setShowSelectedAddressModal(true)}>Calcular Frete</a>
-                        )}
+                                        {!freightValues?.totalFreightCost ? (
+                                            <>
+                                                <div
+                                                    className="input-progress-container position-absolute z-1 mt-2"
+                                                    style={{
+                                                        position: 'absolute',
+                                                        top: '100%',
+                                                        right: 0,
+                                                        visibility: showPopover ? 'visible' : 'hidden'
+                                                    }}
+                                                >
+                                                    <div className="popover shadow-sm">
+                                                        <div className='popover-header py-1'>
+                                                            <span className='small'>Frete Não Calculado</span>
+                                                        </div>
+                                                        <div className="d-flex align-items-center justify-content-center popover-content p-2">
+                                                            <span>
+                                                                {addressErrorMessages.freight ? (
+                                                                    <>
+                                                                        Erro ao Calcular o frete, tente novamente mais tarde
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        Por favor, insira um CEP ou selecione um endereço para calcular o valor do frete.
+                                                                    </>
+
+                                                                )}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <a
+                                                    className='float-end ms-2 z-3 position-relative text-muted'
+                                                    type="button"
+                                                    onMouseOver={() => setShowPopover(true)}
+                                                    onMouseOut={() => setShowPopover(false)}
+                                                >
+                                                    <ExclamationCircleIcon />
+                                                </a>
+                                            </>
+                                        ) : (
+                                            <>
+                                                {getEstimatedArrivalDate(freightValues?.estimateDays)}
+                                                <span className="text-success ms-1 font-numbers">
+                                                    - R${freightValues?.totalFreightCost?.toFixed(2)}
+                                                </span>
+                                            </>
+                                        )}
+
+                                    </span>
+                                </div>
+                            ) : (
+                                <Placeholder as='span' animation="glow" className="small d-flex justify-content-between">
+                                    <Placeholder xs={5} />
+                                    <Placeholder xs={4} />
+                                </Placeholder>
+                            )
+                            }
+                        </>
+
                     </Card.Footer>
-                )}
-            </Card>
+                ) : null}
+            </Card >
             <ModalSelectedAddress
                 address={address}
                 setShowSelectedAddressModal={setShowSelectedAddressModal}
@@ -469,21 +525,19 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                 setFormCEP={setFormCEP}
                 handleGetAddressByCep={handleGetAddressByCep}
                 isLoggedIn={isLoggedIn}
-                quantity={totalQuantity}
             />
         </>
     )
 }
 
-function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues, addressIsLoaded, address, isLoggedIn, userData, addressValues }) {
+function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoaded, addressIsLoaded, address, setAddress, isLoggedIn, userData, addressValues, setAddressValues, freightValues, setFreightValues, freightIsLoaded, addressErrorMessages }) {
     const [showPopover, setShowPopover] = useState(false);
     const [showSaleStepsModal, setShowSaleStepsModal] = useState();
-    const { createSale } = SaleServices();
+    const [steps, setSteps] = useState('address');
 
-    const handleContinueSale = () =>{
+    const handleContinueSale = () => {
         setShowSaleStepsModal(true);
     }
-
     return (
         <>
             <Card className={`border-0 shadow h-100  ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
@@ -532,49 +586,55 @@ function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues
                                         <div className="d-flex justify-content-between position-relative">
                                             <span className="small">Valor Frete</span>
                                             <span>
-                                                {freightValues?.totalFreightCost ? (
-                                                    <span className="font-numbers small">
-                                                        R$ {freightValues?.totalFreightCost}
-                                                    </span>
-                                                ) : addressIsLoaded && !localStorage.getItem('addressCep') && address?.length === 0 ? (
+                                                {freightIsLoaded ? (
                                                     <>
-                                                        <div
-                                                            className="input-progress-container position-absolute z-1 mt-2"
-                                                            style={{
-                                                                position: 'absolute',
-                                                                top: '100%',
-                                                                right: -20,
-                                                                visibility: showPopover ? 'visible' : 'hidden'
-                                                            }}
-                                                        >
-                                                            <div className="popover shadow-sm">
-                                                                <div className='popover-header py-1'>
-                                                                    <span className='small'>Frete Não Calculado</span>
-                                                                </div>
-                                                                <div className="d-flex align-items-center justify-content-center popover-content p-2">
-                                                                    <span>
-                                                                        Por favor, insira um CEP ou selecione um endereço para calcular o valor do frete.
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                                        {freightValues?.totalFreightCost ? (
+                                                            <span className="font-numbers small">
+                                                                R$ {freightValues.totalFreightCost}
+                                                            </span>
+                                                        ) : (
+                                                            addressIsLoaded && !localStorage.getItem('addressCep') && address.length === 0 ? (
+                                                                <>
+                                                                    <div className="input-progress-container position-absolute z-1 mt-2" style={{ position: 'absolute', top: '100%', right: -20, visibility: showPopover ? 'visible' : 'hidden' }}>
+                                                                        <div className="popover shadow-sm">
+                                                                            <div className='popover-header py-1'>
+                                                                                <span className='small'>Frete Não Calculado</span>
+                                                                            </div>
+                                                                            <div className="d-flex align-items-center justify-content-center popover-content p-2">
+                                                                                <span>
+                                                                                    {addressErrorMessages?.freight ? (
+                                                                                        <>
+                                                                                            Erro ao Calcular o frete, tente novamente mais tarde
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        <>
+                                                                                            Por favor, insira um CEP ou selecione um endereço para calcular o valor do frete.
+                                                                                        </>
+                                                                                    )}
 
-                                                        <a
-                                                            className='float-end ms-2 text-muted z-3 position-relative'
-                                                            type="button"
-                                                            onMouseOver={() => setShowPopover(true)}
-                                                            onMouseOut={() => setShowPopover(false)}
-                                                        >
-                                                            <ExclamationCircleIcon />
-                                                        </a>
+                                                                                </span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <a
+                                                                        className='float-end ms-2 text-muted z-3 position-relative'
+                                                                        type="button"
+                                                                        onMouseOver={() => setShowPopover(true)}
+                                                                        onMouseOut={() => setShowPopover(false)}
+                                                                    >
+                                                                        <ExclamationCircleIcon />
+                                                                    </a>
+                                                                </>
+                                                            ) : null
+                                                        )}
                                                     </>
                                                 ) : (
-                                                    <>
-                                                        <Spinner size="sm" animation="border" role="status">
-                                                            <span className="visually-hidden">Loading...</span>
-                                                        </Spinner>
-                                                    </>
+                                                    <Spinner size="sm" animation="border" role="status">
+                                                        <span className="visually-hidden">Loading...</span>
+                                                    </Spinner>
                                                 )}
+
                                             </span>
                                         </div>
                                     </section>
@@ -590,7 +650,7 @@ function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues
                                                 </span>
                                             </span>
                                         </div>
-                                        <Button variant="yellow fw-bold w-100 py-2 mt-2" onClick={() => handleContinueSale()}>Continuar a Compra</Button>
+                                        <Button variant="yellow fw-bold w-100 py-2 mt-2" disabled={!freightIsLoaded} onClick={() => handleContinueSale()}>Continuar a Compra</Button>
                                     </section>
                                 </>
                             ) : (
@@ -609,12 +669,19 @@ function RenderCartSummaryCard({ batteryCart, batteryCartIsLoaded, freightValues
             </Card >
 
             <SaleStepsModal
-            showSaleStepsModal={showSaleStepsModal} 
-            setShowSaleStepsModal={setShowSaleStepsModal}
-            isLoggedIn={isLoggedIn}
-            addressValues={addressValues}
-            address={address}
-            userData={userData}
+                showSaleStepsModal={showSaleStepsModal}
+                setShowSaleStepsModal={setShowSaleStepsModal}
+                isLoggedIn={isLoggedIn}
+                addressValues={addressValues}
+                setAddressValues={setAddressValues}
+                freightValues={freightValues}
+                address={address}
+                setAddress={setAddress}
+                userData={userData}
+                steps={steps}
+                setSteps={setSteps}
+                batteryCart={batteryCart}
+                setBatteryCart={setBatteryCart}
             />
         </>
     )

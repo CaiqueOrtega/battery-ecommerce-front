@@ -20,8 +20,9 @@ const CardServices = () => {
                 cardOwner: formValues.cardOwner,
                 expirationDate: formValues.expirationDate,
                 cvv: formValues.cvv,
-                userId: userId,
-                main: formValues.main
+                ownerDocument: formValues.ownerDocument,
+                main: formValues.main,
+                userId: userId
             })
             return response.data
         } catch (error) {
@@ -55,7 +56,7 @@ const CardServices = () => {
     const updateMainCard = async (cardId) => {
         try {
             const response = await ConnectionAPI.put(`card/main/${cardId}`)
-            return response.data
+            return response.status
         } catch (error) {
             handleAPIError(error)
         }

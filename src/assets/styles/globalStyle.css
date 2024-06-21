@@ -144,3 +144,7 @@ body {
     width: 0;
     height: 0;
 }
+
+.custom-mask-color::placeholder {
+    color: #54575a !important; 
+}

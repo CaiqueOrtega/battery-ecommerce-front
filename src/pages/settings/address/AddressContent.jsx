@@ -1,4 +1,4 @@
-import { Button, Form, Card, Row, Col } from "react-bootstrap";
+import { Button, Form, Card, Row, Col, Container } from "react-bootstrap";
 import { AddAddressIcon, ReturnIcon } from "../../../assets/icons/IconsSet"
 import { useState, useEffect } from "react";
 import { useAuthProvider } from "../../../context/AuthProvider";
@@ -165,8 +165,9 @@ function AddressContent() {
                 )}
             </div >
 
-            <div className="h-100 py-5 px-md-5 px-4 d-flex-justify-content-center" >
-                {showAddressForm ? (
+
+            {showAddressForm ? (
+                <div className="h-100 py-5 px-md-5 px-4 d-flex align-items-center" >
                     <AddressForm
                         setShowAddressForm={setShowAddressForm}
                         showAddressForm={showAddressForm}
@@ -178,8 +179,10 @@ function AddressContent() {
                         getAddressCep={getAddressCep}
                         errorMessages={errorMessages}
                     />
-                ) : (
-                    address.length !== 0 ? (
+                </div>
+            ) : (
+                address.length !== 0 ? (
+                    <Container className= "h-100 py-5 px-md-5 px-4" style={{maxWidth: 736}}>
                         <UserAddress
                             address={address}
                             setAddress={setAddress}
@@ -187,13 +190,13 @@ function AddressContent() {
                             setShowAddressForm={setShowAddressForm}
                             handleAddressAction={handleAddressAction}
                         />
-                    ) : (
-                        <div className="d-flex justify-content-center align-items-center h-100">
-                            <h3 className="text-dark text-muted">Nenhum Endereço Cadastrado</h3>
-                        </div>
-                    )
-                )}
-            </div>
+                    </Container >
+                ) : (
+                    <div className="d-flex justify-content-center align-items-center h-100">
+                        <h3 className="text-dark text-muted">Nenhum Endereço Cadastrado</h3>
+                    </div>
+                )
+            )}
             <ConfirmChangesModal
                 showConfirmChangesModal={showConfirmChangesModal}
                 setShowConfirmChangesModal={setShowConfirmChangesModal}
@@ -223,17 +226,21 @@ function AddressForm(props) {
     return (
         <section>
             <h3>{props.isUpdateId ? 'Editar o' : 'Cadastro de'} Endereço</h3>
-            <button className='btn-close btn-close-white' onClick={() => props.setShowAddressForm(false)} />
 
             <FormAddressRegister
-                handleSubmit={handleSubmit}
                 errorMessages={props.errorMessages}
                 formAddressValues={props.formAddressValues}
                 setFormAddressValues={props.setFormAddressValues}
                 isUpdateId={props.isUpdateId}
                 getAddressCep={props.getAddressCep} />
 
-        </section >
+            <div className="mt-5">
+                <Button variant="yellow float-end" type="submit" onClick={(e) => handleSubmit(e)} style={{ maxHeight: '35px' }}>
+                    {props.action === 'update' ? 'Editar' : 'Cadastrar'} Endereço
+                </Button>
+            </div>
+
+        </section>
     );
 }
 

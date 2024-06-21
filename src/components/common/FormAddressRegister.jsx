@@ -1,10 +1,10 @@
-import { Form, Col, Row, Button} from "react-bootstrap";
+import { Form, Col, Row, Button } from "react-bootstrap";
 import { MapIcon, TextBodyIcon, StreetIcon, NumberIcon, CityIcon, NeighborHood, StateIcon } from "../../assets/icons/IconsSet";
 import AlertErrorOrSuccess from "./AlertErrorOrSuccess";
 import FormGroupWithIcon from "./FormGroupWithIcon";
 
 
-function FormAddressRegister({ handleSubmit, errorMessages, formAddressValues, setFormAddressValues, isUpdateId, getAddressCep }) {
+function FormAddressRegister({ errorMessages, formAddressValues, setFormAddressValues, isUpdateId, getAddressCep, formRef }) {
 
     async function handleCepChange(cep) {
         const cleanedCep = cep.replace(/\D/g, '');
@@ -17,12 +17,12 @@ function FormAddressRegister({ handleSubmit, errorMessages, formAddressValues, s
                 setFormAddressValues({
                     ...formAddressValues,
                     cep: cleanedCep,
-                    address: response.logradouro,
+                    address: response.address,
                     number: formAddressValues.number || '',
-                    complement: formAddressValues.complement || '',
-                    neighborhood: response.bairro,
-                    city: response.localidade,
-                    state: response.uf,
+                    complement: response.complement ||  formAddressValues.complement,
+                    neighborhood: response.neighborhood,
+                    city: response.city,
+                    state: response.state,
                 });
             }
         }
@@ -30,18 +30,19 @@ function FormAddressRegister({ handleSubmit, errorMessages, formAddressValues, s
 
     return (
 
-        <Form onSubmit={handleSubmit}>
+        <Form ref={formRef}>
             <Row>
                 <Col className="col-5">
                     <Form.Label className="w-100">CEP
                         <FormGroupWithIcon
                             icon={<MapIcon className='position-absolute ms-3' currentColor={'#a3a29f'} />}
                             type={'text'}
-                            placeholder={'XXXXX-XXX'}
+                            placeholder={'Digite seu CEP'}
                             value={formAddressValues.cep}
                             onChange={(e) => handleCepChange(e.target.value)}
-                            maxLength={8}
+                            maxLength={9}
                             feedback={errorMessages.CEP}
+                            mask={'99999-999'}
                         />
                     </Form.Label>
                 </Col>
@@ -137,16 +138,6 @@ function FormAddressRegister({ handleSubmit, errorMessages, formAddressValues, s
                 ) : null}
 
             </Row>
-            <Col xs={12} className="d-flex justify-content-between">
-                <div className="d-flex align-items-end flex-grow-1">
-                    <AlertErrorOrSuccess errorMessages={errorMessages} />
-                </div>
-                <div className="d-flex justify-content-end mt-5 flex-grow-1">
-                    <Button variant="yellow float-end"
-                        type="submit">{isUpdateId ? 'Editar' : 'Cadastrar'} Endereço</Button>
-                </div>
-            </Col>
-
         </Form>
     )
 }

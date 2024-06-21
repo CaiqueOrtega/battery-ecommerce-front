@@ -1,8 +1,9 @@
 import { FormControl, Form, FloatingLabel } from "react-bootstrap";
 import { useEffect, useState, useRef } from 'react';
 import { AlertIcon } from "../../assets/icons/IconsSet";
+import { withMask } from 'use-mask-input';
 
-function FormGroupWithIcon({ icon, type, placeholder, value, onChange, feedback, bgBorder, disable, className, disableRequired, maxLength, onBlurData, onFocusData, pattern }) {
+function FormGroupWithIcon({ icon, type, placeholder, value, onChange, feedback, bgBorder, disable, className, disableRequired, maxLength, onBlurData, onFocusData, pattern, mask }) {
     const [isFocused, setIsFocused] = useState(false);
 
     return (
@@ -24,8 +25,9 @@ function FormGroupWithIcon({ icon, type, placeholder, value, onChange, feedback,
                     onFocusData={onFocusData}
                     bgBorder={bgBorder}
                     feedback={feedback}
+                    mask={mask}
                 />
-                
+
                 {icon}
             </div>
             {
@@ -43,7 +45,7 @@ function FormGroupWithIcon({ icon, type, placeholder, value, onChange, feedback,
 
 
 
-function RenderInputFormControl({ value, onChange, type, placeholder, className, disableRequired, disable, maxLength, pattern, setIsFocused, onBlurData, onFocusData, bgBorder, feedback }) {
+function RenderInputFormControl({ value, onChange, type, placeholder, className, disableRequired, disable, maxLength, pattern, setIsFocused, onBlurData, onFocusData, bgBorder, feedback, mask }) {
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -52,6 +54,13 @@ function RenderInputFormControl({ value, onChange, type, placeholder, className,
         }
 
     }, [feedback]);
+
+    useEffect(() => {
+        if (mask) {
+            withMask(mask)(inputRef.current);
+        }
+    }, []);
+
 
     const onBlur = () => {
         if (onBlurData && Object.keys(onBlurData).length !== 0) {
@@ -75,7 +84,7 @@ function RenderInputFormControl({ value, onChange, type, placeholder, className,
             onChange={onChange}
             type={type}
             placeholder={placeholder}
-            className={`ps-5 py-2 ${className} ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''}`}
+            className={`ps-5 py-2 ${className} ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''} custom-mask-color`}
             ref={inputRef}
             onFocus={onFocus}
             onBlur={onBlur}

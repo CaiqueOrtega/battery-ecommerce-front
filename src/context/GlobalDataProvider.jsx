@@ -25,7 +25,7 @@ function GlobalDataProvider({ children }) {
     const { getByUser } = BatteryCartServices();
 
     const { getAllCardByUser } = CardServices();
-    const[card, setCard] = useState([]);
+    const [card, setCard] = useState([]);
     const [cardIsLoaded, setCardIsLoaded] = useState(null);
 
     const fetchBatteries = async () => {
@@ -45,7 +45,7 @@ function GlobalDataProvider({ children }) {
             }
         } catch (error) {
             console.error("Erro ao buscar endereço:", error);
-        }finally{
+        } finally {
             setAddressIsLoaded(true);
         }
     };
@@ -57,7 +57,7 @@ function GlobalDataProvider({ children }) {
                 setBatteryCart(response);
             } catch (error) {
                 console.error("falha ao pegar carrinho:", error);
-            }finally{
+            } finally {
                 setBatteryCartIsLoaded(true);
             }
         }
@@ -73,7 +73,7 @@ function GlobalDataProvider({ children }) {
 
                 const updatedBatteries = cartData.batteries.map(cartBattery => {
                     const matchingBattery = response.find(battery => battery.batteryId === cartBattery.batteryId);
-                    if (matchingBattery) {                        
+                    if (matchingBattery) {
                         return {
                             cart_battery_id: cartBattery.cart_battery_id,
                             quantity: cartBattery.quantity,
@@ -82,41 +82,44 @@ function GlobalDataProvider({ children }) {
                     }
                     return null;
                 }).filter(battery => battery !== null);
-                
+
                 setBatteryCart({
                     cardId: cartData.cartId,
                     totalValue: cartData.totalValue || 0,
                     promotion: cartData.promotion || null,
+                    itemsQuantity: cartData.itemsQuantity || 0,
                     batteries: updatedBatteries
                 });
             }
         } catch (error) {
             console.error("Falha ao pegar carrinho (não logado):", error);
-        }finally{
+        } finally {
             setBatteryCartIsLoaded(true);
         }
     };
 
-    
-    const fetchCard= async () => {
-        try {
-            const cardData = await getAllCardByUser(userData.userId);
-            setCard(cardData);
-        } catch (error) {
-            console.error("Erro ao buscar baterias ativas:", error);
-        }finally{
-            setCardIsLoaded(true);
+
+    const fetchCard = async () => {
+        if (!cardIsLoaded) {
+            try {
+                const cardData = await getAllCardByUser(userData.userId);
+                setCard(cardData);
+            } catch (error) {
+                console.error("Erro ao buscar baterias ativas:", error);
+            } finally {
+                setCardIsLoaded(true);
+            }
         }
+        console.log(batteryCart)
     };
 
     useEffect(() => {
-        if(Object.keys(batteryCart).length === 0){
-            if (userData?.userId && isLoggedIn) {
-                fetchCartLogged(userData.userId);
-            } else {
-                fetchCartNotLogged();
-            }
+        if (userData?.userId && isLoggedIn) {
+            fetchCartLogged(userData.userId);
+        } else {
+            fetchCartNotLogged();
         }
+
     }, [userData, isLoggedIn]);
 
 
@@ -124,7 +127,7 @@ function GlobalDataProvider({ children }) {
         fetchBatteries();
     }, [fetchBatteryData]);
 
-    const resetGlobalData= () => {
+    const resetGlobalData = () => {
         setAddress({});
         setBatteryCart({})
     }
@@ -137,14 +140,14 @@ function GlobalDataProvider({ children }) {
             addressIsLoaded,
             address,
             setAddress,
-            batteryCart, 
+            batteryCart,
             batteryCartIsLoaded,
             setBatteryCart,
             card,
             setCard,
             fetchCard,
             cardIsLoaded,
-            resetGlobalData, 
+            resetGlobalData,
             userData,
             isLoggedIn
         }}>
