@@ -59,7 +59,7 @@ function SaleIndex({ sales, setSales }) {
     };
 
     useEffect(() => {
-        if (!showCalendar) {
+        if (!showCalendar || showCalendar == undefined) {
             calculateTotalSales();
         }
     }, [showCalendar])
@@ -186,61 +186,127 @@ function SaleIndex({ sales, setSales }) {
 }
 
 function ModalSale({ showModalSale, setShowModalSale, selectedSale }) {
-    console.log(selectedSale)
+
+    const fetchInitials = (userDataName) => {
+        let initials = '';
+        if (userDataName) {
+            const names = userDataName.split(' ');
+            if (names.length >= 2) {
+                initials = names[0].charAt(0).toUpperCase() + names[1].charAt(0).toUpperCase();
+            } else if (names.length === 1) {
+                initials = names[0].slice(0, 2).toUpperCase();
+            }
+        }
+        return initials;
+    }
+
+
     return (
         <Modal size="lg" show={showModalSale} onHide={() => setShowModalSale(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
             <Modal.Header className='bg-red text-white'>
-                <Modal.Title>Venda {selectedSale.code}</Modal.Title>
+                <Modal.Title>Venda <span className="fw-bold">#{selectedSale.code}</span></Modal.Title>
                 <button className='btn-close btn-close-white' onClick={() => setShowModalSale(false)} />
             </Modal.Header>
             <Modal.Body className="px-4 py-5">
                 <Row>
                     <Col md={8}>
-                        <Card className="h-100">
-                            <Card.Header className="py-3" style={{ backgroundColor: '#f8f8f8' }}>
-                                <h6 className="text-muted fw-bold mb-0">Items Da venda</h6>
-                            </Card.Header>
-                            <Card.Body className="h-100">
-                                {selectedSale?.cart?.batteries?.map(item => (
-                                    <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
-                                        <Col xs={2} md={2} className="p-0">
-                                            <img src={exemploImageCart} width={80} className="img-fluid" alt="Battery" />
-                                        </Col>
+                        <section className="d-flex flex-column">
+                            <Card className="h-100">
+                                <Card.Header className="py-3 bg-white">
+                                    <h6 className="text-muted fw-bold mb-0">Items Da venda</h6>
+                                </Card.Header>
+                                <Card.Body className="h-100 overflow-auto" style={{maxHeight: 182.967}}>
 
-                                        <Col md={4} xs={9} className="ms-3 lh-md p-0 ">
-                                            <h6 className="mb-0 text-wrap">
-                                                {item.battery.name.length > 30 ? item.battery.name.substring(0, 30) + "..." : item.battery.name}
-                                            </h6>
-                                        </Col>
+                                    {selectedSale?.cart?.batteries?.map(item => (
+                                        <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
+                                            <Col xs={2} md={2} className="p-0">
+                                                <img src={exemploImageCart} width={80} className="img-fluid" alt="Battery" />
+                                            </Col>
 
-                                        <Col className="col-auto d-flex align-items-center justify-content-center" >
-                                            <span className="text-muted small" style={{ bottom: -17 }}>
-                                                {item.quantity} unidade{item.battery.quantity > 1 && 's'}
-                                            </span>
-                                        </Col>
+                                            <Col md={4} xs={9} className="ms-3 lh-md p-0 ">
+                                                <h6 className="mb-0 text-wrap">
+                                                    {item.battery.name.length > 30 ? item.battery.name.substring(0, 30) + "..." : item.battery.name}
+                                                </h6>
+                                            </Col>
 
-                                        <Col className="d-flex align-items-center">
-                                            <span className="ms-auto font-numbers">R$ {item.battery.value.toFixed(2).replace('.', ',')}</span>
+                                            <Col className="col-auto d-flex align-items-center justify-content-center" >
+                                                <span className="text-muted small" style={{ bottom: -17 }}>
+                                                    {item.quantity} unidade{item.battery.quantity > 1 && 's'}
+                                                </span>
+                                            </Col>
+
+                                            <Col className="d-flex align-items-center">
+                                                <span className="ms-auto font-numbers"
+                                                    style={{
+                                                        display: 'inline-block',
+                                                        maxWidth: '10ch',
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis'
+                                                    }}>
+                                                    R$ {item.battery.value.toFixed(2).replace('.', ',')}
+                                                </span>
+                                            </Col>
+                                        </Row>
+                                    ))}
+                                </Card.Body>
+                            </Card>
+
+                            <Card className="mt-4">
+                                <Card.Body className="d-flex align-items-center">
+                                    <Row className="w-100 px-2">
+                                        <Col xs={2} className="d-flex align-items-center justify-content-center p-0">
+                                            <div className="rounded-circle  bg-body-secondary text-dark-emphasis d-flex justify-content-center align-items-center border" style={{ width: '60px', height: '60px' }}>
+                                                <span style={{ fontSize: '1.7rem' }}>{fetchInitials(selectedSale?.user?.name)}</span>
+                                            </div>
+                                        </Col>
+                                        <Col xs={10} className="ps-2 p-0 d-flex align-items-center">
+
+                                            <div className="lh-sm d-flex flex-column">
+                                                <h6 className="text-muted fw-bold mb-0">Dados do Cliente</h6>
+                                                <hr className="my-2" />
+                                                <span>
+                                                    {selectedSale?.user?.name},
+                                                    <a
+                                                        className="ms-2 text-muted"
+                                                        href={`https://mail.google.com/mail/?view=cm&fs=1&to=${selectedSale?.user?.email}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                    >
+                                                        {selectedSale?.user?.email}
+                                                    </a>
+                                                </span>
+                                            </div>
                                         </Col>
                                     </Row>
-                                ))}
-                            </Card.Body>
-                        </Card>
+                                </Card.Body>
+                            </Card>
+                        </section>
                     </Col>
                     <Col>
                         <Card className="h-100">
-                            <Card.Header className="py-3" style={{ backgroundColor: '#f8f8f8' }}>
+                            <Card.Header className="py-3 bg-white">
                                 <h6 className="text-muted fw-bold mb-0">Resumo da venda</h6>
                             </Card.Header>
                             <Card.Body className="h-100">
                                 <div className="d-flex justify-content-between">
-                                    <span>SubTotal</span>
-                                    <span className="text-muted">R$ {selectedSale.value.toFixed(2).replace('.', ',')}</span>
+                                    <span>Pagamento</span>
+                                    <span className="text-muted small">{selectedSale.payment.description}</span>
                                 </div>
 
-                                <div className="d-flex justify-content-between">
+                                <div className="d-flex justify-content-between mt-1">
+                                    <span>Situação</span>
+                                    <span className="text-muted small">{selectedSale.payment.status}</span>
+                                </div>
+
+                                <div className="d-flex justify-content-between mt-1">
+                                    <span>SubTotal</span>
+                                    <span className="text-muted small">R$ {selectedSale.value.toFixed(2).replace('.', ',')}</span>
+                                </div>
+
+                                <div className="d-flex justify-content-between mt-1">
                                     <span>Frete</span>
-                                    <span className="text-muted">R$ {selectedSale.freightValue.toFixed(2).replace('.', ',')}</span>
+                                    <span className="text-muted small">R$ {selectedSale.freightValue.toFixed(2).replace('.', ',')}</span>
                                 </div>
                             </Card.Body>
                             <Card.Footer className="bg-white">
@@ -254,9 +320,8 @@ function ModalSale({ showModalSale, setShowModalSale, selectedSale }) {
                         </Card>
                     </Col>
                 </Row>
-
             </Modal.Body>
-        </Modal>
+        </Modal >
     )
 }
 
@@ -274,7 +339,6 @@ function Calendar({ selectedDay, setSelectedDay, selectedMonth, setSelectedMonth
             setSelectedDate(null);
         }
     }, [selectedDay, selectedMonth, selectedYear]);
-
 
     useEffect(() => {
         const handleClickOutside = (event) => {
