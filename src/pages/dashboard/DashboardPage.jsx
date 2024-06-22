@@ -44,7 +44,7 @@ function DashboardPage() {
             default:
                 return null;
         }
-    }, [sidebarSelectedOption, batteries, users, promotions, sales]);
+    }, [sidebarSelectedOption, batteries, users, promotions, sales, deliveries]);
 
 
     return (

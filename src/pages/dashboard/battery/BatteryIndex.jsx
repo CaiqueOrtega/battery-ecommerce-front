@@ -302,9 +302,7 @@ function BatteryIndex({ batteries, setBatteries }) {
                 <Card.Header className='py-3 d-flex'>
                     <h3 className='text-align-center mb-0'>Controle de Baterias</h3>
                     <div className='d-flex ms-auto '>
-                    <a type='button' className='btn btn-outline-danger' onClick={()=> setShowModalPDF(true)}><PdfIcon /></a>
-                    
-                        
+                        <a type='button' className='btn btn-outline-danger' onClick={() => setShowModalPDF(true)}><PdfIcon /></a>
                         <Button className='ms-3 btn btn-red bg-red border-0' onClick={() => {
                             setSelectedBattery('')
                             setShowBatteryFormModal(true);
@@ -375,7 +373,6 @@ function BatteryIndex({ batteries, setBatteries }) {
                             ))}
                         </tbody>
                     </Table>
-
                     <Pagination
                         totalItems={batteries.length}
                         itemsPerPage={itemsPerPage}
@@ -388,7 +385,7 @@ function BatteryIndex({ batteries, setBatteries }) {
 
             {renderBatteryFormModal()}
 
-            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'}/>
+            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'} />
 
         </>
     );

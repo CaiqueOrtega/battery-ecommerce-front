@@ -33,7 +33,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, setIt
 
 
     return (
-        <>
+        <div>
             <div className="d-flex justify-content-end gap-2">
                 <select
                     className="form-select form-select-sm w-auto h-50 mt-1"
@@ -64,7 +64,7 @@ function Pagination({ totalItems, itemsPerPage, currentPage, onPageChange, setIt
                 </ul>
             </div>
             <p className="text-end text-muted small">Há um total de {totalItems} registros na tabela</p>
-        </>
+        </div>
     );
 }
 

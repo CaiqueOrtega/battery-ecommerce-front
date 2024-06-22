@@ -7,6 +7,7 @@ import { useContext } from 'react';
 import UserService from '../users/UsersServices';
 import BatteryServices from '../battery/BatteryServices';
 import PromotionService from '../promotion/PromotionService';
+import SaleServices from '../sale/SaleServices';
 
 
 // Estilo para o PDF
@@ -191,6 +192,30 @@ const TableUser = ({ data }) => (
     )
 );
 
+const TableSale = ({ data }) => (
+    data.length === 0 ? <Text>Sem dados disponíveis</Text> : (
+        <View style={styles.table}>
+            <View style={styles.tableRow}>
+                <View style={styles.tableColHeader}><Text>Código</Text></View>
+                <View style={styles.tableColHeader}><Text>Cliente</Text></View>
+                <View style={styles.tableColHeader}><Text>Data</Text></View>
+                <View style={styles.tableColHeader}><Text>Pagamento</Text></View>
+                <View style={styles.tableColHeader}><Text>Valor</Text></View>
+                <View style={styles.tableColHeader}><Text>Situação</Text></View>
+            </View>
+            {data.map((row, index) => (
+                <View style={styles.tableRow} key={index}>
+                    <View style={styles.tableCol}><Text>{row.code}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.user.name}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.creationDate}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.payment.description}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.value}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.payment.status}</Text></View>
+                </View>
+            ))}
+        </View>
+    )
+);
 
 const MyDocument = ({ data, user, type, filter }) => {
 
@@ -198,7 +223,7 @@ const MyDocument = ({ data, user, type, filter }) => {
     const ITEMS_PER_PAGE_NEXT = 35;
     const date = new Date().toLocaleString();
 
-    const chunks = data.reduce((chunks, item, index) => {
+    const chunks = data?.reduce((chunks, item, index) => {
         let chunkIndex;
         if (index < ITEMS_PER_PAGE_FIRST) {
             chunkIndex = 0;
@@ -227,9 +252,84 @@ const MyDocument = ({ data, user, type, filter }) => {
     proporcionando uma visão minuciosa sobre os perfis ativos. Priorizando a identificação de usuários de destaque e seu comportamento na plataforma, \
     seu propósito é fornecer uma compreensão completa dos diversos tipos de usuários."
 
+    const saleSubtitle = "Este relatório oferece uma análise detalhada e abrangente das vendas registradas, \
+    proporcionando uma visão minuciosa sobre as transações comerciais realizadas. \
+    Priorizando a oferta de dados precisos e insights valiosos, \
+    seu propósito é fornecer uma compreensão completa dos valores de venda, \
+    datas de validade e outras informações pertinentes para auxiliar na tomada de decisões estratégicas.";
+
     return (
         <Document>
-            {chunks.length === 0 ? (
+            {chunks?.length > 0 ? (
+                chunks?.map((chunk, pageIndex) => (
+                    <Page key={pageIndex} size="A4" style={styles.page}>
+                        <View style={styles.section}>
+                            {pageIndex === 0 && (
+                                <View>
+                                    <View style={styles.header}>
+                                        <View style={styles.columnImage}>
+                                            <Image src={logo} style={styles.logo} />
+                                        </View>
+                                        <View style={styles.columnText}>
+                                            {type === 'battery' ? (
+                                                <Text>Relatório de Baterias</Text>
+                                            ) : type === 'promotion' ? (
+                                                <Text>Relatório de Promoções</Text>
+                                            ) : type === 'user' ? (
+                                                <Text>Relatório de Usuários</Text>
+                                            ) : type === 'sale' ? (
+                                                <Text>Relatório de Vendas</Text>
+                                            ) : null}
+                                        </View>
+                                    </View>
+                                    <View style={styles.subtitle}>
+                                        {type === 'battery' ? (
+                                            <Text>{batterySubtitle}</Text>
+                                        ) : type === 'promotion' ? (
+                                            <Text>{promotionSubtitle}</Text>
+                                        ) : type === 'user' ? (
+                                            <Text>{userSubtitle}</Text>
+                                        ) : type === 'sale' ? (
+                                            <Text>{saleSubtitle}</Text>
+                                        ) : null}
+                                    </View>
+                                    <View style={styles.divisor}>
+                                        <Text>Usuário Solicitante</Text>
+                                    </View>
+                                    <View style={styles.userInfo}>
+                                        <View>
+                                            {filter ? (
+                                                <Text><Text style={styles.boldText}>Filtro selecionado: </Text>{filter}</Text>
+                                            ) : null}
+                                        </View>
+
+                                        <View>
+                                            <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
+                                            <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
+                                            <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
+                                        </View>
+                                    </View>
+                                </View>
+                            )}
+                            {type === 'battery' ? (
+                                <TableBattery data={chunk} />
+                            ) : type === 'promotion' ? (
+                                <TablePromotion data={chunk} />
+                            ) : type === 'user' ? (
+                                <TableUser data={chunk} />
+                            ) : type === 'sale' ? (
+                                <TableSale data={chunk} />
+                            ) : null}
+                            <View style={styles.pageCounter}>
+                                <Text>{date}</Text>
+                                <Text render={({ pageNumber, totalPages }) => (
+                                    `${pageNumber} / ${totalPages}`
+                                )} fixed />
+                            </View>
+                        </View>
+                    </Page>
+                ))
+            ) : (
                 <Page size="A4" style={styles.page}>
                     <View style={styles.section}>
                         <View style={styles.header}>
@@ -243,6 +343,8 @@ const MyDocument = ({ data, user, type, filter }) => {
                                     <Text>Relatório de Promoções</Text>
                                 ) : type === 'user' ? (
                                     <Text>Relatório de Usuários</Text>
+                                ) : type === 'sale' ? (
+                                    <Text>Relatório de Vendas</Text>
                                 ) : null}
                             </View>
                         </View>
@@ -253,6 +355,8 @@ const MyDocument = ({ data, user, type, filter }) => {
                                 <Text>{promotionSubtitle}</Text>
                             ) : type === 'user' ? (
                                 <Text>{userSubtitle}</Text>
+                            ) : type === 'sale' ? (
+                                <Text>{saleSubtitle}</Text>
                             ) : null}
                         </View>
                         <View style={styles.divisor}>
@@ -280,69 +384,6 @@ const MyDocument = ({ data, user, type, filter }) => {
                         </View>
                     </View>
                 </Page>
-            ) : (
-                chunks.map((chunk, pageIndex) => (
-                    <Page key={pageIndex} size="A4" style={styles.page}>
-                        <View style={styles.section}>
-                            {pageIndex === 0 && (
-                                <View>
-                                    <View style={styles.header}>
-                                        <View style={styles.columnImage}>
-                                            <Image src={logo} style={styles.logo} />
-                                        </View>
-                                        <View style={styles.columnText}>
-                                            {type === 'battery' ? (
-                                                <Text>Relatório de Baterias</Text>
-                                            ) : type === 'promotion' ? (
-                                                <Text>Relatório de Promoções</Text>
-                                            ) : type === 'user' ? (
-                                                <Text>Relatório de Usuários</Text>
-                                            ) : null}
-                                        </View>
-                                    </View>
-                                    <View style={styles.subtitle}>
-                                        {type === 'battery' ? (
-                                            <Text>{batterySubtitle}</Text>
-                                        ) : type === 'promotion' ? (
-                                            <Text>{promotionSubtitle}</Text>
-                                        ) : type === 'user' ? (
-                                            <Text>{userSubtitle}</Text>
-                                        ) : null}
-                                    </View>
-                                    <View style={styles.divisor}>
-                                        <Text>Usuário Solicitante</Text>
-                                    </View>
-                                    <View style={styles.userInfo}>
-                                        <View>
-                                            {filter ? (
-                                                <Text><Text style={styles.boldText}>Filtro selecionado: </Text>{filter}</Text>
-                                            ) : null}
-                                        </View>
-
-                                        <View>
-                                            <Text><Text style={styles.boldText}>Nome: </Text> {user.name}</Text>
-                                            <Text><Text style={styles.boldText}>CPF: </Text> {user.document}</Text>
-                                            <Text><Text style={styles.boldText}>Email: </Text> {user.email}</Text>
-                                        </View>
-                                    </View>
-                                </View>
-                            )}
-                            {type === 'battery' ? (
-                                <TableBattery data={chunk} />
-                            ) : type === 'promotion' ? (
-                                <TablePromotion data={chunk} />
-                            ) : type === 'user' ? (
-                                <TableUser data={chunk} />
-                            ) : null}
-                            <View style={styles.pageCounter}>
-                                <Text>{date}</Text>
-                                <Text render={({ pageNumber, totalPages }) => (
-                                    `${pageNumber} / ${totalPages}`
-                                )} fixed />
-                            </View>
-                        </View>
-                    </Page>
-                ))
             )}
         </Document>
     );
@@ -381,7 +422,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
         type === 'user' ? 'user-clear' :
             type === 'battery' ? 'battery-clear' :
                 type === 'promotion' ? 'promotion-clear' :
-                    ''
+                    type === 'sale' ? 'sale-clear' : ''
     );
 
     const [data, setData] = useState([]);
@@ -398,6 +439,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { getUserReportData } = UserService();
     const { getBatteryReportData } = BatteryServices()
     const { getPromotionReportData } = PromotionService()
+    const { getSaleReporData } = SaleServices()
 
     async function handleReportChange() {
         if (shouldDataUpdate != null) {
@@ -415,6 +457,11 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                 case 'promotion':
                     const promotionResponse = await getPromotionReportData(report)
                     setData(promotionResponse)
+                    setShouldDataUpdate(false)
+                    break;
+                case 'sale':
+                    const saleResponse = await getSaleReporData(report)
+                    setData(saleResponse)
                     setShouldDataUpdate(false)
                     break;
                 default:
@@ -465,6 +512,17 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
             { label: '15 - 30%', value: 'promotion-percentage-30', group: 'Porcentagem de Desconto' },
             { label: '30 - 50%', value: 'promotion-percentage-50', group: 'Porcentagem de Desconto' },
             { label: 'Acima de 50%', value: 'promotion-percentage-over-50', group: 'Porcentagem de Desconto' }
+        ],
+        sale: [
+            { label: 'Sem filtros', value: 'sale-clear' },
+            { label: '0 R$ - 250 R$', value: 'sale-value-250', group: 'Preço' },
+            { label: '250 R$ - 500 R$', value: 'sale-value-500', group: 'Preço' },
+            { label: '500 R$ - 1000 R$', value: 'sale-value-1000', group: 'Preço' },
+            { label: 'Acima de 1000 R$', value: 'sale-value-over-1000', group: 'Preço' },
+            { label: 'Próximo mês', value: 'sale-validity-1', group: 'Vencimento' },
+            { label: 'Próximos 3 meses', value: 'sale-validity-3', group: 'Vencimento' },
+            { label: 'Próximos 6 meses', value: 'sale-validity-6', group: 'Vencimento' },
+            { label: 'Acima de 6 meses', value: 'sale-validity-over-6', group: 'Vencimento' }
         ]
     };
 
@@ -502,7 +560,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 Filtros
                                 <FormSelect
                                     className=" py-2 mt-1"
-                                    aria-label={`Filtragem ${type === 'user' ? 'Usuários' : type === 'battery' ? 'Baterias' : 'Promoções'}`}
+                                    aria-label={`Filtragem ${type === 'user' ? 'Usuários' : type === 'battery' ? 'Baterias' : type === 'promotion' ? 'Promoções' : type === 'sale' ? 'Vendas' : ''}`}
                                     onChange={(e) => {
                                         setSelectedFilter(e.target.options[e.target.selectedIndex].text);
                                         setReport(e.target.value);

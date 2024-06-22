@@ -68,7 +68,7 @@ const SaleServices = () => {
         }
     }
 
-    const getReportData = async (report) => {
+    const getSaleReporData = async (report) => {
         try {
             const response = await ConnectionAPI.get(`sale/report/${report}`)
             return response.data
@@ -77,7 +77,7 @@ const SaleServices = () => {
         }
     }
 
-    return { createCreditCardPayment, createPixPayment, createTicketPayment, getAllSales, getReportData, setErrorMessages, errorMessages }
+    return { createCreditCardPayment, createPixPayment, createTicketPayment, getAllSales, getSaleReporData, setErrorMessages, errorMessages }
 }
 
 export default SaleServices;
