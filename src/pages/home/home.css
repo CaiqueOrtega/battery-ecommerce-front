@@ -32,3 +32,12 @@
     min-width: 1250px;
   }
 }
+
+.slick-slide{
+  max-width: 260px !important;
+}
+
+.slick-track{
+  justify-content: center !important;
+  display: flex !important;
+}

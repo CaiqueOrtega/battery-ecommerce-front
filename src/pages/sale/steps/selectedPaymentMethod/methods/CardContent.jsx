@@ -213,7 +213,7 @@ function RenderSelectionCardContent({ card, cardValues, setCardValues, setSelect
     )
 }
 
-function RenderCardStepFormContent({ selectedCard, card, setCard, cardValues, setCardValues, setCardStepContent, userId, action, prevFormCardValues, setPrevFormCardValues }) {
+function RenderCardStepFormContent({ selectedCard, card, setCard, cardValues, setCardValues, setCardStepContent, userId, action, prevFormCardValues, setPrevFormCardValues, handleSelectedCard }) {
     const { createCard, updateCard, errorMessages, setErrorMessages } = CardServices();
     const [showToastError, setShowToastError] = useState(false);
     const formRef = useRef()
@@ -244,7 +244,7 @@ function RenderCardStepFormContent({ selectedCard, card, setCard, cardValues, se
 
                     setCard(updatedCardValues);
                     setCardValues(response);
-                    handleSelectedAddress();
+                    handleSelectedCard(response);
                 }
             } else if (action === 'update') {
                 response = await updateCard(selectedCard?.cardId, formCardValues)

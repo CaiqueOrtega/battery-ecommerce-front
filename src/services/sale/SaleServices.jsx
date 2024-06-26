@@ -11,7 +11,7 @@ const SaleServices = () => {
                 fmc_description: 'pagamento via cartão de crédito',
                 cardId: paymentCardValues.cardId,
                 saleData: {
-                    value: paymentCardValues.value,
+                    cep: paymentCardValues.cep,
                     freightValue: paymentCardValues.freightValue,
                     addressId: paymentCardValues.addressId,
                     userId: paymentCardValues.userId,
@@ -28,8 +28,7 @@ const SaleServices = () => {
             const response = await ConnectionAPI.post(`payment/pix`, {
                 fmp_description: 'pagamento via Pix',
                 saleData: {
-                    value: paymentPixValues.value,
-                    freightValue: paymentPixValues.freightValue,
+                    cep: paymentPixValues.cep,
                     addressId: paymentPixValues.addressId,
                     userId: paymentPixValues.userId,
                     cartId: paymentPixValues.cartId
@@ -46,8 +45,7 @@ const SaleServices = () => {
             const response = await ConnectionAPI.post(`payment/ticket`, {
                 fmc_description: 'Pagamento via Boleto',
                 saleData: {
-                    value: paymentTicketValues.value,
-                    freightValue: paymentTicketValues.freightValue,
+                    cep: paymentTicketValues.cep,
                     addressId: paymentTicketValues.addressId,
                     userId: paymentTicketValues.userId,
                     cartId: paymentTicketValues.cartId

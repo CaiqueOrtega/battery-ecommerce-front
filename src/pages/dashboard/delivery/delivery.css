@@ -1,0 +1,25 @@
+.filled-circle-red {
+    animation: fillCircle 0.2s forwards linear;
+    animation-delay: 0.3s;
+    background: linear-gradient(to right, #c00d0d 50%, rgb(212, 212, 212) 50%);
+    background-size: 200% 100%;
+    background-position: 100% 0;
+}
+
+@keyframes fillCircle {
+    0% {
+        background-position: 100% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+.bg-progressBar{
+    background-color: rgb(212, 212, 212);
+}
+
+.progress-delivery{
+    transition: width 0.3s linear; 
+}

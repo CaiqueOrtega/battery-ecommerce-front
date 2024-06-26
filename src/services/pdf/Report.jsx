@@ -8,6 +8,7 @@ import UserService from '../users/UsersServices';
 import BatteryServices from '../battery/BatteryServices';
 import PromotionService from '../promotion/PromotionService';
 import SaleServices from '../sale/SaleServices';
+import DeliveryServices from '../delivery/DeliveryServices';
 
 
 // Estilo para o PDF
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
         border: 0.8,
         borderRight: 0,
         borderBottom: 0,
-        marginTop: 30,
+        marginTop: 80,
     },
     tableRow: {
         flexDirection: "row"
@@ -43,7 +44,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         fontSize: 12,
         fontWeight: 'ultrabold',
-        padding: 2
+        padding: 2,
+        backgroundColor: '#f8f8f8'
     },
     tableCol: {
         flex: 1,
@@ -56,7 +58,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         fontSize: 12,
-        padding: 2
+        padding: 2,
     },
     header: {
         width: "100%",
@@ -118,6 +120,11 @@ const styles = StyleSheet.create({
     noContentText: {
         textAlign: 'center',
         marginTop: 10
+    },
+    dateHeader: {
+        fontSize: 13,
+        position: 'absolute',
+        top: 60
     }
 });
 
@@ -130,7 +137,7 @@ const TablePromotion = ({ data }) => (
                 <View style={styles.tableColHeader}><Text>Porcentagem</Text></View>
                 <View style={styles.tableColHeader}><Text>Data Início</Text></View>
                 <View style={styles.tableColHeader}><Text>Data Validade</Text></View>
-                <View style={styles.tableColHeader}><Text>Status</Text></View>
+                <View style={styles.tableColHeader}><Text>Situação</Text></View>
             </View>
             {data.map((row, index) => (
                 <View style={styles.tableRow} key={index}>
@@ -156,12 +163,12 @@ const TableBattery = ({ data }) => (
                 <View style={styles.tableColHeader}><Text>Nome</Text></View>
                 <View style={styles.tableColHeader}><Text>Valor</Text></View>
                 <View style={styles.tableColHeader}><Text>Quantidade</Text></View>
-                <View style={styles.tableColHeader}><Text>Status</Text></View>
+                <View style={styles.tableColHeader}><Text>Situação</Text></View>
             </View>
             {data.map((row, index) => (
                 <View style={styles.tableRow} key={index}>
-                    <View style={styles.tableCol}><Text>{row.code}</Text></View>
-                    <View style={styles.tableCol}><Text>{row.name}</Text></View>
+                    <View style={styles.tableCol}><Text>{row ? row.code.length > 14 ? `${row.code.slice(0, 14)}...` : row.code : null}</Text></View>
+                    <View style={styles.tableCol}><Text>{row ? row.name.length > 14 ? `${row.name.slice(0, 14)}...` : row.name : null}</Text></View>
                     <View style={styles.tableCol}><Text>{row.value}</Text></View>
                     <View style={styles.tableCol}><Text>{row.quantity}</Text></View>
                     <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
@@ -178,12 +185,12 @@ const TableUser = ({ data }) => (
                 <View style={styles.tableColHeader}><Text>Nome</Text></View>
                 <View style={styles.tableColHeader}><Text>Email</Text></View>
                 <View style={styles.tableColHeader}><Text>Cargo</Text></View>
-                <View style={styles.tableColHeader}><Text>Status</Text></View>
+                <View style={styles.tableColHeader}><Text>Situação</Text></View>
             </View>
             {data.map((row, index) => (
                 <View style={styles.tableRow} key={index}>
-                    <View style={styles.tableCol}><Text>{row.name}</Text></View>
-                    <View style={styles.tableCol}><Text>{row.email}</Text></View>
+                    <View style={styles.tableCol}><Text>{row ? row.name.length > 14 ? `${row.name.slice(0, 14)}...` : row.name : null}</Text></View>
+                    <View style={styles.tableCol}><Text>{row ? row.email.length > 17 ? `${row.email.slice(0, 17)}...` : row.email : null}</Text></View>
                     <View style={styles.tableCol}><Text>{row.role === 'ADMIN' ? 'Administrador' : 'Usuário'}</Text></View>
                     <View style={styles.tableCol}><Text>{row.status === 'ACTIVE' ? 'Ativo' : 'Inativo'}</Text></View>
                 </View>
@@ -192,35 +199,79 @@ const TableUser = ({ data }) => (
     )
 );
 
-const TableSale = ({ data }) => (
+
+const TableSale = ({ data }) => {
+    if (data.length === 0) {
+        return <Text>Sem dados disponíveis</Text>;
+    }
+
+    const groupedData = data.reduce((acc, row) => {
+        const date = row.creationDate;
+        if (!acc[date]) {
+            acc[date] = [];
+        }
+        acc[date].push(row);
+        return acc;
+    }, {});
+
+    return (
+        <View style={styles.container}>
+            {Object.keys(groupedData).map((date, index) => (
+                <View key={date} style={styles.dateGroup}>
+                    <Text style={styles.dateHeader}>{index + 1}. Vendas referente a data {date}</Text>
+                    <View style={styles.table}>
+                        <View style={styles.tableRow}>
+                            <View style={styles.tableColHeader}><Text>Código</Text></View>
+                            <View style={styles.tableColHeader}><Text>Cliente</Text></View>
+                            <View style={styles.tableColHeader}><Text>Pagamento</Text></View>
+                            <View style={styles.tableColHeader}><Text>Valor</Text></View>
+                            <View style={styles.tableColHeader}><Text>Situação</Text></View>
+                        </View>
+                        {groupedData[date].map((row, index) => (
+                            <View style={styles.tableRow} key={index}>
+                                <View style={styles.tableCol}><Text>{row.code}</Text></View>
+                                <View style={styles.tableCol}><Text>{row ? row.user.name.length > 14 ? `${row.user.name.slice(0, 14)}...` : row.user.name : null}</Text></View>
+                                <View style={styles.tableCol}><Text>{row.payment.description}</Text></View>
+                                <View style={styles.tableCol}><Text>{row.value}</Text></View>
+                                <View style={styles.tableCol}><Text>{row.payment.status}</Text></View>
+                            </View>
+                        ))}
+                    </View>
+                </View>
+            ))}
+        </View>
+    );
+};
+
+const TableDelivery = ({ data }) => (
     data.length === 0 ? <Text>Sem dados disponíveis</Text> : (
         <View style={styles.table}>
             <View style={styles.tableRow}>
                 <View style={styles.tableColHeader}><Text>Código</Text></View>
                 <View style={styles.tableColHeader}><Text>Cliente</Text></View>
                 <View style={styles.tableColHeader}><Text>Data</Text></View>
-                <View style={styles.tableColHeader}><Text>Pagamento</Text></View>
-                <View style={styles.tableColHeader}><Text>Valor</Text></View>
+                <View style={styles.tableColHeader}><Text>Endereço</Text></View>
                 <View style={styles.tableColHeader}><Text>Situação</Text></View>
             </View>
             {data.map((row, index) => (
                 <View style={styles.tableRow} key={index}>
-                    <View style={styles.tableCol}><Text>{row.code}</Text></View>
-                    <View style={styles.tableCol}><Text>{row.user.name}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.sale.code}</Text></View>
+                    <View style={styles.tableCol}><Text>{row ? row.sale.user.name.length > 14 ? `${row.sale.user.name.slice(0, 14)}...` : row.sale.user.name : null}</Text></View>
                     <View style={styles.tableCol}><Text>{row.creationDate}</Text></View>
-                    <View style={styles.tableCol}><Text>{row.payment.description}</Text></View>
-                    <View style={styles.tableCol}><Text>{row.value}</Text></View>
-                    <View style={styles.tableCol}><Text>{row.payment.status}</Text></View>
+                    <View style={styles.tableCol}><Text>{`${row.address}, ${row.number}`}</Text></View>
+                    <View style={styles.tableCol}><Text>{row.status}</Text></View>
                 </View>
             ))}
         </View>
     )
 );
 
+
+
 const MyDocument = ({ data, user, type, filter }) => {
 
-    const ITEMS_PER_PAGE_FIRST = 15;
-    const ITEMS_PER_PAGE_NEXT = 35;
+    const ITEMS_PER_PAGE_FIRST = 19;
+    const ITEMS_PER_PAGE_NEXT = 25;
     const date = new Date().toLocaleString();
 
     const chunks = data?.reduce((chunks, item, index) => {
@@ -258,6 +309,13 @@ const MyDocument = ({ data, user, type, filter }) => {
     seu propósito é fornecer uma compreensão completa dos valores de venda, \
     datas de validade e outras informações pertinentes para auxiliar na tomada de decisões estratégicas.";
 
+    const deliverySubtitle = "Este relatório oferece uma análise detalhada e abrangente das entregas realizadas, \
+    proporcionando uma visão minuciosa sobre as operações de distribuição. \
+    Priorizando a oferta de dados precisos e insights valiosos, \
+    seu propósito é fornecer uma compreensão completa dos prazos de entrega, \
+    destinos e outras informações pertinentes para auxiliar na tomada de decisões logísticas.";
+
+
     return (
         <Document>
             {chunks?.length > 0 ? (
@@ -279,6 +337,8 @@ const MyDocument = ({ data, user, type, filter }) => {
                                                 <Text>Relatório de Usuários</Text>
                                             ) : type === 'sale' ? (
                                                 <Text>Relatório de Vendas</Text>
+                                            ) : type === 'delivery' ? (
+                                                <Text>Relatório de Entregas</Text>
                                             ) : null}
                                         </View>
                                     </View>
@@ -291,7 +351,10 @@ const MyDocument = ({ data, user, type, filter }) => {
                                             <Text>{userSubtitle}</Text>
                                         ) : type === 'sale' ? (
                                             <Text>{saleSubtitle}</Text>
-                                        ) : null}
+                                        ) : type === 'delivery' ? (
+                                            <Text>{deliverySubtitle}</Text>
+                                        ) : null
+                                        }
                                     </View>
                                     <View style={styles.divisor}>
                                         <Text>Usuário Solicitante</Text>
@@ -319,6 +382,8 @@ const MyDocument = ({ data, user, type, filter }) => {
                                 <TableUser data={chunk} />
                             ) : type === 'sale' ? (
                                 <TableSale data={chunk} />
+                            ) : type === 'delivery' ? (
+                                <TableDelivery data={chunk} />
                             ) : null}
                             <View style={styles.pageCounter}>
                                 <Text>{date}</Text>
@@ -345,6 +410,8 @@ const MyDocument = ({ data, user, type, filter }) => {
                                     <Text>Relatório de Usuários</Text>
                                 ) : type === 'sale' ? (
                                     <Text>Relatório de Vendas</Text>
+                                ) : type === 'delivery' ? (
+                                    <Text>Relatório de Entregas</Text>
                                 ) : null}
                             </View>
                         </View>
@@ -357,7 +424,10 @@ const MyDocument = ({ data, user, type, filter }) => {
                                 <Text>{userSubtitle}</Text>
                             ) : type === 'sale' ? (
                                 <Text>{saleSubtitle}</Text>
-                            ) : null}
+                            ) : type === 'delivery' ? (
+                                <Text>{deliverySubtitle}</Text>
+                            ) : null
+                            }
                         </View>
                         <View style={styles.divisor}>
                             <Text>Usuário Solicitante</Text>
@@ -422,7 +492,8 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
         type === 'user' ? 'user-clear' :
             type === 'battery' ? 'battery-clear' :
                 type === 'promotion' ? 'promotion-clear' :
-                    type === 'sale' ? 'sale-clear' : ''
+                    type === 'sale' ? 'sale-clear' :
+                        type === 'delivery' ? 'delivery-clear' : ''
     );
 
     const [data, setData] = useState([]);
@@ -440,6 +511,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
     const { getBatteryReportData } = BatteryServices()
     const { getPromotionReportData } = PromotionService()
     const { getSaleReporData } = SaleServices()
+    const { getDeliveryReportData } = DeliveryServices()
 
     async function handleReportChange() {
         if (shouldDataUpdate != null) {
@@ -462,6 +534,11 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                 case 'sale':
                     const saleResponse = await getSaleReporData(report)
                     setData(saleResponse)
+                    setShouldDataUpdate(false)
+                    break;
+                case 'delivery':
+                    const deliveryResponse = await getDeliveryReportData(report)
+                    setData(deliveryResponse)
                     setShouldDataUpdate(false)
                     break;
                 default:
@@ -519,11 +596,24 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
             { label: '250 R$ - 500 R$', value: 'sale-value-500', group: 'Preço' },
             { label: '500 R$ - 1000 R$', value: 'sale-value-1000', group: 'Preço' },
             { label: 'Acima de 1000 R$', value: 'sale-value-over-1000', group: 'Preço' },
-            { label: 'Próximo mês', value: 'sale-validity-1', group: 'Vencimento' },
-            { label: 'Próximos 3 meses', value: 'sale-validity-3', group: 'Vencimento' },
-            { label: 'Próximos 6 meses', value: 'sale-validity-6', group: 'Vencimento' },
-            { label: 'Acima de 6 meses', value: 'sale-validity-over-6', group: 'Vencimento' }
+            { label: 'Há um mês', value: 'sale-creation-1', group: 'Vencimento' },
+            { label: 'Há 3 meses', value: 'sale-creation-3', group: 'Vencimento' },
+            { label: 'Há 6 meses', value: 'sale-creation-6', group: 'Vencimento' },
+            { label: 'Há mais de 6 meses', value: 'sale-creation-over-6', group: 'Vencimento' }
+        ],
+        delivery: [
+            { label: 'Sem filtros', value: 'delivery-clear' },
+            { label: 'Aguardando', value: 'delivery-waiting', group: 'Status' },
+            { label: 'Confirmado', value: 'delivery-confirmed', group: 'Status' },
+            { label: 'Preparando', value: 'delivery-preparing', group: 'Status' },
+            { label: 'Em trânsito', value: 'delivery-transporting', group: 'Status' },
+            { label: 'Entregue', value: 'delivery-delivered', group: 'Status' },
+            { label: 'Há um mês', value: 'delivery-creation-1', group: 'Criação' },
+            { label: 'Há 3 meses', value: 'delivery-creation-3', group: 'Criação' },
+            { label: 'Há 6 meses', value: 'delivery-creation-6', group: 'Criação' },
+            { label: 'Há mais de 6 meses', value: 'delivery-creation-over-6', group: 'Criação' }
         ]
+
     };
 
     return (
@@ -560,7 +650,7 @@ function ModalPdf({ showsModalPDF, setShowModalPDF, currentItems, type }) {
                                 Filtros
                                 <FormSelect
                                     className=" py-2 mt-1"
-                                    aria-label={`Filtragem ${type === 'user' ? 'Usuários' : type === 'battery' ? 'Baterias' : type === 'promotion' ? 'Promoções' : type === 'sale' ? 'Vendas' : ''}`}
+                                    aria-label={`Filtragem ${type === 'user' ? 'Usuários' : type === 'battery' ? 'Baterias' : type === 'promotion' ? 'Promoções' : type === 'sale' ? 'Vendas' : type === 'delivery' ? 'Entregas' : ''}`}
                                     onChange={(e) => {
                                         setSelectedFilter(e.target.options[e.target.selectedIndex].text);
                                         setReport(e.target.value);

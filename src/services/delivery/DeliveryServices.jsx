@@ -22,7 +22,7 @@ const DeliveryServices = () => {
         }
     }
 
-    const getReportData = async (report) => {
+    const getDeliveryReportData = async (report) => {
         try {
             const response = await ConnectionAPI.get(`delivery/report/${report}`)
             return response.data
@@ -39,7 +39,6 @@ const DeliveryServices = () => {
             handleAPIError(e)
         }
     }
-
     
     const updateStatus = async (deliveryId, status) => {
         try {
@@ -50,7 +49,7 @@ const DeliveryServices = () => {
         }
     }
 
-    return { getAllDeliveries, getAllDeliveriesByUser, getReportData, updateTrackingCode, updateStatus, errorMessages, setErrorMessages }
+    return { getAllDeliveries, getAllDeliveriesByUser, getDeliveryReportData, updateTrackingCode, updateStatus, errorMessages, setErrorMessages }
 }
 
 export default DeliveryServices;

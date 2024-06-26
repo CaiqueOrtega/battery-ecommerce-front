@@ -1,23 +1,68 @@
-import { ModalBody, ModalFooter, Accordion, Button, Card, Row, Col } from "react-bootstrap";
-import { PaymentPixIcon, PaymentTicketIcon, GeoFenceIcon, BatteryIcon, ReturnIcon } from "../../../../assets/icons/IconsSet";
+import { ModalBody, ModalFooter, Accordion, Button, Card, Row, Col, Spinner } from "react-bootstrap";
+import { PaymentPixIcon, PaymentTicketIcon, GeoFenceIcon, BatteryIcon, ReturnIcon, CardsMultiColorIcon } from "../../../../assets/icons/IconsSet";
 import SaleServices from "../../../../services/sale/SaleServices";
 import getCardDetails from "../../../../components/common/getCardDetails";
 import { useState, useMemo, useEffect } from "react";
 import { ErrorAnimation, SuccessAnimation } from "../../../../components/common/ErrorOrSuccessAnimation";
 import BatteryCartServices from "../../../../services/cart/BatteryCartServices";
-import RenderPixContent from "../selectedPaymentMethod/methods/PixContent";
+import RenderPixContent from "../selectedPaymentMethod/methods/PixContent"
+import TicketContent from "../selectedPaymentMethod/methods/TicketContent";
+import { Link } from "react-router-dom";
+import { AgilePayIcon } from "../../../../assets/icons/IconsSet";
 
-function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setBatteryCart, setShowProgressBar, setSteps, handlePreviousStep }) {
+function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setBatteryCart, setShowProgressBar, setSteps, handlePreviousStep, setSuccessSale }) {
     const { getByUser } = BatteryCartServices();
     const { createCreditCardPayment, createPixPayment, createTicketPayment } = SaleServices();
     const [stepsConfirmPayment, setStepsConfirmPayment] = useState('confirm_data');
     const [resultPayment, setResultPayment] = useState({});
     const [isLoadingPayment, setIsLoadingPayment] = useState(false);
 
-    const RenderSaleSuccess = () => (
-        <ModalBody>
-            <SuccessAnimation />
-        </ModalBody>
+    const RenderSaleSuccessCard = ({ resultPayment }) => (
+        <>
+            <div className="position-absolute d-flex flex-column w-100 align-items-center border-bottom py-3 " style={{ backgroundColor: '#fcfcfc' }} >
+                <SuccessAnimation />
+                <h5 className='mt-2 ' style={{ color: '#58af9b' }}>Seu pedido foi realizado com sucesso</h5>
+            </div>
+            <ModalBody>
+                <section className="px-4 h-100 d-flex flex-column justify-content-center align-items-center">
+
+                    <Card className="mt-4 w-100">
+                        <Card.Header>
+                            <Card.Text className='text-muted'>
+                                Pedido: <span className='fw-bold' style={{ color: '#58af9b' }}>#1234 </span>
+                                - Status Pago
+                            </Card.Text>
+                        </Card.Header>
+                        <Card.Body>
+                            <Row>
+                                <Col xs={1} className="col-auto d-flex align-items-center">
+                                    <div className="position-absolute">
+                                        <CardsMultiColorIcon />
+                                    </div>
+                                </Col>
+                                <Col className="d-flex flex-column justify-content-center ms-4 lh-sm">
+                                    <span>Veja Mais detalhes do pagamento</span>
+                                    <span className="text-muted">como comprovante valore e etc...</span>
+                                   
+                                </Col>
+                                <Col className="col-auto"><Button variant="green" onClick={() => window.open(resultPayment.registros[0].fmc_link_compartilhamento, '_blank', 'noopener noreferrer')}
+                                >Ver mais</Button></Col>
+                            
+                            </Row>
+                        </Card.Body>
+                    </Card>
+
+                    <Card className="mt-4">
+                        <Card.Body>
+                            <span className="text-muted">
+                                Sua compra foi concluída com sucesso. Agora, você pode verificar todos os detalhes do seu <Link className="text-muted" to={'/configuracoes/pedidos'}>
+                                    pedido</Link>.
+                            </span>
+                        </Card.Body>
+                    </Card>
+                </section>
+            </ModalBody>
+        </>
     );
 
     const handleCreateSale = async (method) => {
@@ -25,9 +70,8 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
         const confirmedPaymentOption = {
             'card': async () => {
                 return await createCreditCardPayment({
+                    cep: optionsSelected.address.cep,
                     cardId: optionsSelected.payment.data.cardId,
-                    value: batteryCart.totalValue,
-                    freightValue: freightValues.totalFreightCost?.toFixed(2),
                     addressId: optionsSelected.address.addressId,
                     userId: optionsSelected.userId,
                     cartId: batteryCart.cartId
@@ -35,8 +79,7 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
             },
             'pix': async () => {
                 return await createPixPayment({
-                    value: batteryCart.totalValue,
-                    freightValue: freightValues.totalFreightCost?.toFixed(2),
+                    cep: optionsSelected.address.cep,
                     addressId: optionsSelected.address.addressId,
                     userId: optionsSelected.userId,
                     cartId: batteryCart.cartId
@@ -44,8 +87,7 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
             },
             'ticket': async () => {
                 return await createTicketPayment({
-                    value: batteryCart.totalValue,
-                    freightValue: freightValues.totalFreightCost?.toFixed(2),
+                    cep: optionsSelected.address.cep,
                     addressId: optionsSelected.address.addressId,
                     userId: optionsSelected.userId,
                     cartId: batteryCart.cartId
@@ -60,6 +102,7 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
                 setResultPayment(response)
                 setStepsConfirmPayment(`create_sale_${method}`)
                 setShowProgressBar(false);
+                setSuccessSale(true);
             }
         }
     }
@@ -75,13 +118,14 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
                     handleCreateSale={handleCreateSale}
                     setSteps={setSteps}
                     handlePreviousStep={handlePreviousStep}
+                    isLoadingPayment={isLoadingPayment}
                 />;
             case 'create_sale_card':
-                return <RenderSaleSuccess />
+                return <RenderSaleSuccessCard resultPayment={resultPayment} />
             case 'create_sale_pix':
                 return <RenderPixContent resultPayment={resultPayment} />
             case 'create_sale_ticket':
-                return <SuccessAnimation />
+                return <TicketContent resultPayment={resultPayment} />
             default:
                 return null;
         }
@@ -92,7 +136,7 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
 
 
 
-function ConfirmOptions({ batteryCart, optionsSelected, freightValues, handleCreateSale, setSteps, handlePreviousStep }) {
+function ConfirmOptions({ batteryCart, optionsSelected, freightValues, handleCreateSale, setSteps, handlePreviousStep, isLoadingPayment }) {
 
     const RenderCardPayment = ({ text, subText, icon }) => {
         return (
@@ -117,7 +161,7 @@ function ConfirmOptions({ batteryCart, optionsSelected, freightValues, handleCre
     const paymentMethod = (selectedMethod) => {
         switch (selectedMethod) {
             case 'card':
-                const { icon } = getCardDetails(optionsSelected?.payment.data?.flag, true);
+                const { icon } = getCardDetails(optionsSelected?.payment.data?.flag, true, '#1c39cb');
                 return <RenderCardPayment
                     text={`Cartão de crédito ${optionsSelected?.payment.data?.flag}`}
                     subText={`Terminado em ••••${optionsSelected?.payment.data?.partialCard}`}
@@ -130,7 +174,7 @@ function ConfirmOptions({ batteryCart, optionsSelected, freightValues, handleCre
             case 'ticket':
                 return <RenderCardPayment
                     text={'Pagamento via Boleto Bancário'}
-                    subText={'Pague até a data de vencimento(3, dias)'}
+                    subText={'Pague até a data de vencimento(3 dias)'}
                     icon={<PaymentTicketIcon />} />
             default:
                 return null;
@@ -177,16 +221,16 @@ function ConfirmOptions({ batteryCart, optionsSelected, freightValues, handleCre
 
                                     <div className="d-flex text-muted justify-content-between mt-1 small">
                                         <span>Frete</span>
-                                        <span className="ms-2">R$ {freightValues?.totalFreightCost}</span>
+                                        <span className="ms-2">R$ {freightValues?.totalFreightCost?.toFixed(2)?.replace('.', (','))}</span>
                                     </div>
 
 
                                     <div className="d-flex text-muted justify-content-between fw-bold mt-1 small">
                                         <span>Total</span>
                                         <span className="ms-2">R$
-                                            {((batteryCart?.totalValue || 0) + (freightValues?.totalFreightCost || 0))
-                                                .toFixed(2)
-                                                .replace('.', ',')}
+                                            {(((batteryCart?.discountedValue) ?? (batteryCart?.totalValue)) + (freightValues?.totalFreightCost || 0))
+                                                ?.toFixed(2)
+                                                ?.replace('.', ',')}
                                         </span>
 
                                     </div>
@@ -202,10 +246,19 @@ function ConfirmOptions({ batteryCart, optionsSelected, freightValues, handleCre
                     <Button variant="secondary d-flex align-items-center" onClick={() => {
                         handlePreviousStep();
                         setSteps('payment');
-                        }}>
+                    }}>
                         <ReturnIcon size={'17'} /><span className="ms-2 small">Voltar</span>
                     </Button>
-                    <Button variant="yellow" onClick={() => handleCreateSale(optionsSelected.payment.method)}>Finalizar Compra</Button>
+                    <Button variant="yellow"
+                        disabled={isLoadingPayment}
+                        onClick={() => handleCreateSale(optionsSelected.payment.method)}>
+                        Finalizar Compra
+                        {isLoadingPayment && (
+                            <Spinner className="ms-2" animation="border" role="status" style={{ width: 15, height: 15 }}>
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        )}
+                    </Button>
                 </div>
             </ModalFooter>
         </>

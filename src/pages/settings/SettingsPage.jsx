@@ -8,6 +8,7 @@ import AddressContent from "./address/AddressContent";
 import './settings.css'
 import { useParams } from "react-router-dom";
 import CardContent from "./card/CardContent";
+import OrderContent from "./order/OrderContent";
 
 
 
@@ -45,9 +46,10 @@ function SettingsPage() {
                 return <AccountContent userData={userData} />;
             case 'enderecos':
                 return <AddressContent />;
-
-                case 'cartoes':
+            case 'cartoes':
                 return <CardContent />;
+            case 'pedidos':
+                return <OrderContent />
             default:
                 return (
                     <div className="d-flex align-items-center justify-content-center h-100">
@@ -61,7 +63,7 @@ function SettingsPage() {
         <>
             <div className="d-flex flex-column h-100">
                 <div className="flex-grow-1 d-flex align-items-center justify-content-center">
-                    <Container fluid={'lg'} className="h-sm-100 py-md-5" style={{maxWidth: 1140}}>
+                    <Container fluid={'lg'} className="h-sm-100 py-md-5" style={{ maxWidth: 1140 }}>
                         <Row className="h-sm-100">
                             <Col md={4} className={`mt-4 mt-md-0 d-md-block ${mobileVisibleCard && 'd-none'}`} id="first-column">
                                 <OptionsCards

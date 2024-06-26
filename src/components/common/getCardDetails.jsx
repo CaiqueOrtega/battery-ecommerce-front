@@ -1,7 +1,6 @@
 import {VisaIcon, MasterCardIcon, AmericanExpressIcon, EloIcon, DiscoverIcon, JcbIcon, DinersClubIcon, HipercardIcon, AuraCardIcon} from '../../assets/icons/IconsSet'
 
-function getCardDetails(cardValue, smallSize) {
-    console.log('teste no carddetails', cardValue)
+function getCardDetails(cardValue, smallSize, currentColor) {
     let cardDetails = {
         length: 16,
         primaryColor: '#888888',
@@ -21,7 +20,7 @@ function getCardDetails(cardValue, smallSize) {
             length: 16,
             primaryColor: '#1A1F71',
             secondaryColor: '#4F5BA6',
-            icon: <VisaIcon size={smallSize ? 35 : null} />,
+            icon: <VisaIcon currentColor={currentColor} size={smallSize ? 35 : null} />,
         };
     } else if (cardValue.match(/^5[1-5][0-9]{14}$/) || cardValue === 'MasterCard') {
         cardDetails = {

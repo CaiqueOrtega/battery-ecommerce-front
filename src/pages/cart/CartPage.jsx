@@ -1,7 +1,7 @@
-import { Card, Col, Row, Button, FormControl, Container, Accordion, Placeholder, Spinner } from "react-bootstrap";
+import { Card, Col, Row, Button, FormControl, Container, Accordion, Placeholder, Spinner, InputGroup, Form } from "react-bootstrap";
 import { useGlobalDataProvider } from "../../context/GlobalDataProvider";
 import exemploImageCart from "../../assets/images/exemploImageRegister.png";
-import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon, ExclamationCircleIcon } from "../../assets/icons/IconsSet";
+import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon, ExclamationCircleIcon, ToEditIcon, AddSquareIcon } from "../../assets/icons/IconsSet";
 import BatteryCartServices from "../../services/cart/BatteryCartServices";
 import AddressServices from "../../services/address/AddressServices";
 import ConfirmChangesModal from "../../components/common/ConfirmChangesModal";
@@ -11,11 +11,12 @@ import { Link } from "react-router-dom";
 import './cart.css';
 import FormValidations from "../../components/common/FormValidation";
 import SaleStepsModal from "../sale/SaleStepsModal";
+import PromotionService from "../../services/promotion/PromotionService";
 
 function CartPage() {
     const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, setAddress, addressIsLoaded, fetchAddress, userData } = useGlobalDataProvider();
-    const { getAddressCep, getFreight, errorMessages: addressErrorMessages } = AddressServices();
-    const { removeBattery, changeBatteryQuantity, errorMessages: batteryErrorMessages, setErrorMessages } = BatteryCartServices();
+    const { getAddressCep, getFreight, errorMessages: addressErrorMessages, setErrorMessages: setAddressErrorMessages } = AddressServices();
+    const { removeBattery, changeBatteryQuantity, addPromotion, removePromotion, errorMessages: batteryErrorMessages, setErrorMessages: setBatteryErrorMessages } = BatteryCartServices();
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
     const [confirmChangesModalData, setConfirmChangesModalData] = useState({});
     const [confirmAction, setConfirmAction] = useState({});
@@ -67,11 +68,11 @@ function CartPage() {
 
                 if (totalQuantity) {
                     handleGetFreightByCep(formCEP, response, isRequestModal, totalQuantity);
-                }else{
+                } else {
                     setFreightIsLoaded(true);
                 }
             } else {
-                setErrorMessages({ cep: 'CEP inválido ou não encontrado' });
+                setAddressErrorMessages({ cep: 'CEP inválido ou não encontrado' });
             }
         }
     };
@@ -193,7 +194,7 @@ function CartPage() {
                 } catch (e) {
                     console.log('erro ao mudar quantidade de bateria do carrinho', e)
                 }
-            }
+            },
         };
 
         if (actions[action]) {
@@ -210,7 +211,7 @@ function CartPage() {
 
     return (
         <>
-            <Container className="py-5" style={{maxWidth: 1140}}>
+            <Container className="py-5" style={{ maxWidth: 1140 }}>
                 <Row>
                     <Col md={8}>
                         <RenderCartItemsCard
@@ -232,6 +233,9 @@ function CartPage() {
                             setShowSelectedAddressModal={setShowSelectedAddressModal}
                             freightIsLoaded={freightIsLoaded}
                             addressErrorMessages={addressErrorMessages}
+                            setBatteryCart={setBatteryCart}
+                            addPromotion={addPromotion}
+                            removePromotion={removePromotion}
                         />
                     </Col>
 
@@ -250,7 +254,6 @@ function CartPage() {
                             setAddressValues={setAddressValues}
                             addressErrorMessages={addressErrorMessages}
                             setBatteryCart={setBatteryCart}
-
                         />
                     </Col>
                 </Row>
@@ -266,9 +269,18 @@ function CartPage() {
     );
 }
 
-function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, freightIsLoaded, addressErrorMessages }) {
-    const { ExtractNumericValue } = FormValidations()
+function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, freightIsLoaded, addressErrorMessages, addPromotion, setBatteryCart, removePromotion }) {
+    const { ExtractNumericValue } = FormValidations();
     const [showPopover, setShowPopover] = useState(false);
+    const [formPromotionValue, setFormPromotionValue] = useState('');
+    const [disableFormPromotionCode, setDisableFormPromotionCode] = useState(false)
+
+    useEffect(() => {
+        if (batteryCartIsLoaded && batteryCart?.promotion?.code) {
+            setFormPromotionValue(batteryCart.promotion.code);
+            setDisableFormPromotionCode(true);
+        }
+    }, [batteryCartIsLoaded])
 
     const handleRemoveBattery = (batteryId) => {
         setShowConfirmChangesModal(true)
@@ -370,21 +382,60 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
         return currentDate.toLocaleDateString('pt-BR', options);
     };
 
+    const handlePromotionCode = async (code) => {
+        if (!disableFormPromotionCode) {
+            if (code) {
+                const response = await addPromotion(batteryCart.cartId, code);
+                if (response) {
+                    setBatteryCart(response);
+                    setDisableFormPromotionCode(true);
+                }
+            }else if(batteryCart?.promotion){
+                const response = await removePromotion(batteryCart.cartId)
+                if(response){
+                    setBatteryCart(response);
+                }
+            }
+        } else {
+            setDisableFormPromotionCode(false);
+        }
+    }
+
     return (
         <>
             <Card className={`border-0 shadow ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
-                <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`}>
-                    Carrinho de Baterias
+                <Card.Header className={`py-0 fw-bold ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`}>
+                    <div className="d-flex justify-content-between">
+                        <span className=" py-3 ">
+                            Carrinho de Baterias
+                        </span>
+                        {batteryCart?.batteries?.length > 0 && (
+                            <div className="d-flex align-items-center position-relative" style={{ maxWidth: 220 }}>
+                                <FormControl
+                                    value={formPromotionValue}
+                                    onChange={(e) => setFormPromotionValue(e.target.value)}
+                                    className="form-control-sm"
+                                    placeholder="Cupom de Desconto"
+                                    disabled={disableFormPromotionCode}
+                                />
+                                <div className='position-absolute top-50 end-0 translate-middle-y d-flex justify-content-center px-2 me-1 z-3'>
+                                    <a className="small text-muted" type="submit" onClick={() => handlePromotionCode(formPromotionValue)}>
+                                        {disableFormPromotionCode ? <ToEditIcon /> : <AddSquareIcon />}
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </Card.Header>
 
-                <Card.Body className="overflow-auto custom-scrollbar" style={{ height: Object.keys(batteryCart).length > 0 && batteryCart?.batteries?.length > 0 ? 350 : 389 }}>
+                <Card.Body className="overflow-auto custom-scrollbar" style={{ height: batteryCart && Object.keys(batteryCart).length > 0 && batteryCart?.batteries?.length > 0 ? 350 : 389 }}>
                     {!batteryCartIsLoaded ? (
                         <div className="d-flex flex-grow-1 align-items-center justify-content-center h-100">
                             <span className="loader"></span>
                         </div>
                     ) : (
                         <>
-                            {Object.keys(batteryCart).length > 0 && batteryCart?.batteries?.length > 0 ? (
+                            {batteryCart && Object.keys(batteryCart).length > 0 && batteryCart?.batteries?.length > 0 ? (
                                 <>
                                     {batteryCart?.batteries?.map(item => (
                                         <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">
@@ -415,7 +466,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                                 </>
                             ) : (
                                 <>
-                                    <section className="d-flex  align-items-center justify-content-center py-5">
+                                    <section className="d-flex  align-items-center justify-content-center h-100 py-5">
                                         <div className="d-flex flex-column align-items-center justify-content-center">
                                             <ShoppingCartIcon />
                                             <span className="mt-2">Seu carrinho de compras está vazio!</span>
@@ -443,7 +494,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
 
                                             <MapIcon size={'15px'} />
                                             <span className="ms-1">
-                                                {addressValues?.address},{addressValues?.number} {addressValues?.neighborhood}, {addressValues?.city}, {addressValues?.state}
+                                                {addressValues?.address}, {addressValues?.number}, {addressValues?.city}, {addressValues?.state}
                                             </span>
                                         </a>
                                     )}
@@ -497,7 +548,7 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                                             <>
                                                 {getEstimatedArrivalDate(freightValues?.estimateDays)}
                                                 <span className="text-success ms-1 font-numbers">
-                                                    - R${freightValues?.totalFreightCost?.toFixed(2)}
+                                                    - R${freightValues?.totalFreightCost?.toFixed(2).replace('.', (','))}
                                                 </span>
                                             </>
                                         )}
@@ -525,12 +576,13 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                 setFormCEP={setFormCEP}
                 handleGetAddressByCep={handleGetAddressByCep}
                 isLoggedIn={isLoggedIn}
+                errorMessages={addressErrorMessages}
             />
         </>
     )
 }
 
-function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoaded, addressIsLoaded, address, setAddress, isLoggedIn, userData, addressValues, setAddressValues, freightValues, setFreightValues, freightIsLoaded, addressErrorMessages }) {
+function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoaded, addressIsLoaded, address, setAddress, isLoggedIn, userData, addressValues, setAddressValues, freightValues, freightIsLoaded, addressErrorMessages }) {
     const [showPopover, setShowPopover] = useState(false);
     const [showSaleStepsModal, setShowSaleStepsModal] = useState();
     const [steps, setSteps] = useState('address');
@@ -544,7 +596,7 @@ function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoade
                 <Card.Header className={`fw-bold py-3 ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`} >
                     Resumo da compra
                 </Card.Header>
-                <Card.Body className="d-flex flex-column justify-content-between px-4 overflow-auto" style={{ height: Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
+                <Card.Body className="d-flex flex-column justify-content-between px-4 overflow-auto" style={{ height: batteryCart && Object.keys(batteryCart).length !== 0 && batteryCart?.batteries?.length !== 0 ? 350 : 389 }}>
 
                     {!batteryCartIsLoaded ? (
                         <div className="d-flex flex-grow-1 align-items-center justify-content-center">
@@ -552,7 +604,7 @@ function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoade
                         </div>
                     ) : (
                         <>
-                            {Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
+                            {batteryCart && Object.keys(batteryCart).length != 0 && batteryCart?.batteries?.length != 0 ? (
                                 <>
                                     <section>
                                         <Accordion defaultActiveKey="0" flush>
@@ -580,7 +632,20 @@ function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoade
                                         <hr className="opacity-25" />
                                         <div className="d-flex justify-content-between small my-1">
                                             <span>SubTotal</span>
-                                            <span>R${batteryCart.totalValue.toFixed(2).replace('.', ',')}</span>
+                                            {batteryCart?.promotion ? (
+                                                <div className="d-flex flex-column">
+                                                    <span>
+                                                        <s className="ms-1" style={{ top: '10%' }}>
+                                                            R${(batteryCart.totalValue / (1 - batteryCart.promotion.percentage / 100)).toFixed(2).replace('.', ',')}
+                                                        </s>
+                                                        <sup className="text-success">{batteryCart.promotion.percentage}%</sup>
+                                                        <span className="fw-bold">R${batteryCart.totalValue.toFixed(2).replace('.', ',')}</span>
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span>R${batteryCart.totalValue.toFixed(2).replace('.', ',')}
+                                                </span>
+                                            )}
                                         </div>
 
                                         <div className="d-flex justify-content-between position-relative">
@@ -590,7 +655,7 @@ function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoade
                                                     <>
                                                         {freightValues?.totalFreightCost ? (
                                                             <span className="font-numbers small">
-                                                                R$ {freightValues.totalFreightCost}
+                                                                R$ {freightValues.totalFreightCost.toFixed(2).replace('.', ',')}
                                                             </span>
                                                         ) : (
                                                             addressIsLoaded && !localStorage.getItem('addressCep') && address.length === 0 ? (
@@ -644,13 +709,13 @@ function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoade
                                             <span className="fw-bold ">Total</span>
                                             <span className="fw-bold font-numbers">R$
                                                 <span className="ms-2">
-                                                    {((batteryCart?.totalValue || 0) + (freightValues?.totalFreightCost || 0))
-                                                        .toFixed(2)
-                                                        .replace('.', ',')}
+                                                    {(
+                                                        ((batteryCart?.discountedValue) ?? (batteryCart?.totalValue)) + (freightValues?.totalFreightCost || 0)
+                                                    ).toFixed(2).replace('.', ',')}
                                                 </span>
                                             </span>
                                         </div>
-                                        <Button variant="yellow fw-bold w-100 py-2 mt-2" disabled={!freightIsLoaded} onClick={() => handleContinueSale()}>Continuar a Compra</Button>
+                                        <Button variant={`yellow ${!freightIsLoaded ? 'disabled-button' : ''} fw-bold w-100 py-2 mt-2`} disabled={!freightIsLoaded} onClick={() => handleContinueSale()}>Continuar a Compra</Button>
                                     </section>
                                 </>
                             ) : (
@@ -668,21 +733,24 @@ function RenderCartSummaryCard({ batteryCart, setBatteryCart, batteryCartIsLoade
                 </Card.Body>
             </Card >
 
-            <SaleStepsModal
-                showSaleStepsModal={showSaleStepsModal}
-                setShowSaleStepsModal={setShowSaleStepsModal}
-                isLoggedIn={isLoggedIn}
-                addressValues={addressValues}
-                setAddressValues={setAddressValues}
-                freightValues={freightValues}
-                address={address}
-                setAddress={setAddress}
-                userData={userData}
-                steps={steps}
-                setSteps={setSteps}
-                batteryCart={batteryCart}
-                setBatteryCart={setBatteryCart}
-            />
+            {showSaleStepsModal && (
+                <SaleStepsModal
+                    showSaleStepsModal={showSaleStepsModal}
+                    setShowSaleStepsModal={setShowSaleStepsModal}
+                    isLoggedIn={isLoggedIn}
+                    addressValues={addressValues}
+                    setAddressValues={setAddressValues}
+                    freightValues={freightValues}
+                    address={address}
+                    setAddress={setAddress}
+                    userData={userData}
+                    steps={steps}
+                    setSteps={setSteps}
+                    batteryCart={batteryCart}
+                    setBatteryCart={setBatteryCart}
+                />
+            )
+            }
         </>
     )
 }

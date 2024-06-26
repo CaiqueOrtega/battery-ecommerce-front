@@ -8,7 +8,7 @@ import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess"
 const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleConfirm, errorMessages, setErrorMessages }) => {
     const [verifyPassword, setVerifyPassword] = useState('')
     const [verifyConfirmPassword, setVerifyConfirmPassword] = useState('')
-    const [prevValues, setPrevValues] = useState({password: null, confirmPassword: null})
+    const [prevValues, setPrevValues] = useState({ password: null, confirmPassword: null })
     const [successMessages, setSuccessMessages] = useState(null)
 
     return (
@@ -43,18 +43,18 @@ const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleC
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowModal(false)}>Fechar</Button>
                 <Button variant="red" onClick={async (e) => {
-                    if (prevValues.password == verifyPassword && prevValues.confirmPassword == verifyConfirmPassword){
-                        setErrorMessages({general: "Os dados não foram alterados"})
+                    if (prevValues.password == verifyPassword && prevValues.confirmPassword == verifyConfirmPassword) {
+                        setErrorMessages({ general: "Os dados não foram alterados" })
                         return
                     }
                     if (verifyPassword !== verifyConfirmPassword) {
                         setErrorMessages({ general: "Senhas incompatíveis" })
                         return
                     }
-                    
-                        const response = await handleConfirm(e, 'disable', verifyPassword)
-                    if (!response){
-                        setPrevValues({password: verifyPassword, confirmPassword: verifyConfirmPassword})
+
+                    const response = await handleConfirm(e, 'disable', verifyPassword)
+                    if (!response) {
+                        setPrevValues({ password: verifyPassword, confirmPassword: verifyConfirmPassword })
                     }
 
                 }
@@ -69,7 +69,7 @@ const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleC
 function AccountContent({ userData }) {
     const [email, setEmail] = useState(userData ? userData.email : '')
     const [name, setName] = useState(userData ? userData.name : '')
-    const [prevValues, setPrevValues] = useState(userData ? {name: userData.name, email: userData.email} : {})
+    const [prevValues, setPrevValues] = useState(userData ? { name: userData.name, email: userData.email } : {})
     const [disableFormControl, setDisableFormControl] = useState(true);
     const [request, setRequest] = useState('view')
     const [successMessage, setSuccessMessage] = useState(null)
@@ -81,7 +81,7 @@ function AccountContent({ userData }) {
 
     const handleConfirm = async (e, action, password) => {
         e.preventDefault();
-    
+
         if (action === 'disable') {
             setShowMainContent(false);
             const response = await disableAccount(userData.userId, password);
@@ -92,7 +92,7 @@ function AccountContent({ userData }) {
             }
         }
     };
-    
+
 
     const handleClick = (e) => {
         e.preventDefault();
@@ -101,21 +101,21 @@ function AccountContent({ userData }) {
     };
 
     const handleUpdate = async (userId, name, email) => {
-            if (prevValues.name == name && prevValues.email == email){
-                setShowMainContent(true)
-                setErrorMessages({general: "Dados não foram alterados"})
-                return
-            }
-        
-            const response = await updateUser(userId, name, email)
-            response ? (setRequest('view'), setSuccessMessage("Cadastro atualizado com sucesso!")) : setRequest('update')
+        if (prevValues.name == name && prevValues.email == email) {
             setShowMainContent(true)
+            setErrorMessages({ general: "Dados não foram alterados" })
+            return
+        }
 
-            if (response) {
-                setPrevValues({name: name, email: email})
-                setShowMainContent(true)
-                setErrorMessages({})
-            }
+        const response = await updateUser(userId, name, email)
+        response ? (setRequest('view'), setSuccessMessage("Cadastro atualizado com sucesso!")) : setRequest('update')
+        setShowMainContent(true)
+
+        if (response) {
+            setPrevValues({ name: name, email: email })
+            setShowMainContent(true)
+            setErrorMessages({})
+        }
     }
 
     useEffect(() => {
@@ -128,74 +128,78 @@ function AccountContent({ userData }) {
 
 
     return (
-        <section className="px-5 py-4 d-flex h-100 justify-content-center flex-column ">
-            <header className="mb-4 pb-2">
-                <h4>Dados da Conta</h4>
-                <span className="text-muted">Atualize suas informações pessoais aqui para garantir uma experiência personalizada.
-                    Mantenha seus detalhes precisos e atualizados.</span>
-            </header>
+        <>
+            <div className="d-flex justify-content-between align-items-center px-5 py-3 bg-yellow text-white fw-bold" style={{ maxHeight: 60 }}>
+                <h4 className="mb-0">Dados de Cadastro</h4>
+            </div>
+            <section className="px-5 py-4 d-flex h-100 justify-content-center flex-column ">
+                <header className="mb-4 pb-2">
+                    <span className="text-muted">Atualize suas informações pessoais aqui para garantir uma experiência personalizada.
+                        Mantenha seus detalhes precisos e atualizados.</span>
+                </header>
 
-            {showMainContent === true ? <AlertErrorOrSuccess successMessage={successMessage} errorMessages={errorMessages} /> : null}
+                {showMainContent === true ? <AlertErrorOrSuccess successMessage={successMessage} errorMessages={errorMessages} /> : null}
 
-            <Form>
-                <Row>
-                    <Col md={12}>
-                        <Form.Label>Nome completo</Form.Label>
+                <Form>
+                    <Row>
+                        <Col md={12}>
+                            <Form.Label>Nome completo</Form.Label>
+                            <FormGroupWithIcon
+                                icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'} />}
+                                type='text'
+                                placeholder=''
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                mb={'mb-3'}
+                                disable={disableFormControl}
+                                feedback={errorMessages.name}
+                            />
+
+                        </Col>
+
+                        <Form.Label>Email</Form.Label>
                         <FormGroupWithIcon
-                            icon={<UserIcon className='position-absolute ms-3' currentColor='a3a29f' size={'20'}/>}
-                            type='text'
+                            icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                            type='email'
                             placeholder=''
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                             mb={'mb-3'}
                             disable={disableFormControl}
-                            feedback={errorMessages.name}
+                            feedback={errorMessages.email}
                         />
 
-                    </Col>
+                        <Col md={12}>
+                            <Form.Label>CPF</Form.Label>
+                            <FormGroupWithIcon
+                                icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
+                                type='text'
+                                placeholder=''
+                                value={userData ? userData.document : ''}
+                                disable={true}
+                            />
+                        </Col>
 
-                    <Form.Label>Email</Form.Label>
-                    <FormGroupWithIcon
-                        icon={<EnvelopeIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                        type='email'
-                        placeholder=''
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        mb={'mb-3'}
-                        disable={disableFormControl}
-                        feedback={errorMessages.email}
-                    />
+                    </Row>
+                </Form>
 
-                    <Col md={12}>
-                        <Form.Label>CPF</Form.Label>
-                        <FormGroupWithIcon
-                            icon={<DocumentIcon className='position-absolute ms-3' currentColor='a3a29f' />}
-                            type='text'
-                            placeholder=''
-                            value={userData ? userData.document : ''}
-                            disable={true}
-                        />
-                    </Col>
+                <div className=" d-flex justify-content-end flex-column flex-md-row mt-5">
+                    {request == 'view' ? <Button variant="yellow ms-md-3" onClick={(e) => handleClick(e)}>Editar Dados</Button>
+                        : <Button variant="yellow ms-md-3" onClick={(e) => handleUpdate(userData.userId, name, email)}>Atualizar Dados</Button>
+                    }
 
-                </Row>
-            </Form>
+                    {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDisableAccountModal(true)}>Desativar Conta</Button>
+                        : <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setRequest('view')}>Cancelar</Button>
+                    }
 
-            <div className=" d-flex justify-content-end flex-column flex-md-row mt-5">
-                {request == 'view' ? <Button variant="yellow ms-md-3" onClick={(e) => handleClick(e)}>Editar Dados</Button>
-                    : <Button variant="yellow ms-md-3" onClick={(e) => handleUpdate(userData.userId, name, email)}>Atualizar Dados</Button>
-                }
-
-                {request == 'view' ? <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setShowConfirmDisableAccountModal(true)}>Desativar Conta</Button>
-                    : <Button variant="red-outline order-md-first mt-md-0 mt-3" onClick={() => setRequest('view')}>Cancelar</Button>
-                }
-
-            </div>
+                </div>
 
 
-            <ConfirmDisableAccountModal showModal={showConfirmDisableAccountModal} setShowModal={setShowConfirmDisableAccountModal}
-                userData={userData} handleConfirm={handleConfirm}
-                errorMessages={errorMessages} setErrorMessages={setErrorMessages} />
-        </section>
+                <ConfirmDisableAccountModal showModal={showConfirmDisableAccountModal} setShowModal={setShowConfirmDisableAccountModal}
+                    userData={userData} handleConfirm={handleConfirm}
+                    errorMessages={errorMessages} setErrorMessages={setErrorMessages} />
+            </section>
+        </>
     );
 }
 

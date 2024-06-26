@@ -69,7 +69,16 @@ const PromotionService = () => {
         }
     }
 
-    return { getPromotions, updatePromotion, deletePromotion, createPromotion, getPromotionReportData, reactivePromotion, errorMessages, setErrorMessages }
+    const getPromotionByCode = async (code) =>{
+        try{
+            const response = await ConnectionAPI.get(`promotion/${code}/code`)
+            return response.data
+        } catch (error){
+            console.error(error)
+        }
+    }
+
+    return { getPromotions, updatePromotion, deletePromotion, createPromotion, getPromotionReportData, reactivePromotion, getPromotionByCode, errorMessages, setErrorMessages }
 }
 
 export default PromotionService

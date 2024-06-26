@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { MapIcon, DeliveryIcon, MotorcycleIcon, SubtractionIcon, AdditionIcon, ShieldCheckIcon, BackIcon, MedalIcon } from '../../assets/icons/IconsSet';
+import { MapIcon, DeliveryIcon, MotorcycleIcon, SubtractionIcon, AdditionIcon, ShieldCheckIcon, BackIcon, MedalIcon, ExclamationCircleIcon } from '../../assets/icons/IconsSet';
 import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Placeholder } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 
@@ -14,24 +14,36 @@ import { useAuthProvider } from '../../context/AuthProvider';
 import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
 import './batteryPurchasePage.css';
 import FormValidations from '../../components/common/FormValidation';
+import SaleStepsModal from '../sale/SaleStepsModal';
 
 function BatteryPurchasePage() {
     const location = useLocation();
+    const navigate = useNavigate();
     const batteryData = location.state;
-    const [quantity, setQuantity] = useState('1');
-    const { addBattery, errorMessages, setErrorMessages } = BatteryCartServices();
 
-    const { fetchAddress, address, batteryCart, setBatteryCart, addressIsLoaded, } = useGlobalDataProvider();
+    useEffect(() => {
+        if (!batteryData) {
+            navigate('/')
+        }
+    }, [batteryData])
+
+    const [quantity, setQuantity] = useState('1');
+    const { addBattery, errorMessages: batteryCartErrorMessages, setErrorMessages: setBatteryCartErrorMessages } = BatteryCartServices();
+
+    const { fetchAddress, address, setAddress, batteryCart, setBatteryCart, addressIsLoaded, userData } = useGlobalDataProvider();
     const { isLoggedIn } = useAuthProvider();
 
     const [formCEP, setFormCEP] = useState('');
     const [prevFormCEP, setPrevFormCEP] = useState({})
 
-    const { getFreight, getAddressCep } = AddressServices();
+    const { getFreight, getAddressCep, errorMessages: addressErrorMessages, setErrorMessages: setAddressErrorMessages } = AddressServices();
     const [freightValues, setFreightValues] = useState({});
 
     const [addressValues, setAddressValues] = useState({})
     const [showSelectedAddressModal, setShowSelectedAddressModal] = useState(false);
+
+    const [showSaleStepsModal, setShowSaleStepsModal] = useState(false);
+    const [steps, setSteps] = useState('address')
 
 
     const handleAddBatteryToCart = async () => {
@@ -131,13 +143,15 @@ function BatteryPurchasePage() {
         if (formCEP != prevFormCEP) {
             const response = await getAddressCep(formCEP);
             if (response) {
+                setAddressErrorMessages({});
                 if (Object.keys(address).length === 0) {
                     localStorage.setItem('cepAddress', formCEP);
                 }
                 setPrevFormCEP(formCEP);
                 handleGetFreightByCep(formCEP, response, isRequestModal, quantity);
             } else {
-                setErrorMessages({ cep: 'CEP inválido ou não encontrado' })
+                console.log('entrou')
+                setAddressErrorMessages({ cep: 'CEP inválido ou não encontrado' })
             }
         }
     }
@@ -154,6 +168,13 @@ function BatteryPurchasePage() {
             if (isRequestModal) {
                 setShowSelectedAddressModal(false)
             }
+        }
+    }
+
+    const handleSaleBattery = async () => {
+        if (isLoggedIn) {
+            await addBatteryToServerCart();
+            setShowSaleStepsModal(true);
         }
     }
 
@@ -217,8 +238,8 @@ function BatteryPurchasePage() {
 
                             <Col className='col-12 col-sm-6 col-lg flex-grow-1 mt-lg-0 mt-4'>
                                 <div>
-                                    <h4 className='text-muted'>{batteryData.name}</h4>
-                                    <p className="text-muted">{batteryData.description}</p>
+                                    <h4 className='text-muted'>{batteryData?.name}</h4>
+                                    <p className="text-muted">{batteryData?.description}</p>
                                 </div>
                             </Col>
 
@@ -237,8 +258,10 @@ function BatteryPurchasePage() {
                                     addressIsLoaded={addressIsLoaded}
                                     address={address}
                                     isLoggedIn={isLoggedIn}
-                                    errorMessages={errorMessages}
+                                    batteryCartErrorMessages={batteryCartErrorMessages}
                                     addressValues={addressValues}
+                                    handleSaleBattery={handleSaleBattery}
+                                    addressErrorMessages={addressErrorMessages}
                                 />
                             </Col>
                         </Row>
@@ -256,7 +279,26 @@ function BatteryPurchasePage() {
                 handleGetAddressByCep={handleGetAddressByCep}
                 isLoggedIn={isLoggedIn}
                 quantity={quantity}
+                errorMessages={addressErrorMessages}
             />
+
+            {showSaleStepsModal && (
+                <SaleStepsModal
+                    showSaleStepsModal={showSaleStepsModal}
+                    setShowSaleStepsModal={setShowSaleStepsModal}
+                    isLoggedIn={isLoggedIn}
+                    addressValues={addressValues}
+                    setAddressValues={setAddressValues}
+                    freightValues={freightValues}
+                    address={address}
+                    setAddress={setAddress}
+                    userData={userData}
+                    steps={steps}
+                    setSteps={setSteps}
+                    batteryCart={batteryCart}
+                    setBatteryCart={setBatteryCart}
+                />
+            )}
         </>
     );
 }
@@ -326,8 +368,8 @@ function CardBatteryPurchase(props) {
         <Card className='card-value-purchase shadow-sm h-100'>
             <Card.Header className='d-flex flex-column justify-content-center py-3 mb-0' style={{ background: '#F5F5F5' }}>
                 <div className="lh-1">
-                    <h4 className='mb-0'>R$ {props.batteryData.value}</h4>
-                    <span className='text-success'>Em 5x R$ {(props.batteryData.value / 5).toFixed(2)} sem juros</span>
+                    <h4 className='mb-0'>R$ {props.batteryData?.value}</h4>
+                    <span className='text-success'>Em 5x R$ {(props.batteryData?.value / 5).toFixed(2)} sem juros</span>
                 </div>
                 <span className='mt-2 text-muted small'><MotorcycleIcon /> Vendido por MacDavis Motos</span>
             </Card.Header>
@@ -343,15 +385,16 @@ function CardBatteryPurchase(props) {
                     formCEP={props.formCEP}
                     setFormCEP={props.setFormCEP}
                     handleGetFreightByCep={props.handleGetFreightByCep}
-                    errorMessages={props.errorMessages}
+                    batteryCartErrorMessages={props.batteryCartErrorMessages}
                     quantity={props.quantity}
+                    addressErrorMessages={props.addressErrorMessages}
                 />
 
                 <div className='h-100 d-flex flex-column justify-content-between'>
                     <section className='mb-3 pb-1 mt-3'>
                         <div className='lh-sm mb-3'>
                             <h6 className='fw-bold mb-0'>Estoque disponível</h6>
-                            <span>disponível: <span className='fw-bold'> {props.batteryData.quantity} unidades</span></span>
+                            <span>disponível: <span className='fw-bold'> {props.batteryData?.quantity} unidades</span></span>
                         </div>
 
                         <Card className="d-flex">
@@ -377,7 +420,8 @@ function CardBatteryPurchase(props) {
                 </div>
 
                 <div>
-                    <Button variant='yellow py-2 fw-bold w-100 mb-2'>Comprar</Button>
+                    <Button variant={`yellow py-2 fw-bold w-100 mb-2`}
+                        onClick={() => props.handleSaleBattery()}>Comprar</Button>
                     <Button variant='red-outline py-2 fw-bold w-100'
                         onClick={() => props.handleAddBatteryToCart()}>
                         Adicionar ao Carrinho
@@ -390,7 +434,7 @@ function CardBatteryPurchase(props) {
 }
 
 
-function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, handleGetAddressByCep, handleGetFreightByCep, renderFreightCards, formCEP, setFormCEP, errorMessages, isLoggedIn, quantity }) {
+function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, handleGetAddressByCep, handleGetFreightByCep, renderFreightCards, formCEP, setFormCEP, addressErrorMessages, batteryCartErrorMessages, quantity }) {
 
     const initialize = async () => {
         if (!addressIsLoaded) {
@@ -415,24 +459,44 @@ function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, handleGetAd
 
 
     if (address && Object.keys(address).length !== 0 || localStorage.getItem('cepAddress')) {
-        return renderFreightCards();
+        if (!addressErrorMessages?.freight) {
+            return renderFreightCards();
+        } else {
+            return (
+                <Card>
+                    <Card.Header className='small text-muted'>
+                        <span className='me-1'><ExclamationCircleIcon /></span>  Erro ao calcular o frete
+                    </Card.Header>
+                    <Card.Body className='py-2 lh-sm'>
+                        <span className='small text-muted '>Estamos com problemas com o frete, tente novamente mais tarde!</span>
+                        <hr className='mt-2 mb-1' />
+                    </Card.Body>
+                </Card>
+            )
+        }
     } else {
         return (
             <section>
                 <span>Calcular frete</span>
                 <Form onSubmit={(e) => handleGetAddressByCep(e, formCEP, false)}>
-                    <InputGroup className='input-group-cep-container flex-nowrap'>
-                        <FormGroupWithIcon
-                            icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
-                            type={'text'}
-                            placeholder={'Digite o CEP'}
-                            value={formCEP}
-                            onChange={(e) => setFormCEP(e.target.value)}
-                            feedback={errorMessages.cep}
-                            className={"input-group-cep"}
-                        />
-                        <Button type="submit" variant={`red ${errorMessages?.cep ? 'input-group-btn-cep-margin-top' : ''}`}>ok</Button>
-
+                    <InputGroup className='flex-nowrap'>
+                        <Row className='g-0'>
+                            <Col style={{maxWidth: 247}}>
+                                <FormGroupWithIcon
+                                    icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
+                                    type={'text'}
+                                    placeholder={'Digite o CEP'}
+                                    value={formCEP}
+                                    onChange={(e) => setFormCEP(e.target.value)}
+                                    feedback={addressErrorMessages.cep}
+                                    className={"z-3 rounded-end-0 input-cep"}
+                                    mask={'99999-999'}
+                                />
+                            </Col>
+                            <Col xs={1} className='position-relative'>
+                                <Button type="submit" variant={`red position-absolute rounded-start-0 z-1 py-2`}>ok</Button>
+                            </Col>
+                        </Row>
                     </InputGroup>
                 </Form>
             </section>

@@ -14,3 +14,11 @@
 .font-numbers {
     font-variant-numeric: tabular-nums !important;
 }
+
+.disabled-button {
+    background-color: #fec117 !important;
+    color: #fff !important;
+    border: #fec117 !important;
+  }
+
+  

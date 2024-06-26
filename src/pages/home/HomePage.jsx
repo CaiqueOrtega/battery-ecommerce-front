@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import BatteryCard from '../../components/common/BatteryCard';
-import { Carousel, Container } from 'react-bootstrap';
+import { Carousel, Container, Card, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { CarouselIconRight, CarouselIconLeft } from '../../assets/icons/IconsSet';
+import { CarouselIconRight, CarouselIconLeft, BatteryIcon } from '../../assets/icons/IconsSet';
 import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
 import exampleCarousel1 from '../../assets/images/carousel-images-examples-1.jpg';
 import exampleCarousel2 from '../../assets/images/carousel-images-examples-2.jpg';
@@ -24,34 +24,36 @@ function HomePage() {
 }
 
 function RenderSliderBatteries() {
-  const { batteriesActive } = useGlobalDataProvider();
+  const { batteriesActive, batteriesActiveIsLoaded } = useGlobalDataProvider();
   const navigate = useNavigate();
   const initialCount = Math.min(5, Object.keys(batteriesActive).length);
-  const slidesToShow = Math.max(1, initialCount); 
-  
+  const slidesToShow = Math.max(1, initialCount);
+
 
   const CustomNextArrow = ({ onClick, style, className }) => (
     <div
       className={className + ' rounded-circle d-flex justify-content-center align-items-center'}
       onClick={onClick}
-      style={{ ...style, width: '45px', height: '45px', backgroundColor: '#fff',  zIndex: 1 }}
+      style={{ ...style, width: '45px', height: '45px', backgroundColor: '#fff', zIndex: 1 }}
     >
-      < CarouselIconLeft size={35} /> 
+      < CarouselIconLeft size={35} />
     </div>
   );
-  
+
   const CustomPrevArrow = ({ onClick, style, className }) => (
     <div
       className={className + ' rounded-circle d-flex justify-content-center align-items-center'}
       onClick={onClick}
       style={{ ...style, width: '45px', height: '45px', backgroundColor: '#fff' }}
     >
-      <CarouselIconRight size={35} /> 
+      <CarouselIconRight size={35} />
     </div>
   );
 
+  console.log(slidesToShow)
+
   const settings = {
-    dots: true,
+    dots: false,
     infinite: false,
     speed: 800,
     slidesToShow: slidesToShow,
@@ -64,7 +66,7 @@ function RenderSliderBatteries() {
           slidesToShow: 3,
           slidesToScroll: 3,
           infinite: true,
-          dots: true
+          dots: false
         }
       },
       {
@@ -85,36 +87,47 @@ function RenderSliderBatteries() {
     ],
     prevArrow: <CustomNextArrow />,
     nextArrow: <CustomPrevArrow />,
-    appendDots: (dots) => (
-      <ul style={{ display: 'flex', top: '-35px', justifyContent: 'end', height: 'min-content' }}>{dots}</ul>
-
-    ),
-
   };
 
   const handleBatteryClick = (batteryData) => {
     navigate('/bateria/detalhes', { state: batteryData });
   };
 
-  
+
   return (
     <Container className="slider-container mt-5">
-      <Slider {...settings}>
-        {Object.keys(batteriesActive).length !== 0 && batteriesActive.map((battery, index) => (
-          <div key={battery.batteryId} className='d-flex '>
-            <BatteryCard
-              batteryName={battery.name}
-              batteryDescription={battery.description}
-              batteryPrice={battery.value}
-              batteryQuantity={battery.quantity}
-              onPlaceholder={true}
-              sizeWidth={'14.5em'}
-              sizeHeight={'27.125em'}
-              onClick={() => handleBatteryClick(battery)}
-            />
-          </div>
-        ))}
-      </Slider>
+      {batteriesActive.length ?
+        <Slider {...settings}>
+          {Object.keys(batteriesActive).length !== 0 && batteriesActive.map((battery, index) => (
+            <div key={battery.batteryId} className='justify-content-center d-flex' >
+              <BatteryCard
+                batteryName={battery.name}
+                batteryDescription={battery.description}
+                batteryPrice={battery.value}
+                batteryQuantity={battery.quantity}
+                onPlaceholder={true}
+                sizeWidth={'14.5em'}
+                sizeHeight={'27.125em'}
+                onClick={() => handleBatteryClick(battery)}
+              />
+            </div>
+          ))}
+        </Slider>
+        : (
+          !batteriesActiveIsLoaded ? (
+            <div className='h-100 d-flex flex-grow-1 align-items-center justify-content-center'>
+              <Spinner animation="border" role="status" style={{ color: '#c00d0d' }}>
+                <span className="visually-hidden">Loading...</span>
+              </Spinner>
+            </div>
+          ) : (
+            <div className="d-flex flex-column align-items-center py-5">
+              <BatteryIcon size={'80px'} />
+              <span className="mt-2">Ainda não existem baterias disponíveis para compra!</span>
+              <span className="text-muted small">Aguarde até que alguma bateria seja adicionada</span>
+            </div>
+          )
+        )}
     </Container>
   );
 
@@ -131,7 +144,7 @@ function ControlledCarouseImages() {
 
   return (
     <Container fluid className='carousel-container-home position-relative overflow-hidden z-1'>
-      <Carousel activeIndex={index} onSelect={handleSelect} >
+      <Carousel activeIndex={index} onSelect={handleSelect} interval={3000} >
         <Carousel.Item>
           <img
             className="d-block w-100"

@@ -225,7 +225,7 @@ function AddressForm(props) {
 
     return (
         <section>
-            <h3>{props.isUpdateId ? 'Editar o' : 'Cadastro de'} Endereço</h3>
+            <h3 className="text-muted mb-5">{props.isUpdateId ? 'Editar o' : 'Cadastro de'} Endereço</h3>
 
             <FormAddressRegister
                 errorMessages={props.errorMessages}

@@ -41,8 +41,26 @@ const BatteryCartServices = () => {
         }
     }
 
+    const removePromotion = async (cartId) => {
+        try{
+            const response = await ConnectionAPI.delete(`cart/${cartId}/promotion`)
+            return response.data
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
 
-    return { getByUser, addBattery, removeBattery, changeBatteryQuantity, errorMessages, setErrorMessages }
+    const addPromotion = async (cartId, promotionCode) => {
+        try{
+            const response = await ConnectionAPI.put(`cart/${cartId}/promotion/${promotionCode}`)
+            return response.data
+        } catch (error) {
+            handleAPIError(error)
+        }
+    }
+
+
+    return { getByUser, addBattery, removeBattery, changeBatteryQuantity, errorMessages, setErrorMessages, removePromotion, addPromotion }
 }
 
 export default BatteryCartServices

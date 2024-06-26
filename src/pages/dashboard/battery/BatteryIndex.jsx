@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button, Card, Col, Form, Modal, Row, Table } from 'react-bootstrap';
-import { AtomIcon, BarCode, DollarIcon, StockIcon, TextBodyIcon, PdfIcon } from '../../../assets/icons/IconsSet';
+import { Button, Card, Col, Form, Modal, Row, Spinner, Table } from 'react-bootstrap';
+import { AtomIcon, BarCode, DollarIcon, StockIcon, TextBodyIcon, PdfIcon, EmptyBatteryIcon } from '../../../assets/icons/IconsSet';
 import AlertErrorOrSuccess from '../../../components/common/AlertErrorOrSuccess';
 import BatteryCard from '../../../components/common/BatteryCard';
 import ConfirmChangesModal from '../../../components/common/ConfirmChangesModal';
@@ -10,7 +10,7 @@ import SortButton from '../../../components/common/SortButton';
 import BatteryServices from '../../../services/battery/BatteryServices';
 import ModalPdf from '../../../services/pdf/Report'
 
-function BatteryIndex({ batteries, setBatteries }) {
+function BatteryIndex({ batteries, setBatteries, batteriesIsLoaded }) {
     const [selectedBattery, setSelectedBattery] = useState(null);
     const [showBatteryFormModal, setShowBatteryFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
@@ -168,11 +168,11 @@ function BatteryIndex({ batteries, setBatteries }) {
                                 onPlaceholder={false}
                                 sizeWidth={'232px'}
                                 sizeHeight={'434px'}
+                                border={'border'}
                             />
                         </Col>
-                        <Col>
-
-                            <AlertErrorOrSuccess errorMessages={errorMessages} successMessage={successMessage} />
+                        <Col className='px-4'>
+                            <AlertErrorOrSuccess errorMessages={errorMessages} successMessage={successMessage} mb={'mb-3'}/>
 
                             <Form ref={formRef}>
                                 <Row>
@@ -182,7 +182,6 @@ function BatteryIndex({ batteries, setBatteries }) {
                                             icon={<AtomIcon className='position-absolute ms-3 color-gray' />}
                                             type='text'
                                             placeholder='Nome do Produto(Ex: Bateria123)'
-                                            mb={'mb-4'}
                                             value={batteryValues.name}
                                             onChange={(e) => setBatteryValues({ ...batteryValues, name: e.target.value })}
                                             feedback={errorMessages.name}
@@ -191,12 +190,11 @@ function BatteryIndex({ batteries, setBatteries }) {
                                     </Col>
 
                                     <Col md={4}>
-                                        <Form.Label className='w-100'>Código</Form.Label>
+                                        <Form.Label className='w-100 '>Código</Form.Label>
                                         <FormGroupWithIcon
                                             icon={<BarCode className='position-absolute ms-3 color-gray' />}
                                             type='text'
                                             placeholder='Código'
-                                            mb={'mb-4'}
                                             value={batteryValues.code}
                                             onChange={(e) => setBatteryValues({ ...batteryValues, code: e.target.value })}
                                             feedback={errorMessages.code}
@@ -205,12 +203,11 @@ function BatteryIndex({ batteries, setBatteries }) {
                                     </Col>
 
                                     <Col md={12}>
-                                        <Form.Label className='w-100'>Descrição do Produto</Form.Label>
+                                        <Form.Label className='w-100 mt-2'>Descrição do Produto</Form.Label>
                                         <FormGroupWithIcon
                                             icon={<TextBodyIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                                             type='text'
                                             placeholder='Descrição do produto(Ex: )'
-                                            mb={'mb-4'}
                                             value={batteryValues.description}
                                             onChange={(e) => setBatteryValues({ ...batteryValues, description: e.target.value })}
                                             feedback={errorMessages.description}
@@ -219,12 +216,11 @@ function BatteryIndex({ batteries, setBatteries }) {
                                     </Col>
 
                                     <Col md={6}>
-                                        <Form.Label className='w-100'>Preço</Form.Label>
+                                        <Form.Label className='w-100 mt-2'>Preço</Form.Label>
                                         <FormGroupWithIcon
                                             icon={<DollarIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                                             type='text'
                                             placeholder='Preço do produto (Ex: R$ 00,00 )'
-                                            mb={'mb-4'}
                                             value={batteryValues.value}
                                             onChange={(e) => setBatteryValues({ ...batteryValues, value: e.target.value })}
                                             feedback={errorMessages.value}
@@ -233,21 +229,21 @@ function BatteryIndex({ batteries, setBatteries }) {
                                     </Col>
 
                                     <Col md={6}>
-                                        <Form.Label className='w-100'>Quantidade</Form.Label>
+                                        <Form.Label className='w-100 mt-2'>Quantidade</Form.Label>
                                         <FormGroupWithIcon
                                             icon={<StockIcon className='position-absolute ms-3' currentColor='#a3a29f' />}
                                             type='number'
                                             placeholder='Quantidade em estoque'
-                                            mb={'mb-4'}
                                             value={batteryValues.quantity}
                                             onChange={(e) => setBatteryValues({ ...batteryValues, quantity: e.target.value })}
                                             feedback={errorMessages.quantity}
                                             disable={disableFormControl}
                                         />
                                     </Col>
-
-                                    <Form.Label >Imagens</Form.Label>
-                                    <Form.Control type='file' accept='.png' multiple disabled={disableFormControl} />
+                                    <Col className='mt-2'>
+                                        <Form.Label >Imagens</Form.Label>
+                                        <Form.Control type='file' accept='.png' multiple disabled={disableFormControl} />
+                                    </Col>
                                 </Row>
                             </Form>
                         </Col>
@@ -312,80 +308,103 @@ function BatteryIndex({ batteries, setBatteries }) {
                     </div>
                 </Card.Header>
                 <Card.Body>
-                    <Table responsive hover bordered >
-                        <thead>
-                            <tr className='border-2'>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Código
-                                        <SortButton field="code" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Nome
-                                        <SortButton field="name" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Descrição
-                                        <SortButton field="description" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Preço
-                                        <SortButton field="value" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Quantidade
-                                        <SortButton field="quantity" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Situação
-                                        <SortButton field="status" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-
-
-                        <tbody>
-                            {currentItems.map((battery) => (
-                                <tr key={battery.batteryId} onDoubleClick={() => {
-                                    setSelectedBattery(battery);
-                                    const { batteryId, status, ...prevValues } = battery;
-                                    setPrevBatteryValues(prevValues);
-                                    setShowBatteryFormModal(true);
-                                }}>
-                                    <td className='table-cell-pointer'>{battery.code}</td>
-                                    <td className='table-cell-pointer'>{battery.name}</td>
-                                    <td className='table-cell-pointer'>{battery.description}</td>
-                                    <td className='table-cell-pointer text-end'>{battery.value}</td>
-                                    <td className='table-cell-pointer text-end'>{battery.quantity}</td>
-                                    <td className='table-cell-pointer'>{battery.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}</td>
+                    {batteries?.length > 0 ? (
+                        <Table responsive hover bordered >
+                            <thead>
+                                <tr className='border-2'>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Código
+                                            <SortButton field="code" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Nome
+                                            <SortButton field="name" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Descrição
+                                            <SortButton field="description" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Preço
+                                            <SortButton field="value" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Quantidade
+                                            <SortButton field="quantity" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Situação
+                                            <SortButton field="status" values={batteries} setValues={setBatteries} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-                    <Pagination
-                        totalItems={batteries.length}
-                        itemsPerPage={itemsPerPage}
-                        setItemsPerPage={setItemsPerPage}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                    />
+                            </thead>
+
+
+                            <tbody>
+                                {currentItems.map((battery) => (
+                                    <tr key={battery.batteryId} onDoubleClick={() => {
+                                        setSelectedBattery(battery);
+                                        const { batteryId, status, ...prevValues } = battery;
+                                        setPrevBatteryValues(prevValues);
+                                        setShowBatteryFormModal(true);
+                                    }}>
+                                        <td className='table-cell-pointer'>{battery.code}</td>
+                                        <td className='table-cell-pointer'>{battery.name}</td>
+                                        <td className='table-cell-pointer'>{battery.description}</td>
+                                        <td className='table-cell-pointer text-end'>{battery.value}</td>
+                                        <td className='table-cell-pointer text-end'>{battery.quantity}</td>
+                                        <td className='table-cell-pointer'>{battery.status == 'ACTIVE' ? 'Ativo' : 'Inativo'}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    ) : (
+                        !batteriesIsLoaded ? (
+                            <div className='h-100 d-flex flex-grow-1 align-items-center justify-content-center' >
+                                <Spinner animation="border" role="status" style={{ color: '#c00d0d' }}>
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
+                            </div>
+                        ) : (
+                            <div className="d-flex flex-column align-items-center py-5">
+                                <EmptyBatteryIcon />
+                                <span className="mt-2">Você ainda não tem nenhuma bateria adicionada!</span>
+                                <span className="text-muted small">Adicione baterias para exibi-las</span>
+                            </div>
+                        )
+                    )}
+
+                    {batteriesIsLoaded && batteries.length > 0 && (
+                        <Pagination
+                            totalItems={batteries.length}
+                            itemsPerPage={itemsPerPage}
+                            setItemsPerPage={setItemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
                 </Card.Body>
-            </Card>
+            </Card >
 
             {renderBatteryFormModal()}
 
-            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'} />
+            {
+                showsModalPDF && (
+                    <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={batteries} type={'battery'} />
+                )
+            }
 
         </>
     );

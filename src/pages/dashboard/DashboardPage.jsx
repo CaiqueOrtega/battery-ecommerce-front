@@ -15,11 +15,10 @@ import DeliveryIndex from './delivery/DeliveryIndex';
 
 function DashboardPage() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const { setRenderOptionData, promotions, setPromotions, batteries, setBatteries, users, setUsers, sales, setSales, deliveries, setDeliveries } = useContext(DashBoardContext);
+    const { setRenderOptionData, promotions, setPromotions, batteries, setBatteries, users, setUsers, sales, setSales, deliveries, setDeliveries, promotionIsLoaded, usersIsLoaded, batteriesIsLoaded, salesIsLoaded, deliveriesIsLoaded } = useContext(DashBoardContext);
     const [sidebarSelectedOption, setSidebarSelectedOption] = useState(sessionStorage.getItem('selectedOption') || 'Baterias');
 
     useEffect(() => {
-        console.log(sidebarSelectedOption)
         setRenderOptionData(sidebarSelectedOption);
         sessionStorage.setItem('selectedOption', sidebarSelectedOption);
     }, [sidebarSelectedOption]);
@@ -32,15 +31,15 @@ function DashboardPage() {
     const mainContent = useMemo(() => {
         switch (sidebarSelectedOption) {
             case "Baterias":
-                return <BatteryIndex batteries={batteries} setBatteries={setBatteries} />;
+                return <BatteryIndex batteries={batteries} setBatteries={setBatteries} batteriesIsLoaded={batteriesIsLoaded} />;
             case 'Usuários':
-                return <UserIndex users={users} setUsers={setUsers} />;
+                return <UserIndex users={users} setUsers={setUsers} usersIsLoaded={usersIsLoaded} />;
             case 'Promoções':
-                return <PromotionIndex promotions={promotions} setPromotions={setPromotions} />;
+                return <PromotionIndex promotions={promotions} setPromotions={setPromotions} promotionIsLoaded={promotionIsLoaded} />;
             case 'Vendas':
-                return <SaleIndex sales={sales} setSales={setSales}/>
+                return <SaleIndex sales={sales} setSales={setSales} salesIsLoaded={salesIsLoaded} />
             case 'Entregas':
-                return <DeliveryIndex deliveries={deliveries} setDeliveries={setDeliveries} />
+                return <DeliveryIndex deliveries={deliveries} setDeliveries={setDeliveries} deliveriesIsLoaded={deliveriesIsLoaded} />
             default:
                 return null;
         }

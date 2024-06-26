@@ -3,7 +3,6 @@ import { DoubleArrowIcon } from '../../assets/icons/IconsSet';
 
 function SortButton({ field, values, setValues, activeField, setActiveField }) {
     const [sortDirection, setSortDirection] = useState(null);
-
     const handleClick = () => {
         const nextDirection = field === activeField && sortDirection === 'asc' ? 'desc' : 'asc';
         setSortDirection(nextDirection);

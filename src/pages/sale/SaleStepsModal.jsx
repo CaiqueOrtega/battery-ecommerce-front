@@ -2,28 +2,39 @@ import SelectedAddressContent from './steps/selectedAddress/SelectedAddressConte
 import SelectedPaymentContent from './steps/selectedPaymentMethod/SelectedPaymentContent';
 import NotLoggedContentStep from './steps/NotLoggedContentStep';
 import { Modal, ModalHeader } from "react-bootstrap";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import ConfirmStepsContent from './steps/confirmSteps/ConfirmStepsContent';
 import './salesSteps.css'
 
 function SaleStepsModal({ showSaleStepsModal, setShowSaleStepsModal, isLoggedIn, addressValues, address, setAddress, setAddressValues, freightValues, userData, steps, setSteps, batteryCart, setBatteryCart }) {
-    const [optionsSelected, setOptionsSelected] = useState({ address: {}, payment: {}, userId: userData.userId })
+    const [optionsSelected, setOptionsSelected] = useState({ address: {}, payment: {}, userId: userData?.userId })
     const [progressBarSteps, setProgressBarSteps] = useState(1);
     const [isDelaying, setIsDelaying] = useState(false);
     const [showProgressBar, setShowProgressBar] = useState(true);
+    const [isAnimationCircle, setIsAnimationCircle] = useState(false);
+    const [isAnimationReversedCircle, setIsAnimationReversedCircle] = useState(false);
+    const [successSale, setSuccessSale] = useState(false);
 
     const handleNextStep = () => {
+        setIsAnimationCircle(true)
         setIsDelaying(false);
         if (progressBarSteps < 3) {
             setProgressBarSteps(progressBarSteps + 1);
         }
+        setTimeout(() => {
+            setIsAnimationCircle(false)
+        }, 600);
     };
 
     const handlePreviousStep = () => {
+        setIsAnimationReversedCircle(true)
         if (progressBarSteps > 1) {
             setIsDelaying(true);
             setProgressBarSteps(progressBarSteps - 1);
         }
+        setTimeout(() => {
+            setIsAnimationReversedCircle(false)
+        }, 300);
     };
 
     const modalContent = useMemo(() => {
@@ -67,15 +78,17 @@ function SaleStepsModal({ showSaleStepsModal, setShowSaleStepsModal, isLoggedIn,
                     setBatteryCart={setBatteryCart}
                     setShowProgressBar={setShowProgressBar}
                     handlePreviousStep={handlePreviousStep}
+                    setSuccessSale={setSuccessSale}
                 />
 
             default: <div>Funcionalidade não Encontrada...</div>
         }
     }, [isLoggedIn, steps, showProgressBar, address, addressValues, batteryCart, freightValues]);
-
+;
 
     return (
-        <Modal show={showSaleStepsModal} onHide={() => setShowSaleStepsModal(false)} backdrop="static" keyboard={false} dialogClassName="modal-sale" contentClassName='modal-sale-content'>
+        <Modal centered show={showSaleStepsModal} onHide={() => setShowSaleStepsModal(false)} backdrop="static" keyboard={false} dialogClassName="modal-sale" contentClassName='modal-sale-content'
+        >
             <ModalHeader className='border-0 position-relative mb-0'>
                 <button className='btn-close position-absolute end-0 top-0 mt-1 me-1 z-3' onClick={() => setShowSaleStepsModal(false)} />
                 {showProgressBar && (
@@ -86,7 +99,7 @@ function SaleStepsModal({ showSaleStepsModal, setShowSaleStepsModal, isLoggedIn,
                                     <div
                                         key={index}
                                         className={`rounded-circle text-white d-flex justify-content-center align-items-center 
-                                            ${index < progressBarSteps ? 'filled-circle' : 'filled-reversed-circle'}`}
+                                             ${index < progressBarSteps ? (index === progressBarSteps - 1 && isAnimationCircle ? 'filled-circle' : 'bg-primary') : isAnimationReversedCircle && index === progressBarSteps ? 'filled-reversed-circle' : 'bg-body-secondary'}`}
                                         style={{ width: 45, height: 45 }}
                                     >
                                         {index + 1}
@@ -96,7 +109,7 @@ function SaleStepsModal({ showSaleStepsModal, setShowSaleStepsModal, isLoggedIn,
 
                             <div className="progress w-100">
                                 <div
-                                    className={`progress-bar ${isDelaying ? 'retrocesso' : ''}`}
+                                    className={`progress-bar progress-bar-sale ${isDelaying ? 'retrocesso' : ''}`}
                                     role="progressbar"
                                     style={{ width: `${((progressBarSteps - 1) / (3 - 1)) * 100}%` }}
                                     aria-valuenow={progressBarSteps}

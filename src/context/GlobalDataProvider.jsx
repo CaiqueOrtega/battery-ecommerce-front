@@ -4,6 +4,7 @@ import { AuthContext } from "./AuthProvider";
 import AddressServices from '../services/address/AddressServices';
 import BatteryCartServices from "../services/cart/BatteryCartServices";
 import CardServices from "../services/card/CardServices";
+import DeliveryServices from "../services/delivery/DeliveryServices";
 
 const GlobalDataContext = createContext({});
 
@@ -13,6 +14,7 @@ function GlobalDataProvider({ children }) {
     const { getBatteriesActive } = BatteryServices();
     const [fetchBatteryData, setFetchBatteryData] = useState(false);
     const [batteriesActive, setBatteriesActive] = useState([]);
+    const [batteriesActiveIsLoaded, setBatteriesActiveIsLoaded] = useState(false);
 
     const { getAddressByUserId } = AddressServices();
     const [address, setAddress] = useState([]);
@@ -28,12 +30,18 @@ function GlobalDataProvider({ children }) {
     const [card, setCard] = useState([]);
     const [cardIsLoaded, setCardIsLoaded] = useState(null);
 
+    const [deliveryUser, setDeliveryUser] = useState(null)
+    const [deliveryIsLoaded, setDeliveryIsLoaded] = useState(null);
+    const { getAllDeliveriesByUser } = DeliveryServices();
+
     const fetchBatteries = async () => {
         try {
             const batteryData = await getBatteriesActive();
             setBatteriesActive(batteryData);
         } catch (error) {
             console.error("Erro ao buscar baterias ativas:", error);
+        } finally {
+            setBatteriesActiveIsLoaded(true)
         }
     };
 
@@ -110,8 +118,20 @@ function GlobalDataProvider({ children }) {
                 setCardIsLoaded(true);
             }
         }
-        console.log(batteryCart)
     };
+
+    const fetchUserDelivery = async () => {
+        if (!deliveryIsLoaded) {
+            try {
+                const deliveryUserData = await getAllDeliveriesByUser(userData.userId);
+                setDeliveryUser(deliveryUserData);
+            } catch (error) {
+                console.error("Erro ao buscar pedidos", error);
+            } finally {
+                setDeliveryIsLoaded(true);
+            }
+        }
+    }
 
     useEffect(() => {
         if (userData?.userId && isLoggedIn) {
@@ -135,6 +155,7 @@ function GlobalDataProvider({ children }) {
     return (
         <GlobalDataContext.Provider value={{
             batteriesActive,
+            batteriesActiveIsLoaded,
             setFetchBatteryData,
             fetchAddress,
             addressIsLoaded,
@@ -147,6 +168,10 @@ function GlobalDataProvider({ children }) {
             setCard,
             fetchCard,
             cardIsLoaded,
+            fetchUserDelivery,
+            deliveryUser,
+            setDeliveryUser,
+            deliveryIsLoaded,
             resetGlobalData,
             userData,
             isLoggedIn

@@ -1,12 +1,12 @@
-import { Card, Table, Modal, Row, Col, Button, Container } from "react-bootstrap";
+import { Card, Table, Modal, Row, Col, Button, Spinner } from "react-bootstrap";
 import SortButton from "../../../components/common/SortButton";
 import Pagination from "../../../components/common/Pagination";
 import { useEffect, useState, useRef } from "react";
 import exemploImageCart from "../../../assets/images/exemploImageRegister.png"
 import ModalPdf from "../../../services/pdf/Report"
-import { PdfIcon, SimpleDollarIcon, CalendarIcon, CaretDownIcon } from "../../../assets/icons/IconsSet";
+import { PdfIcon, SimpleDollarIcon, CalendarIcon, CaretDownIcon, EmptySaleIcon } from "../../../assets/icons/IconsSet";
 
-function SaleIndex({ sales, setSales }) {
+function SaleIndex({ sales, setSales, salesIsLoaded }) {
     const [showModalSale, setShowModalSale] = useState(false);
     const [showsModalPDF, setShowModalPDF] = useState(false);
     const [selectedSale, setSelectedSale] = useState({});
@@ -73,102 +73,119 @@ function SaleIndex({ sales, setSales }) {
                     <a type='button' className='btn btn-outline-danger' onClick={() => setShowModalPDF(true)}><PdfIcon /></a>
                 </Card.Header>
                 <Card.Body>
-                    <Table responsive hover bordered >
-                        <thead>
-                            <tr className='border-2'>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Código da Venda
-                                        <SortButton field="description" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Nome do Cliente
-                                        <SortButton field="description" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Data da Venda
-                                        <SortButton field="code" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Meio de Pagamento
-                                        <SortButton field="value" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Valor da Venda
-                                        <SortButton field="name" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Situação
-                                        <SortButton field="quantity" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentItems.map((sales) => (
-                                <tr key={sales.saleId} onDoubleClick={() => {
-                                    setSelectedSale(sales)
-                                    setShowModalSale(true)
-                                }}>
-                                    <td className='table-cell-pointer'>{sales.code}</td>
-                                    <td className='table-cell-pointer'>{sales.user.name}</td>
-                                    <td className='table-cell-pointer'>{sales.creationDate}</td>
-                                    <td className='table-cell-pointer'>{sales.payment.description}</td>
-                                    <td className='table-cell-pointer text-end'>R${sales.value}</td>
-                                    <td className='table-cell-pointer'>{sales.payment.status}</td>
+                    {sales.length > 0 ? (
+                        <Table responsive hover bordered >
+                            <thead>
+                                <tr className='border-2'>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Código da Venda
+                                            <SortButton field="code" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Nome do Cliente
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Data da Venda
+                                            <SortButton field="creationDate" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Meio de Pagamento
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Valor da Venda
+                                            <SortButton field="value" values={sales} setValues={setSales} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Situação
+                                        </div>
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
-
-                    <section className="d-flex justify-content-between">
-                        <Card className="position-relative flex-grow-0 d-flex flex-row rounded-3"
-                            style={{ maxHeight: 80 }}
-                        >
-
-                            <Card.Header className="bg-red px-1 rounded-0 rounded-start-3">
-                            </Card.Header>
-
-                            <Card.Body className="d-flex align-items-center px-4" style={{ minWidth: 206.117 }}>
-                                <SimpleDollarIcon />
-                                <h5 className="text-muted mb-0 ms-2"> {totalSaleValues}</h5>
-                            </Card.Body>
-                            <div className="position-absolute end-0 me-2">
-                                <a type="button" onClick={() => setShowCalendar(true)}>
-                                    <span className="text-muted me-2" style={{ fontSize: 12 }}>{selectedDay}/{selectedMonth}/{selectedYear}</span>
-                                    <CalendarIcon />
-                                </a>
+                            </thead>
+                            <tbody>
+                                {currentItems.map((sales) => (
+                                    <tr key={sales.saleId} onDoubleClick={() => {
+                                        setSelectedSale(sales)
+                                        setShowModalSale(true)
+                                    }}>
+                                        <td className='table-cell-pointer'>#{sales.code}</td>
+                                        <td className='table-cell-pointer'>{sales.user.name}</td>
+                                        <td className='table-cell-pointer'>{sales.creationDate}</td>
+                                        <td className='table-cell-pointer'>{sales.payment.description}</td>
+                                        <td className='table-cell-pointer text-end'>R${sales.value}</td>
+                                        <td className='table-cell-pointer'>{sales.payment.status}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    ) : (
+                        !salesIsLoaded ? (
+                            <div className='h-100 d-flex flex-grow-1 align-items-center justify-content-center'>
+                                <Spinner animation="border" role="status" style={{ color: '#c00d0d' }}>
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
                             </div>
-                            <div className="position-absolute" style={{ top: -300, right: -250 }}>
-                                {showCalendar && (
-                                    <Calendar
-                                        selectedDay={selectedDay} setSelectedDay={setSelectedDay}
-                                        selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth}
-                                        selectedYear={selectedYear} setSelectedYear={setSelectedYear}
-                                        setShowCalendar={setShowCalendar}
-                                    />
-                                )}
+                        ) : (
+                            <div className="d-flex flex-column align-items-center py-5">
+                                <EmptySaleIcon />
+                                <span className="mt-2">Você ainda não tem nenhuma venda realizada!</span>
+                                <span className="text-muted small">Aguarde uma venda ser realizada para exibi-la</span>
                             </div>
-                        </Card>
+                        )
+                    )}
 
-                        <Pagination
-                            totalItems={sales.length}
-                            itemsPerPage={itemsPerPage}
-                            setItemsPerPage={setItemsPerPage}
-                            currentPage={currentPage}
-                            onPageChange={setCurrentPage}
-                        />
-                    </section>
+                    {salesIsLoaded && sales.length > 0 && (
+                        <section className="d-flex justify-content-between">
+                            <Card className="position-relative flex-grow-0 d-flex flex-row rounded-3"
+                                style={{ maxHeight: 80 }}
+                            >
+
+                                <Card.Header className="bg-red px-1 rounded-0 rounded-start-3">
+                                </Card.Header>
+
+                                <Card.Body className="d-flex align-items-center px-4" style={{ minWidth: 206.117 }}>
+                                    <SimpleDollarIcon />
+                                    <h5 className="text-muted mb-0 ms-2"> {totalSaleValues}</h5>
+                                </Card.Body>
+                                <div className="position-absolute end-0 me-2">
+                                    <a type="button" onClick={() => setShowCalendar(true)}>
+                                        <span className="text-muted me-2" style={{ fontSize: 12 }}>{selectedDay}/{selectedMonth}/{selectedYear}</span>
+                                        <CalendarIcon />
+                                    </a>
+                                </div>
+                                <div className="position-absolute" style={{ top: -300, right: -250 }}>
+                                    {showCalendar && (
+                                        <Calendar
+                                            selectedDay={selectedDay} setSelectedDay={setSelectedDay}
+                                            selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth}
+                                            selectedYear={selectedYear} setSelectedYear={setSelectedYear}
+                                            setShowCalendar={setShowCalendar}
+                                        />
+                                    )}
+                                </div>
+                            </Card>
+
+
+                            <Pagination
+                                totalItems={sales.length}
+                                itemsPerPage={itemsPerPage}
+                                setItemsPerPage={setItemsPerPage}
+                                currentPage={currentPage}
+                                onPageChange={setCurrentPage}
+                            />
+                        </section>
+                    )}
+
                 </Card.Body >
             </Card >
 
@@ -180,7 +197,9 @@ function SaleIndex({ sales, setSales }) {
                 />
             )
             }
-            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={sales} type={'sale'} />
+            {showsModalPDF && (
+                <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={sales} type={'sale'} />
+            )}
         </>
     );
 }
@@ -204,18 +223,18 @@ function ModalSale({ showModalSale, setShowModalSale, selectedSale }) {
     return (
         <Modal size="lg" show={showModalSale} onHide={() => setShowModalSale(false)} backdrop="static" keyboard={false} style={{ zIndex: 1050 }}>
             <Modal.Header className='bg-red text-white'>
-                <Modal.Title>Venda <span className="fw-bold">#{selectedSale.code}</span></Modal.Title>
+                <Modal.Title>Venda <span>#{selectedSale.code}</span></Modal.Title>
                 <button className='btn-close btn-close-white' onClick={() => setShowModalSale(false)} />
             </Modal.Header>
-            <Modal.Body className="px-4 py-5">
-                <Row>
+            <Modal.Body className="px-4 py-5 h-100 d-flex align-items-center">
+                <Row className="d-flex flex-grow-1">
                     <Col md={8}>
                         <section className="d-flex flex-column">
                             <Card className="h-100">
                                 <Card.Header className="py-3 bg-white">
                                     <h6 className="text-muted fw-bold mb-0">Items Da venda</h6>
                                 </Card.Header>
-                                <Card.Body className="h-100 overflow-auto" style={{maxHeight: 182.967}}>
+                                <Card.Body className="h-100 overflow-auto" style={{ maxHeight: 182.967 }}>
 
                                     {selectedSale?.cart?.batteries?.map(item => (
                                         <Row key={item.cart_battery_id} className="px-3 mt-2 d-flex align-items-center">

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Card, Table, Modal, Row, Col, Form, Button } from "react-bootstrap";
+import { Card, Table, Modal, Row, Col, Form, Button, Spinner } from "react-bootstrap";
 import FormGroupWithIcon from '../../../components/common/FormGroupWithIcon';
-import { BarCode, PercentIcon, FailDate, PdfIcon } from '../../../assets/icons/IconsSet';
+import { BarCode, PercentIcon, FailDate, PdfIcon, EmptyPromotionIcon } from '../../../assets/icons/IconsSet';
 import PromotionService from "../../../services/promotion/PromotionService";
 import ConfirmChanges from "../../../components/common/ConfirmChangesModal";
 import AlertErrorOrSuccess from "../../../components/common/AlertErrorOrSuccess";
@@ -10,7 +10,7 @@ import Pagination from '../../../components/common/Pagination';
 import SortButton from "../../../components/common/SortButton";
 
 
-export default function PromotionIndex({ promotions, setPromotions }) {
+export default function PromotionIndex({ promotions, setPromotions, promotionIsLoaded }) {
     const [selectedPromotion, setSelectedPromotion] = useState(null);
     const [showPromotionFormModal, setShowPromotionFormModal] = useState(false);
     const [showConfirmChangesModal, setShowConfirmChangesModal] = useState(false);
@@ -163,7 +163,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                     <Modal.Title>{selectedPromotion ? 'Editar Promoção' : 'Cadastrar Promoção'}</Modal.Title>
                     <button className='btn-close btn-close-white' onClick={() => setShowPromotionFormModal(false)} />
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body className='p-4'>
                     <Row>
                         <Col>
                             <AlertErrorOrSuccess errorMessages={errorMessages} />
@@ -195,6 +195,7 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                                     icon={<FailDate className='position-absolute ms-3' currentColor='#a3a29f' />}
                                     type='text'
                                     placeholder='Data Validade da Promoção (Ex: dd/MM/yyyy)'
+                                    mask='99/99/9999'
                                     mb={'mb-4'}
                                     value={promotionValues.expirationDate}
                                     onChange={(e) => setPromotionValues({ ...promotionValues, expirationDate: e.target.value })}
@@ -237,7 +238,9 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                 confirmChangesModalData={confirmChangesModalData}
             />
 
-            <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={promotions} type={'promotion'} />
+            {showsModalPDF && (
+                <ModalPdf setShowModalPDF={setShowModalPDF} showsModalPDF={showsModalPDF} currentItems={promotions} type={'promotion'} />
+            )}
 
         </>
     )
@@ -267,69 +270,88 @@ export default function PromotionIndex({ promotions, setPromotions }) {
                     </div>
                 </Card.Header>
                 <Card.Body>
-                    <Table responsive hover bordered>
-                        <thead>
-                            <tr>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Código
-                                        <SortButton field="code" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Porcentagem
-                                        <SortButton field="percentage" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Data início
-                                        <SortButton field="startDate" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className='bg-table-header'>
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Data validade
-                                        <SortButton field="expirationDate" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                                <th className="bg-table-header">
-                                    <div className='d-flex justify-content-between py-1'>
-                                        Status
-                                        <SortButton field="status" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentItems.map((promotion) => (
-                                <tr key={promotion.promotionId} onDoubleClick={() => {
-                                    setSelectedPromotion(promotion);
-                                    const { promotionId, status, startDate, ...prevValues } = promotion;
-                                    setPrevPromotionValues(prevValues);
-                                    setShowPromotionFormModal(true);
-                                }}>
-                                    <td>{promotion.code}</td>
-                                    <td className='text-end'>{promotion.percentage}%</td>
-                                    <td>{promotion.startDate}</td>
-                                    <td>{promotion.expirationDate}</td>
-                                    <td>{promotion.status == 'ACTIVE' ? 'Ativo'
-                                        : promotion.status == 'INACTIVE' ? 'Inativo'
-                                            : promotion.status == 'EXPIRED' ? 'Vencido'
-                                                : null}</td>
+                    {promotions?.length > 0 ? (
+                        <Table responsive hover bordered>
+                            <thead>
+                                <tr>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Código
+                                            <SortButton field="code" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Porcentagem
+                                            <SortButton field="percentage" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Data início
+                                            <SortButton field="startDate" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className='bg-table-header'>
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Data validade
+                                            <SortButton field="expirationDate" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
+                                    <th className="bg-table-header">
+                                        <div className='d-flex justify-content-between py-1'>
+                                            Status
+                                            <SortButton field="status" values={promotions} setValues={setPromotions} activeField={activeField} setActiveField={setActiveField} />
+                                        </div>
+                                    </th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </Table>
+                            </thead>
+                            <tbody>
+                                {currentItems.map((promotion) => (
+                                    <tr key={promotion.promotionId} onDoubleClick={() => {
+                                        setSelectedPromotion(promotion);
+                                        const { promotionId, status, startDate, ...prevValues } = promotion;
+                                        setPrevPromotionValues(prevValues);
+                                        setShowPromotionFormModal(true);
+                                    }}>
+                                        <td>{promotion.code}</td>
+                                        <td className='text-end'>{promotion.percentage}%</td>
+                                        <td>{promotion.startDate}</td>
+                                        <td>{promotion.expirationDate}</td>
+                                        <td>{promotion.status == 'ACTIVE' ? 'Ativo'
+                                            : promotion.status == 'INACTIVE' ? 'Inativo'
+                                                : promotion.status == 'EXPIRED' ? 'Vencido'
+                                                    : null}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </Table>
+                    ) : (
+                        !promotionIsLoaded ? (
+                            <div className='h-100 d-flex flex-grow-1 align-items-center justify-content-center'>
+                                <Spinner animation="border" role="status" style={{ color: '#c00d0d' }}>
+                                    <span className="visually-hidden">Loading...</span>
+                                </Spinner>
+                            </div>
+                        ) : (
+                            <div className="d-flex flex-column align-items-center py-5">
+                                <EmptyPromotionIcon />
+                                <span className="mt-2">Você ainda não tem nenhuma promoção adicionada!</span>
+                                <span className="text-muted small">Adicione promoções para exibi-las</span>
+                            </div>
+                        )
 
-                    <Pagination
-                        totalItems={promotions.length}
-                        itemsPerPage={itemsPerPage}
-                        setItemsPerPage={setItemsPerPage}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                    />
+                    )}
+
+                    {promotionIsLoaded && promotions.length > 0 && (
+                        <Pagination
+                            totalItems={promotions.length}
+                            itemsPerPage={itemsPerPage}
+                            setItemsPerPage={setItemsPerPage}
+                            currentPage={currentPage}
+                            onPageChange={setCurrentPage}
+                        />
+                    )}
                 </Card.Body>
             </Card>
 

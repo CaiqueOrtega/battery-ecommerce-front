@@ -1,6 +1,6 @@
 .filled-circle {
-    animation: fillCircle 0.3s forwards;
-    animation-delay: 0.37s;
+    animation: fillCircle 0.2s forwards linear;
+    animation-delay: 0.3s;
     background: linear-gradient(to right, #007bff 50%, #e9ecef 50%);
     background-size: 200% 100%;
     background-position: 100% 0;
@@ -20,8 +20,13 @@
     transition-delay: 0.3s !important;
 }
 
+.progress-bar-sale{
+    transition: width 0.3s linear; 
+
+}
+
 .filled-reversed-circle {
-    animation: fillCircleReverse 0.3s forwards ease-in;
+    animation: fillCircleReverse 0.2s forwards linear;
     background: linear-gradient(to left, #007bff 50%, #e9ecef 50%);
     background-size: 200% 100%;
     background-position: 100% 0;

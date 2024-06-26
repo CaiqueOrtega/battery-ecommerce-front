@@ -11,14 +11,14 @@
     z-index: 1050;
 }
 
-
 .purchase-col-card {
     max-width: 20.5em;
 }
 
-.input-group-cep-container:focus-within .input-group-btn-cep-margin-top {
+.input-group-cep-container:focus-within .input-group-btn-cep-margin-top:not(:focus-within) {
     margin-bottom: 1.5em;
 }
+
 
 @media (min-width: 1200px) {
     .purchase-container {

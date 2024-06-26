@@ -63,25 +63,27 @@ const AddressServices = () => {
 
     const getAddressByUserId = async (userId) => {
         try {
-            const response = await ConnectionAPI.get(`address/user/${userId}`)
+            const response = await ConnectionAPI.get(`address/user/${userId}`);
             return response.data;
         } catch (error) {
-            handleAPIError(error)
+            handleAPIError(error);
         }
     }
 
     const getFreight = async (cep, quantity) => {
         try {
-            const response = await ConnectionAPI.get(`freight/${cep}/${quantity}`)
-            return response.data
+            const filteredCep = cep.replace('-', (''));
+            const response = await ConnectionAPI.get(`freight/${filteredCep}/${quantity}`);
+            return response.data;
         } catch (error) {
-            handleAPIError(error)
+            handleAPIError(error);
         }
     }
 
     const getAddressCep = async (cep) => {
         try {
-            const response = await ViaCepAPI.get(`${cep}/json/`)
+            const filteredCep = cep.replace('-', (''));
+            const response = await ViaCepAPI.get(`${filteredCep}/json/`);
             console.log(response.data)
             return {
                 address: response.data.logradouro,
@@ -92,7 +94,7 @@ const AddressServices = () => {
                 state: response.data.uf,
             }
         } catch (error) {
-            return false
+            return false;
         }
     }
 

@@ -148,3 +148,23 @@ body {
 .custom-mask-color::placeholder {
     color: #54575a !important; 
 }
+
+.btn-green {
+    background-color: #58af9b;
+    color: #fff ;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-green:hover {
+    background-color: #4a927a;
+    color: #fff;
+}
+
+.link-green{
+    color: #58af9b;
+    transition: background-color 0.3s, color 0.3s;
+
+}
+.link-green:hover {
+    color: #3f806a;
+}

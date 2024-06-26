@@ -1,9 +1,9 @@
-import {Image, ProgressBar, InputGroup, FormControl, Row, Col, Card } from 'react-bootstrap'
+import { Image, ProgressBar, InputGroup, FormControl, Row, Col, Card, ModalBody, Button } from 'react-bootstrap'
 import { LogoPixIcon } from '../../../../../assets/icons/IconsSet';
 import { useState, useEffect } from 'react';
 
-function RenderPixContent({ resultPayment }){
-    const [timeLeft, setTimeLeft] = useState(600);
+function RenderPixContent({ resultPayment }) {
+    const [timeLeft, setTimeLeft] = useState(2400);
     const [progress, setProgress] = useState(100);
     const [copied, setCopied] = useState(false);
 
@@ -27,7 +27,7 @@ function RenderPixContent({ resultPayment }){
     };
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(resultPayment.fmp_hash)
+        navigator.clipboard.writeText(resultPayment?.registros[0].fmp_hash)
             .then(() => setCopied(true))
             .catch(() => setCopied(false));
     };
@@ -51,33 +51,41 @@ function RenderPixContent({ resultPayment }){
             </Row>
 
             <ModalBody>
-                <section className="h-100 px-4 d-flex flex-column justify-content-center">
-                    <div className="d-flex align-items-center justify-content-center">
-                        <Image
-                            className="img-fluid"
-                            alt="QR Code Pix"
-                            thumbnail
-                            width={230}
-                        />
-                    </div>
-                </section>
-
-                <Card className="mt-4">
-                    <Card.Body>
-                        <h6 className="text-muted">Ou copie o código de pagamento</h6>
-                        <InputGroup>
-                            <FormControl
-                                readOnly
-                                value={'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'}
+                    <Row className="d-flex h-100 px-3 py-5">
+                        <Col md={6}>
+                            <ol className="list-group list-group-numbered h-100">
+                                <li className="list-group-item h-100">Abra o aplicativo do seu banco de preferência</li>
+                                <li className="list-group-item h-100">Selecione a opção pagar com Pix</li>
+                                <li className="list-group-item h-100">Leia o QR code ou copie o código e cole no campo de pagamento</li>
+                            </ol>
+                        </Col>
+                        <Col md={6}>
+                            <Image
+                                src={resultPayment?.registros[0].fmp_link_qrcode}
+                                className="img-fluid p-0"
+                                alt="QR Code Pix"
+                                thumbnail
+                                height={100}
                             />
-                            <InputGroup.Append>
-                                <Button variant="outline-secondary" onClick={() => handleCopy()}>
-                                    {copied ? 'Copiado!' : 'Copiar'}
-                                </Button>
-                            </InputGroup.Append>
-                        </InputGroup>
-                    </Card.Body>
-                </Card>
+                        </Col>
+
+                        <Col xs={12} className='mt-4'>
+                            <Card >
+                                <Card.Body>
+                                    <h6 className="text-muted">Ou copie o código de pagamento</h6>
+                                    <InputGroup>
+                                        <FormControl
+                                            readOnly
+                                            value={resultPayment?.registros[0].fmp_hash}
+                                        />
+                                        <Button variant="outline-secondary" onClick={() => handleCopy()}>
+                                            {copied ? 'Copiado!' : 'Copiar'}
+                                        </Button>
+                                    </InputGroup>
+                                </Card.Body>
+                            </Card>
+                        </Col>
+                    </Row>
             </ModalBody>
         </>
     );

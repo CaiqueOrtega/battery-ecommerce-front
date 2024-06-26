@@ -84,7 +84,7 @@ function RenderInputFormControl({ value, onChange, type, placeholder, className,
             onChange={onChange}
             type={type}
             placeholder={placeholder}
-            className={`ps-5 py-2 ${className} ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''} custom-mask-color`}
+            className={`${className} ps-5 py-2 ${bgBorder ? 'bg-main border-0' : ''} rounded-1 ${feedback ? 'is-invalid' : ''} custom-mask-color`}
             ref={inputRef}
             onFocus={onFocus}
             onBlur={onBlur}

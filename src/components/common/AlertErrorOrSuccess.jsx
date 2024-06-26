@@ -1,10 +1,10 @@
 import React from 'react';
 import { AlertIcon, CheckIcon } from '../../assets/icons/IconsSet';
 import { Row, Col } from 'react-bootstrap';
-const AlertErrorOrSuccess = ({ errorMessages, successMessage }) => {
+const AlertErrorOrSuccess = ({ errorMessages, successMessage, mb }) => {
     return (
         errorMessages?.general || errorMessages?.serverError || successMessage != '' && successMessage !== null && successMessage !== undefined ? (
-            <Row className={`lh-sm g-0 msg alert ${!successMessage ? 'alert-danger' : 'alert-success'} d-flex align-items-centerW mb-0`}>
+            <Row className={`lh-sm g-0 msg alert ${!successMessage ? 'alert-danger' : 'alert-success'} d-flex align-items-center ${mb}`}>
                 <Col className="col-auto me-2">
                     {successMessage
                         ? (<CheckIcon />)

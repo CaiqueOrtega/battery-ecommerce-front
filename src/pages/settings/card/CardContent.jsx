@@ -391,7 +391,6 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction, select
     };
 
     const handleFocus = (field) => {
-        console.log('testeeeeeeeeeee')
         setFocusedField(field);
         if (field === 'cvv') {
             setIsCardFlipped(true);
