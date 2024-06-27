@@ -19,8 +19,8 @@ const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleC
             </Modal.Header>
             <Modal.Body className="mt-2">
                 <AlertErrorOrSuccess errorMessages={errorMessages} successMessage={successMessages} />
-                <InputGroup hasValidation>
-                    <Form.Label>Digite sua senha para desativar a conta {userData ? userData.name : 'carregando...'} </Form.Label>
+                <Form.Label className="px-4">Digite sua senha para desativar a conta {userData ? userData.name : 'carregando...'} </Form.Label>
+                <div className="px-4">
                     <FormGroupWithIcon
                         icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                         type='text'
@@ -29,6 +29,8 @@ const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleC
                         value={verifyPassword}
                         onChange={(e) => setVerifyPassword(e.target.value)}
                     />
+                </div>
+                <div className="mt-2 px-4">
                     <FormGroupWithIcon
                         icon={<LockIcon className='position-absolute ms-3' currentColor='a3a29f' />}
                         type='text'
@@ -37,7 +39,7 @@ const ConfirmDisableAccountModal = ({ showModal, setShowModal, userData, handleC
                         value={verifyConfirmPassword}
                         onChange={(e) => setVerifyConfirmPassword(e.target.value)}
                     />
-                </InputGroup>
+                </div>
 
             </Modal.Body>
             <Modal.Footer>

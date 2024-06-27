@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Form } from 'react-bootstrap';
 import { AlertIcon } from '../../assets/icons/IconsSet';
-const InputWithFloatingLabel = ({ type, labelText, onBlurData, onFocusData, inputId, feedback, value, onChange, disableRequired, maxLength, pattern, disable }) => {
+import { withMask } from 'use-mask-input';
+
+
+const InputWithFloatingLabel = ({ type, labelText, onBlurData, onFocusData, inputId, feedback, value, onChange, disableRequired, maxLength, pattern, disable, mask }) => {
     const [inputFocused, setInputFocused] = useState(false);
     const inputRef = useRef(null);
 
@@ -34,6 +37,13 @@ const InputWithFloatingLabel = ({ type, labelText, onBlurData, onFocusData, inpu
         setInputFocused(true);
     }
 
+    useEffect(() => {
+        if (mask) {
+            withMask(mask)(inputRef.current);
+        }
+    }, []);
+
+
     return (
         <section>
             <div className='position-relative' style={{ height: '42px' }}>
@@ -53,7 +63,7 @@ const InputWithFloatingLabel = ({ type, labelText, onBlurData, onFocusData, inpu
                 />
                 <label
                     htmlFor={inputId}
-                    className={`position-absolute text-muted ${disable ? '' : 'bg-white'} `}
+                    className={`position-absolute ${inputId === 'cpf' && !inputFocused ? 'pe-5' : ''} text-muted ${disable ? '' : 'bg-white'} `}
                     style={{
                         top: inputFocused ? '-19px' : '50%',
                         left: inputFocused ? '0px' : '8px',

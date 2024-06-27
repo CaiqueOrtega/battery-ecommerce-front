@@ -45,7 +45,7 @@ function TicketContent({ resultPayment }) {
                         <Card className='mb-3 d-flex'>
                             <Card.Header>
                                 <Card.Text className='text-muted'>
-                                    Pedido: <span className='fw-bold' style={{ color: '#58af9b' }}>#1234 </span>
+                                    Pedido: <span className='fw-bold' style={{ color: '#58af9b' }}>#{resultPayment.saleCode} </span>
                                     - Status Aguardando Pagamento
                                 </Card.Text>
                             </Card.Header>

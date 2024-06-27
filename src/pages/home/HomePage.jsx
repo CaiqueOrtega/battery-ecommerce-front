@@ -26,7 +26,7 @@ function HomePage() {
 function RenderSliderBatteries() {
   const { batteriesActive, batteriesActiveIsLoaded } = useGlobalDataProvider();
   const navigate = useNavigate();
-  const initialCount = Math.min(5, Object.keys(batteriesActive).length);
+  const initialCount = Math.min(5, batteriesActive ? Object.keys(batteriesActive).length : 0);
   const slidesToShow = Math.max(1, initialCount);
 
 
@@ -49,8 +49,6 @@ function RenderSliderBatteries() {
       <CarouselIconRight size={35} />
     </div>
   );
-
-  console.log(slidesToShow)
 
   const settings = {
     dots: false,
@@ -96,9 +94,9 @@ function RenderSliderBatteries() {
 
   return (
     <Container className="slider-container mt-5">
-      {batteriesActive.length ?
+      {batteriesActive && batteriesActive?.length ?
         <Slider {...settings}>
-          {Object.keys(batteriesActive).length !== 0 && batteriesActive.map((battery, index) => (
+          {batteriesActive && Object.keys(batteriesActive).length !== 0 && batteriesActive.map((battery, index) => (
             <div key={battery.batteryId} className='justify-content-center d-flex' >
               <BatteryCard
                 batteryName={battery.name}

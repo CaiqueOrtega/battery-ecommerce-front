@@ -20,6 +20,7 @@ const SaleServices = () => {
             })
             return response.data
         }catch(error){
+            handleAPIError(error)
         }
     }
 
@@ -34,9 +35,9 @@ const SaleServices = () => {
                     cartId: paymentPixValues.cartId
                 }
             })
-            console.log(response.data)
             return response.data;
         }catch(error){
+            handleAPIError(error)
         }
     }
 
@@ -53,6 +54,7 @@ const SaleServices = () => {
             })
             return response.data;
         }catch(error){
+            handleAPIError(error)
         }
     }
 

@@ -1,91 +1,103 @@
-import { Image, ProgressBar, InputGroup, FormControl, Row, Col, Card, ModalBody, Button } from 'react-bootstrap'
-import { LogoPixIcon } from '../../../../../assets/icons/IconsSet';
-import { useState, useEffect } from 'react';
+import { Image, FormControl, Row, Col, Card, ModalBody, Button } from 'react-bootstrap'
+import { LogoPixIcon, CopySuccessIcon, CopyIcon, CaretDownIcon } from '../../../../../assets/icons/IconsSet';
+import { useState } from 'react';
+import { SuccessAnimation } from '../../../../../components/common/ErrorOrSuccessAnimation';
 
 function RenderPixContent({ resultPayment }) {
-    const [timeLeft, setTimeLeft] = useState(2400);
-    const [progress, setProgress] = useState(100);
+    const [showTooltip, setShowToolTip] = useState(false);
     const [copied, setCopied] = useState(false);
-
-    useEffect(() => {
-        if (timeLeft > 0) {
-            const intervalId = setInterval(() => {
-                setTimeLeft(prevTime => prevTime - 1);
-            }, 1000);
-            return () => clearInterval(intervalId);
-        }
-    }, [timeLeft]);
-
-    useEffect(() => {
-        setProgress((timeLeft / 600) * 100);
-    }, [timeLeft]);
-
-    const formatTime = (seconds) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
-        return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
-    };
 
     const handleCopy = () => {
         navigator.clipboard.writeText(resultPayment?.registros[0].fmp_hash)
-            .then(() => setCopied(true))
-            .catch(() => setCopied(false));
+            .then(() => {
+                setCopied(true);
+
+                setTimeout(() => {
+                    setCopied(false);
+                }, 3000);
+            })
+            .catch(() => {
+                setCopied(false);
+                console.error('Falha ao copiar o texto');
+            });
     };
 
     return (
         <>
-            <Row className="g-0" style={{ boxShadow: '0 4px 4px -2px rgba(0, 0, 0, 0.2)' }}>
-                <Col xs={12} className="py-5 position-relative d-flex justify-content-center align-items-center">
-                    <div className="position-absolute">
-                        <LogoPixIcon size={'80px'} />
-                    </div>
-                </Col>
+            <div className="position-absolute d-flex flex-column w-100 align-items-center border-bottom py-3 " style={{ backgroundColor: '#fcfcfc' }} >
+                <SuccessAnimation />
+                <h5 className='mt-2 ' style={{ color: '#58af9b' }}>Seu pedido foi realizado com sucesso</h5>
+            </div>
 
-                <Col xs={12} className="d-flex flex-column align-items-center">
-                    <span className="text-muted mb-4 fw-bold">Tempo Restante {formatTime(timeLeft)}</span>
+            <ModalBody className='d-flex flex-column justify-content-center px-4' style={{ marginTop: 140 }}>
+                <Row className="d-flex h-100" style={{ maxHeight: '259px' }}>
 
-                    <div className="d-flex align-items-center w-50">
-                        <ProgressBar now={progress} style={{ flex: 1, height: 7 }} />
-                    </div>
-                </Col>
-            </Row>
+                    <Col md={6}>
+                        <Card className='border-0'>
+                            <Card.Header className='border'>
+                                <Card.Text className='text-muted small'>
+                                    Pedido: <span className='fw-bold' style={{ color: '#58af9b' }}>#{resultPayment.saleCode} </span>
+                                    - Status Aguardando Pagamento
+                                </Card.Text>
+                            </Card.Header>
+                            <Card.Body className='p-0 border-0 small text-muted'>
+                                <ol className="list-group list-group-numbered h-100 rounded-top-0">
+                                    <li className="list-group-item h-100" style={{ textAlign: 'justify', wordBreak: 'break-word', hyphens: 'auto', lang: 'pt' }}>
+                                        Abra o aplicativo do seu banco de preferência
+                                    </li>
+                                    <li className="list-group-item h-100" >
+                                        Selecione a opção pagar com Pix
+                                    </li>
+                                    <li className="list-group-item h-100" style={{ textAlign: 'justify', wordBreak: 'break-word', hyphens: 'auto', lang: 'pt' }}>
+                                        Leia o QR code ou copie o código e cole no campo de pagamento
+                                    </li>
+                                </ol>
+                            </Card.Body>
+                        </Card>
+                    </Col>
 
-            <ModalBody>
-                    <Row className="d-flex h-100 px-3 py-5">
-                        <Col md={6}>
-                            <ol className="list-group list-group-numbered h-100">
-                                <li className="list-group-item h-100">Abra o aplicativo do seu banco de preferência</li>
-                                <li className="list-group-item h-100">Selecione a opção pagar com Pix</li>
-                                <li className="list-group-item h-100">Leia o QR code ou copie o código e cole no campo de pagamento</li>
-                            </ol>
-                        </Col>
-                        <Col md={6}>
-                            <Image
-                                src={resultPayment?.registros[0].fmp_link_qrcode}
-                                className="img-fluid p-0"
-                                alt="QR Code Pix"
-                                thumbnail
-                                height={100}
-                            />
-                        </Col>
+                    <Col md={6}>
+                        <Image
+                            src={resultPayment?.registros[0].fmp_link_qrcode}
+                            className=" p-0"
+                            alt="QR Code Pix"
+                            thumbnail
+                            style={{ minHeight: '100%' }}
+                        />
+                    </Col>
+                </Row>
 
-                        <Col xs={12} className='mt-4'>
-                            <Card >
-                                <Card.Body>
-                                    <h6 className="text-muted">Ou copie o código de pagamento</h6>
-                                    <InputGroup>
-                                        <FormControl
-                                            readOnly
-                                            value={resultPayment?.registros[0].fmp_hash}
-                                        />
-                                        <Button variant="outline-secondary" onClick={() => handleCopy()}>
-                                            {copied ? 'Copiado!' : 'Copiar'}
-                                        </Button>
-                                    </InputGroup>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
+                <div className='w-100 mt-4'>
+                    <Card>
+                        <Card.Body>
+                            <h6 className="text-muted">Ou copie o código de pagamento</h6>
+                            <div className='position-relative'>
+                                <FormControl
+                                    className='pe-4'
+                                    readOnly
+                                    value={resultPayment?.registros[0].fmp_hash}
+                                />
+
+                                <div className='position-absolute bg-white top-50 end-0 translate-middle-y d-flex justify-content-center px-2 me-1'>
+                                    {showTooltip && (
+                                        <div
+                                            className='z-1 position-absolute text-white d-flex align-items-center small shadow-sm rounded-3 py-2 px-3 '
+                                            style={{ width: 320, top: '-170%', left: '-620%', backgroundColor: '#333333' }}>
+                                            Copiar para área de transferência
+                                            <div className='position-absolute top-50 end-0'>
+                                                <CaretDownIcon currentColor={'#333333'} />
+                                            </div>
+                                        </div>
+                                    )}
+                                    <a type='button' className='ms-1 z-3 link-green'
+                                        onMouseOver={() => setShowToolTip(true)}
+                                        onMouseLeave={() => setShowToolTip(false)}
+                                        onClick={() => handleCopy()}>{copied ? <CopySuccessIcon /> : <CopyIcon />}</a>
+                                </div>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                </div>
             </ModalBody>
         </>
     );

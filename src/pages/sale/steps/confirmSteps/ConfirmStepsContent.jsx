@@ -1,5 +1,5 @@
 import { ModalBody, ModalFooter, Accordion, Button, Card, Row, Col, Spinner } from "react-bootstrap";
-import { PaymentPixIcon, PaymentTicketIcon, GeoFenceIcon, BatteryIcon, ReturnIcon, CardsMultiColorIcon } from "../../../../assets/icons/IconsSet";
+import { PaymentPixIcon, PaymentTicketIcon, GeoFenceIcon, BatteryIcon, ReturnIcon, CardsMultiColorIcon, ErrorCircleFillIcon } from "../../../../assets/icons/IconsSet";
 import SaleServices from "../../../../services/sale/SaleServices";
 import getCardDetails from "../../../../components/common/getCardDetails";
 import { useState, useMemo, useEffect } from "react";
@@ -8,14 +8,15 @@ import BatteryCartServices from "../../../../services/cart/BatteryCartServices";
 import RenderPixContent from "../selectedPaymentMethod/methods/PixContent"
 import TicketContent from "../selectedPaymentMethod/methods/TicketContent";
 import { Link } from "react-router-dom";
-import { AgilePayIcon } from "../../../../assets/icons/IconsSet";
+import ToastComponent from "../../../../components/common/ToastComponent";
 
 function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setBatteryCart, setShowProgressBar, setSteps, handlePreviousStep, setSuccessSale }) {
     const { getByUser } = BatteryCartServices();
-    const { createCreditCardPayment, createPixPayment, createTicketPayment } = SaleServices();
+    const { createCreditCardPayment, createPixPayment, createTicketPayment, setErrorMessages, errorMessages, } = SaleServices();
     const [stepsConfirmPayment, setStepsConfirmPayment] = useState('confirm_data');
     const [resultPayment, setResultPayment] = useState({});
     const [isLoadingPayment, setIsLoadingPayment] = useState(false);
+    const [showToast, setShowToast] = useState(false);
 
     const RenderSaleSuccessCard = ({ resultPayment }) => (
         <>
@@ -29,7 +30,7 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
                     <Card className="mt-4 w-100">
                         <Card.Header>
                             <Card.Text className='text-muted'>
-                                Pedido: <span className='fw-bold' style={{ color: '#58af9b' }}>#1234 </span>
+                                Pedido: <span className='fw-bold' style={{ color: '#58af9b' }}>#{resultPayment.saleCode} </span>
                                 - Status Pago
                             </Card.Text>
                         </Card.Header>
@@ -43,11 +44,11 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
                                 <Col className="d-flex flex-column justify-content-center ms-4 lh-sm">
                                     <span>Veja Mais detalhes do pagamento</span>
                                     <span className="text-muted">como comprovante valore e etc...</span>
-                                   
+
                                 </Col>
                                 <Col className="col-auto"><Button variant="green" onClick={() => window.open(resultPayment.registros[0].fmc_link_compartilhamento, '_blank', 'noopener noreferrer')}
                                 >Ver mais</Button></Col>
-                            
+
                             </Row>
                         </Card.Body>
                     </Card>
@@ -70,8 +71,8 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
         const confirmedPaymentOption = {
             'card': async () => {
                 return await createCreditCardPayment({
-                    cep: optionsSelected.address.cep,
                     cardId: optionsSelected.payment.data.cardId,
+                    cep: optionsSelected.address.cep,
                     addressId: optionsSelected.address.addressId,
                     userId: optionsSelected.userId,
                     cartId: batteryCart.cartId
@@ -103,6 +104,9 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
                 setStepsConfirmPayment(`create_sale_${method}`)
                 setShowProgressBar(false);
                 setSuccessSale(true);
+            } else {
+                setErrorMessages({ general: 'Ocorreu um erro ao realizar a compra, tente novamente mais tarde' })
+                setShowToast(true);
             }
         }
     }
@@ -131,7 +135,20 @@ function ConfirmStepsContent({ optionsSelected, batteryCart, freightValues, setB
         }
     }, [stepsConfirmPayment, isLoadingPayment]);
 
-    return confirmStep;
+    return (
+        <>
+            {confirmStep}
+            <div className='position-fixed top-0 end-0 mt-2 me-4' style={{ zIndex: 1350 }}>
+                <ToastComponent
+                    icon={<ErrorCircleFillIcon />}
+                    message={errorMessages.general}
+                    showToast={showToast}
+                    setShowToast={setShowToast}
+                />
+            </div>
+        </>
+    )
+
 }
 
 

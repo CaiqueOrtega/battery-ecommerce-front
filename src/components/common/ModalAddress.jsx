@@ -17,18 +17,7 @@ function ModalSelectedAddress(props) {
                                 <Card key={index}
                                     className={`${index > 0 ? 'mt-2' : ''} card-modal-select-address shadow-sm d-flex flex-row `}
                                     onClick={() =>
-                                        props.handleGetFreightByCep(address.cep,
-                                            {
-                                                logradouro: address.address,
-                                                cep: address.cep,
-                                                cidade: address.city,
-                                                complemento: address.complement,
-                                                bairro: address.neighborhood,
-                                                numero: address.number,
-                                                estado: address.state
-                                            },
-                                            true,
-                                            props.quantity
+                                        props.handleGetFreightByCep(address.cep, address, true,  props.quantity
                                         )
                                     } >
                                     <Card.Header className="px-2 border rounded-0 rounded-start-2"></Card.Header>
@@ -101,9 +90,9 @@ function ModalSelectedAddress(props) {
             <Modal.Body className='px-3 px-md-5 py-5'>
                 <section>
                     <Form className="d-flex align-items-center" onSubmit={(e) => props.handleGetAddressByCep(e, props.formCEP, true)}>
-                        <Row className="g-0">
+                        <Row className="g-0 w-100">
                             <Col xs={12}><Form.Label className='text-muted'> Digite um CEP</Form.Label></Col>
-                            <Col xs={9} className="pe-2">
+                            <Col className="pe-3">
                                 <FormGroupWithIcon
                                     icon={<MapIcon className="position-absolute ms-3" currentColor="#333" />}
                                     type={"text"}
@@ -115,7 +104,7 @@ function ModalSelectedAddress(props) {
                                 />
 
                             </Col>
-                            <Col className="position-relative ps-2">
+                            <Col className="position-relative " style={{maxWidth: 95}}>
                                 <Button variant={`red position-absolute`} type="submit">Consultar</Button>
                             </Col>
                         </Row>

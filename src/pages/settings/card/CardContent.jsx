@@ -30,7 +30,7 @@ function CardContent() {
         main: false,
         ownerDocument: '',
         cvv: ''
-        
+
     })
 
     useEffect(() => {
@@ -59,7 +59,8 @@ function CardContent() {
                 cardOwner: selectedFormCardValues.cardOwner || '',
                 expirationDate: selectedFormCardValues.expirationDate || '',
                 main: selectedFormCardValues.main || false,
-                cvv: selectedFormCardValues.cvv || ''
+                cvv: selectedFormCardValues.cvv || '',
+                ownerDocument: selectedFormCardValues.ownerDocument || ''
             })
         }
         if (selectedFormCardValues) {
@@ -184,6 +185,7 @@ function CardContent() {
                             )}
 
                         </section>
+
                         <CardModel
                             formCardValues={formCardValues}
                             setFormCardValues={setFormCardValues}
@@ -196,15 +198,22 @@ function CardContent() {
                     </>
                 ) : (
                     <>
-                        <UserCard
-                            card={card}
-                            userData={userData}
-                            setShowCardForm={setShowCardForm}
-                            setSelectedFormCardValues={setSelectedFormCardValues}
-                            selectedFormCardValues={selectedFormCardValues}
-                            getCardDetails={getCardDetails}
-                            handleCardAction={handleCardAction}
-                        />
+                        {card.length > 0 ? (
+                            <UserCard
+                                card={card}
+                                userData={userData}
+                                setShowCardForm={setShowCardForm}
+                                setSelectedFormCardValues={setSelectedFormCardValues}
+                                selectedFormCardValues={selectedFormCardValues}
+                                getCardDetails={getCardDetails}
+                                handleCardAction={handleCardAction}
+                            />
+                        ) : (
+                            <div className="d-flex flex-grow-1 h-100 align-items-center justify-content-center">
+                                <h4 className="text muted">Você ainda não possui nenhum cartão</h4>
+                            </div>
+                        )}
+
                     </>
                 )}
             </div>
@@ -225,7 +234,7 @@ function UserCard({ card, setShowCardForm, handleCardAction, selectedFormCardVal
     }
 
     const handleOpenFormUpdate = (card, length) => {
-        const updatedCard = { ...card, cvv: '***', length: length };
+        const updatedCard = { ...card, cvv: '***', ownerDocument: '***.***.***-**', length: length };
         setSelectedFormCardValues(updatedCard);
         setShowCardForm(true);
     }
@@ -489,7 +498,7 @@ function CardModel({ formCardValues, setFormCardValues, handleCardAction, select
                 </Col>
 
                 <Col xs={12} className="d-flex justify-content-between">
-                    <div className="d-flex align-items-end flex-grow-1">
+                    <div className="d-flex align-items-end flex-grow-1 position-absolute mt-3">
                         <AlertErrorOrSuccess errorMessages={errorMessages} />
                     </div>
 
@@ -554,6 +563,7 @@ function CardForm({ formCardValues, setFormCardValues, handleFocus, handleBlur, 
                                 maxLength={"5"}
                                 required={true}
                                 feedback={errorMessages.expirationDate}
+                                mask={'99/99'}
                             />
                         </Form.Group>
                     </Col>
@@ -579,18 +589,20 @@ function CardForm({ formCardValues, setFormCardValues, handleFocus, handleBlur, 
                     </Col>
                 </Row>
                 <Form.Group className="m-floating-label">
-                        <FormFloatingWithIcon
-                            type={"text"}
-                            labelText={'CPF Titular'}
-                            inputId={'cpf'}
-                            value={formCardValues.ownerDocument}
-                            onChange={(e) => setFormCardValues({ ...formCardValues, ownerDocument: e.target.value })}
-                            onFocusData={{ function: handleFocus, param: 'cpf' }}
-                            onBlurData={{ function: handleBlur }}
-                            maxLength={"14"}
-                            required={true}
-                            feedback={errorMessages.expirationDate}
-                        />
+                    <FormFloatingWithIcon
+                        type={"text"}
+                        labelText={'CPF Titular'}
+                        inputId={'cpf'}
+                        value={formCardValues.ownerDocument}
+                        onChange={(e) => setFormCardValues({ ...formCardValues, ownerDocument: e.target.value })}
+                        onFocusData={{ function: handleFocus, param: 'cpf' }}
+                        onBlurData={{ function: handleBlur }}
+                        maxLength={"14"}
+                        required={true}
+                        disable={selectedFormCardValues?.cvv ? true : false}
+                        feedback={errorMessages.expirationDate}
+                        mask={!selectedFormCardValues?.cvv ? '999.999.999-99' : null}
+                    />
                 </Form.Group>
                 {!selectedFormCardValues?.partialCard ? (
                     <div className="col-md-12 mt-2">

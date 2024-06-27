@@ -3,6 +3,7 @@ import SelectedPaymentContent from './steps/selectedPaymentMethod/SelectedPaymen
 import NotLoggedContentStep from './steps/NotLoggedContentStep';
 import { Modal, ModalHeader } from "react-bootstrap";
 import { useMemo, useState, useEffect } from "react";
+import { ErrorCircleFillIcon } from '../../assets/icons/IconsSet';
 import ConfirmStepsContent from './steps/confirmSteps/ConfirmStepsContent';
 import './salesSteps.css'
 
@@ -84,46 +85,55 @@ function SaleStepsModal({ showSaleStepsModal, setShowSaleStepsModal, isLoggedIn,
             default: <div>Funcionalidade não Encontrada...</div>
         }
     }, [isLoggedIn, steps, showProgressBar, address, addressValues, batteryCart, freightValues]);
-;
+    ;
+
+    useEffect(() =>{
+        console.log(optionsSelected)
+        if(!setShowSaleStepsModal && successSale){
+            setSteps('address')
+        }
+    },[setShowSaleStepsModal]);
 
     return (
-        <Modal centered show={showSaleStepsModal} onHide={() => setShowSaleStepsModal(false)} backdrop="static" keyboard={false} dialogClassName="modal-sale" contentClassName='modal-sale-content'
-        >
-            <ModalHeader className='border-0 position-relative mb-0'>
-                <button className='btn-close position-absolute end-0 top-0 mt-1 me-1 z-3' onClick={() => setShowSaleStepsModal(false)} />
-                {showProgressBar && (
-                    <section className="px-4 pt-4 w-100">
-                        <div className="progress-container position-relative d-flex align-items-center">
-                            <div className="position-absolute d-flex justify-content-between w-100">
-                                {[...Array(3)].map((_, index) => (
-                                    <div
-                                        key={index}
-                                        className={`rounded-circle text-white d-flex justify-content-center align-items-center 
+        <>
+            <Modal centered show={showSaleStepsModal} onHide={() => setShowSaleStepsModal(false)} backdrop="static" keyboard={false} dialogClassName="modal-sale" contentClassName='modal-sale-content'
+            >
+                <ModalHeader className='border-0 position-relative mb-0'>
+                    <button className='btn-close position-absolute end-0 top-0 mt-1 me-1 z-3' onClick={() => setShowSaleStepsModal(false)} />
+                    {showProgressBar && (
+                        <section className="px-4 pt-4 w-100">
+                            <div className="progress-container position-relative d-flex align-items-center">
+                                <div className="position-absolute d-flex justify-content-between w-100">
+                                    {[...Array(3)].map((_, index) => (
+                                        <div
+                                            key={index}
+                                            className={`rounded-circle text-white d-flex justify-content-center align-items-center 
                                              ${index < progressBarSteps ? (index === progressBarSteps - 1 && isAnimationCircle ? 'filled-circle' : 'bg-primary') : isAnimationReversedCircle && index === progressBarSteps ? 'filled-reversed-circle' : 'bg-body-secondary'}`}
-                                        style={{ width: 45, height: 45 }}
-                                    >
-                                        {index + 1}
-                                    </div>
-                                ))}
-                            </div>
+                                            style={{ width: 45, height: 45 }}
+                                        >
+                                            {index + 1}
+                                        </div>
+                                    ))}
+                                </div>
 
-                            <div className="progress w-100">
-                                <div
-                                    className={`progress-bar progress-bar-sale ${isDelaying ? 'retrocesso' : ''}`}
-                                    role="progressbar"
-                                    style={{ width: `${((progressBarSteps - 1) / (3 - 1)) * 100}%` }}
-                                    aria-valuenow={progressBarSteps}
-                                    aria-valuemin="1"
-                                    aria-valuemax={3}
-                                />
+                                <div className="progress w-100">
+                                    <div
+                                        className={`progress-bar progress-bar-sale ${isDelaying ? 'retrocesso' : ''}`}
+                                        role="progressbar"
+                                        style={{ width: `${((progressBarSteps - 1) / (3 - 1)) * 100}%` }}
+                                        aria-valuenow={progressBarSteps}
+                                        aria-valuemin="1"
+                                        aria-valuemax={3}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    </section>
-                )}
-            </ModalHeader>
+                        </section>
+                    )}
+                </ModalHeader>
 
-            {modalContent}
-        </Modal>
+                {modalContent}
+            </Modal>
+        </>
     )
 }
 

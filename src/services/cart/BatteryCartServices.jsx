@@ -19,6 +19,7 @@ const BatteryCartServices = () => {
             const response = await ConnectionAPI.put(`cart/${userId}/battery/${batteryId}/quantity/${quantity}`)
             return response.data
         } catch (error) {
+            console.log('entoru')
             handleAPIError(error)
         }
     }

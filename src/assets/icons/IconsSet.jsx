@@ -881,7 +881,7 @@ export const CheckCart = ({ currentColor }) => (
         preserveAspectRatio="xMidYMid meet">
 
         <g transform="translate(0.000000,180.000000) scale(0.100000,-0.100000)"
-            fill={ currentColor|| "#000000"} stroke="none">
+            fill={currentColor || "#000000"} stroke="none">
             <path d="M115 1745 c-30 -29 -32 -64 -6 -96 17 -22 29 -25 117 -29 l98 -5 36
    -190 c21 -104 58 -300 84 -435 26 -135 51 -259 57 -277 13 -42 97 -119 145
    -132 22 -6 127 -11 239 -11 l200 0 2 75 2 75 -202 0 c-235 0 -239 1 -256 80
@@ -913,6 +913,54 @@ export const CheckTruckIcon = ({ currentColor }) => (
     <svg fill={currentColor || '#000'} height="34px" width="34px" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 512 512" xmlSpace="preserve"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <g> <path d="M93.867,46.925C42.112,46.925,0,89.037,0,140.791c0,51.755,42.112,93.867,93.867,93.867 c51.755,0,93.867-42.112,93.867-93.867C187.733,89.037,145.621,46.925,93.867,46.925z M134.033,121.225L74.3,180.958 c-1.664,1.664-3.849,2.5-6.033,2.5s-4.369-0.836-6.033-2.5l-17.067-17.067c-3.337-3.336-3.337-8.73,0-12.066s8.73-3.337,12.066,0 l11.034,11.034l53.7-53.7c3.337-3.337,8.73-3.337,12.066,0S137.37,117.888,134.033,121.225z"></path> </g> </g> <g> <g> <path d="M401.067,362.675c-28.237,0-51.2,22.963-51.2,51.2c0,28.237,22.963,51.2,51.2,51.2c28.237,0,51.2-22.963,51.2-51.2 C452.267,385.638,429.303,362.675,401.067,362.675z M401.067,448.009c-18.825,0-34.133-15.309-34.133-34.133 c0-18.825,15.309-34.133,34.133-34.133c18.825,0,34.133,15.309,34.133,34.133C435.2,432.7,419.891,448.009,401.067,448.009z"></path> </g> </g> <g> <g> <path d="M110.933,362.675c-28.237,0-51.2,22.963-51.2,51.2c0,28.237,22.963,51.2,51.2,51.2s51.2-22.963,51.2-51.2 C162.133,385.638,139.17,362.675,110.933,362.675z M110.933,448.009c-18.825,0-34.133-15.309-34.133-34.133 c0-18.825,15.309-34.133,34.133-34.133s34.133,15.309,34.133,34.133C145.067,432.7,129.758,448.009,110.933,448.009z"></path> </g> </g> <g> <g> <path d="M494.933,320.009h12.8c2.355,0,4.267-1.911,4.267-4.267v-8.533c0-2.355-1.911-4.267-4.267-4.267h-115.2 c-4.71,0-8.533-3.823-8.533-8.533v-81.067c0-2.355-1.911-4.267-4.267-4.267H358.4c-4.71,0-8.533,3.823-8.533,8.533v128H332.8 c0-64.435,0-179.2,0-179.2c0-18.825-15.309-34.133-34.133-34.133H210.27c-2.509-0.23-5.419,1.485-5.419,4.002 c0,0.572,0,1.041,0,1.417c-0.154,57.83-43.059,108.22-100.651,113.459c-34.483,3.14-66.116-9.626-88.422-31.77 c-2.697-2.671-7.245-0.828-7.245,2.97c0,20.224,0,62.797,0,76.348c0,2.355,1.911,4.241,4.267,4.241h12.8 c4.71,0,8.533,3.823,8.533,8.533s-3.823,8.533-8.533,8.533H12.8c-2.355,0-4.267,1.911-4.267,4.267v12.8 c-4.71,0-8.533,3.823-8.533,8.533v43.46c0,1.869,0.828,3.601,2.167,4.907c2.901,2.842,1.442,2.833,36.233,2.799 c3.234,0,7.023-2.424,8.09-5.478c15.13-43.213,71.202-64.043,115.405-25.19c7.159,6.289,10.641,15.334,13.261,24.499 c1.058,3.686,4.412,6.187,8.201,6.187h140.911c4.71,0,8.533-3.823,8.533-8.533c0-0.009,0-0.026,0-0.043c0-0.529,0-10.394,0-25.557 h19.994c2.014,0,3.942-0.751,5.513-2.014c20.881-16.811,49.212-20.079,77.065-7.04c15.232,7.134,24.439,21.683,30.089,37.53 c1.212,3.396,4.429,5.666,8.038,5.666h29.969c4.71,0,8.533-3.823,8.533-8.533v-46.933c0-2.355-1.911-4.267-4.267-4.267h-12.8 c-4.71,0-8.533-3.823-8.533-8.533S490.223,320.009,494.933,320.009z"></path> </g> </g> <g> <g> <path d="M511.42,279.543l-38.989-66.074c-1.596-2.705-4.634-4.386-7.919-4.386h-58.914c-2.5,0-4.531,1.911-4.531,4.267v68.267 c0,2.355,2.031,4.267,4.531,4.267H507.46C510.916,285.884,513.101,282.385,511.42,279.543z"></path> </g> </g> </g></svg>
 )
 
-export const FilledCheck = ({currentColor}) => (
+export const FilledCheck = ({ currentColor }) => (
     <svg viewBox="0 0 16 16" height="30px" width="30px" id="meteor-icon-kit__solid-check-circle-s" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" strokeWidth="0"></g><g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g><g id="SVGRepo_iconCarrier"><path fillRule="evenodd" clipRule="evenodd" d="M8 16C3.58172 16 0 12.4183 0 8C0 3.58172 3.58172 0 8 0C12.4183 0 16 3.58172 16 8C16 12.4183 12.4183 16 8 16zM5.70711 7.2929C5.31658 6.9024 4.68342 6.9024 4.29289 7.2929C3.90237 7.6834 3.90237 8.3166 4.29289 8.7071L6.2929 10.7071C6.6834 11.0976 7.3166 11.0976 7.7071 10.7071L11.7071 6.7071C12.0976 6.3166 12.0976 5.68342 11.7071 5.29289C11.3166 4.90237 10.6834 4.90237 10.2929 5.29289L7 8.5858L5.70711 7.2929z" fill={currentColor || "#000"}></path></g></svg>
+)
+
+export const ErrorCircleFillIcon = () => (
+    <svg
+        version="1.1"
+        id="Capa_1"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlnsXlink="http://www.w3.org/1999/xlink"
+        viewBox="0 0 50 50"
+        xmlSpace="preserve"
+        width="64px"
+        height="64px"
+        fill="#000000"
+    >
+        <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+        <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+        <g id="SVGRepo_iconCarrier">
+            <circle style={{ fill: "#D75A4A" }} cx="25" cy="25" r="25"></circle>
+            <polyline
+                style={{
+                    fill: "none",
+                    stroke: "#FFFFFF",
+                    strokeWidth: 2,
+                    strokeLinecap: "round",
+                    strokeMiterlimit: 10
+                }}
+                points="16,34 25,25 34,16"
+            ></polyline>
+            <polyline
+                style={{
+                    fill: "none",
+                    stroke: "#FFFFFF",
+                    strokeWidth: 2,
+                    strokeLinecap: "round",
+                    strokeMiterlimit: 10
+                }}
+                points="16,16 25,25 34,34"
+            ></polyline>
+        </g>
+    </svg>
+)
+
+export const WarningTriangleIcon = () => (
+    <svg width="38px" height="38px" viewBox="0 0 36 36" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--twemoji" preserveAspectRatio="xMidYMid meet" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path fill="#FFCC4D" d="M2.653 35C.811 35-.001 33.662.847 32.027L16.456 1.972c.849-1.635 2.238-1.635 3.087 0l15.609 30.056c.85 1.634.037 2.972-1.805 2.972H2.653z"></path><path fill="#231F20" d="M15.583 28.953a2.421 2.421 0 0 1 2.419-2.418a2.421 2.421 0 0 1 2.418 2.418a2.422 2.422 0 0 1-2.418 2.419a2.422 2.422 0 0 1-2.419-2.419zm.186-18.293c0-1.302.961-2.108 2.232-2.108c1.241 0 2.233.837 2.233 2.108v11.938c0 1.271-.992 2.108-2.233 2.108c-1.271 0-2.232-.807-2.232-2.108V10.66z"></path></g></svg>
+)
+
+export const BoxesIcons = () => (
+<svg width="30px" height="30px" viewBox="0 0 24 24" id="meteor-icon-kit__solid-boxes" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g clip-path="url(#clip0_525_134)"> <path d="M11 0H6C5.44772 0 5 0.447715 5 1V11C5 11.5523 5.44772 12 6 12H18C18.5523 12 19 11.5523 19 11V1C19 0.447715 18.5523 0 18 0H13V2.5C13 3.05228 12.5523 3.5 12 3.5C11.4477 3.5 11 3.05228 11 2.5V0Z" fill="#fff"></path> <path d="M5 14V16C5 16.5523 5.44772 17 6 17C6.55228 17 7 16.5523 7 16V14H11C11.5523 14 12 14.4477 12 15V23C12 23.5523 11.5523 24 11 24H1C0.447715 24 0 23.5523 0 23V15C0 14.4477 0.447715 14 1 14H5Z" fill="#fff"></path> <path d="M18 14V16C18 16.5523 18.4477 17 19 17C19.5523 17 20 16.5523 20 16V14H23C23.5523 14 24 14.4477 24 15V23C24 23.5523 23.5523 24 23 24H15C14.4477 24 14 23.5523 14 23V15C14 14.4477 14.4477 14 15 14H18Z" fill="#fff"></path> </g> <defs> <clipPath id="clip0_525_134"> <rect width="24" height="24" fill="white"></rect> </clipPath> </defs> </g></svg>
 )

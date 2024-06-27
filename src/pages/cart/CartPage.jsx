@@ -1,7 +1,7 @@
 import { Card, Col, Row, Button, FormControl, Container, Accordion, Placeholder, Spinner, InputGroup, Form } from "react-bootstrap";
 import { useGlobalDataProvider } from "../../context/GlobalDataProvider";
 import exemploImageCart from "../../assets/images/exemploImageRegister.png";
-import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon, ExclamationCircleIcon, ToEditIcon, AddSquareIcon } from "../../assets/icons/IconsSet";
+import { AdditionIcon, SubtractionIcon, ShoppingCartIcon, PurchaseIcon, MapIcon, DeliveryIcon, ExclamationCircleIcon, ToEditIcon, AddSquareIcon, ErrorCircleFillIcon } from "../../assets/icons/IconsSet";
 import BatteryCartServices from "../../services/cart/BatteryCartServices";
 import AddressServices from "../../services/address/AddressServices";
 import ConfirmChangesModal from "../../components/common/ConfirmChangesModal";
@@ -12,6 +12,7 @@ import './cart.css';
 import FormValidations from "../../components/common/FormValidation";
 import SaleStepsModal from "../sale/SaleStepsModal";
 import PromotionService from "../../services/promotion/PromotionService";
+import ToastComponent from "../../components/common/ToastComponent";
 
 function CartPage() {
     const { batteryCart, setBatteryCart, batteryCartIsLoaded, isLoggedIn, address, setAddress, addressIsLoaded, fetchAddress, userData } = useGlobalDataProvider();
@@ -236,6 +237,7 @@ function CartPage() {
                             setBatteryCart={setBatteryCart}
                             addPromotion={addPromotion}
                             removePromotion={removePromotion}
+                            batteryErrorMessages={batteryErrorMessages}
                         />
                     </Col>
 
@@ -269,11 +271,13 @@ function CartPage() {
     );
 }
 
-function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, freightIsLoaded, addressErrorMessages, addPromotion, setBatteryCart, removePromotion }) {
+function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfirmChangesModalData, setConfirmAction, handleCartAction, batteryCartIsLoaded, isLoggedIn, address, formCEP, setFormCEP, handleGetAddressByCep, handleGetFreightByCep, freightValues, addressValues, showSelectedAddressModal, setShowSelectedAddressModal, freightIsLoaded, addressErrorMessages, addPromotion, setBatteryCart, removePromotion, batteryErrorMessages }) {
     const { ExtractNumericValue } = FormValidations();
     const [showPopover, setShowPopover] = useState(false);
     const [formPromotionValue, setFormPromotionValue] = useState('');
     const [disableFormPromotionCode, setDisableFormPromotionCode] = useState(false)
+    const [showPopoverPromotion, setShowPopoverPromotion] = useState(false);
+    const [showToast, setShowToast] = useState(false);
 
     useEffect(() => {
         if (batteryCartIsLoaded && batteryCart?.promotion?.code) {
@@ -389,11 +393,15 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
                 if (response) {
                     setBatteryCart(response);
                     setDisableFormPromotionCode(true);
+                }else{
+                    setShowToast(true);
                 }
-            }else if(batteryCart?.promotion){
+            } else if (batteryCart?.promotion) {
                 const response = await removePromotion(batteryCart.cartId)
-                if(response){
+                if (response) {
                     setBatteryCart(response);
+                }else{
+                    setShowToast(true);
                 }
             }
         } else {
@@ -403,26 +411,73 @@ function RenderCartItemsCard({ batteryCart, setShowConfirmChangesModal, setConfi
 
     return (
         <>
+            <div className='position-fixed top-0 end-0 mt-2 me-2' style={{ zIndex: 1350 }}>
+                <ToastComponent
+                    icon={<ErrorCircleFillIcon />}
+                    message={batteryErrorMessages.general}
+                    showToast={showToast}
+                    setShowToast={setShowToast}
+                />
+            </div>
             <Card className={`border-0 shadow ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light' : ''}`}>
                 <Card.Header className={`py-0 fw-bold ${batteryCartIsLoaded && batteryCart?.batteries?.length === 0 ? 'bg-light text-muted' : 'bg-white'}`}>
                     <div className="d-flex justify-content-between">
                         <span className=" py-3 ">
                             Carrinho de Baterias
                         </span>
-                        {batteryCart?.batteries?.length > 0 && (
-                            <div className="d-flex align-items-center position-relative" style={{ maxWidth: 220 }}>
-                                <FormControl
-                                    value={formPromotionValue}
-                                    onChange={(e) => setFormPromotionValue(e.target.value)}
-                                    className="form-control-sm"
-                                    placeholder="Cupom de Desconto"
-                                    disabled={disableFormPromotionCode}
-                                />
-                                <div className='position-absolute top-50 end-0 translate-middle-y d-flex justify-content-center px-2 me-1 z-3'>
-                                    <a className="small text-muted" type="submit" onClick={() => handlePromotionCode(formPromotionValue)}>
-                                        {disableFormPromotionCode ? <ToEditIcon /> : <AddSquareIcon />}
-                                    </a>
+                        {isLoggedIn ? (
+                            batteryCart?.batteries?.length > 0 && (
+                                <div className="d-flex align-items-center position-relative" style={{ maxWidth: 220 }}>
+                                    <FormControl
+                                        value={formPromotionValue}
+                                        onChange={(e) => setFormPromotionValue(e.target.value)}
+                                        className="form-control-sm"
+                                        placeholder={"Cupom de Desconto"}
+                                        disabled={disableFormPromotionCode}
+                                    />
+
+                                    <div className='position-absolute top-50 end-0 translate-middle-y d-flex justify-content-center px-2 me-1 z-3'>
+                                        <a className="small text-muted" type="submit" onClick={() => handlePromotionCode(formPromotionValue)}>
+                                            {disableFormPromotionCode ? <ToEditIcon /> : <AddSquareIcon />}
+                                        </a>
+                                    </div>
+
                                 </div>
+                            )
+                        ) : (
+                            <div className="fw-normal d-flex align-items-center position-relative">
+                                <span className="small text-muted">Cupom de desconto</span>
+
+                                <div
+                                    className="input-progress-container position-absolute z-1 "
+                                    style={{
+                                        position: 'absolute',
+                                        top: '90%',
+                                        right: -20,
+                                        visibility: showPopoverPromotion ? 'visible' : 'hidden',
+                                        width: 250
+                                    }}
+                                >
+                                    <div className="popover shadow-sm">
+                                        <div className='popover-header py-1'>
+                                            <span className='small'>Promoções indisponíveis</span>
+                                        </div>
+                                        <div className="d-flex align-items-center justify-content-center popover-content p-2">
+                                            <span>
+                                                Entre ou se cadastre para ter acesso aos cupons promocionais!
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <a
+                                    className='float-end ms-2 z-3 position-relative text-muted'
+                                    type="button"
+                                    onMouseOver={() => setShowPopoverPromotion(true)}
+                                    onMouseOut={() => setShowPopoverPromotion(false)}
+                                >
+                                    <ExclamationCircleIcon />
+                                </a>
                             </div>
                         )}
                     </div>

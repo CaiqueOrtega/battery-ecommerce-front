@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-import { MapIcon, DeliveryIcon, MotorcycleIcon, SubtractionIcon, AdditionIcon, ShieldCheckIcon, BackIcon, MedalIcon, ExclamationCircleIcon } from '../../assets/icons/IconsSet';
+import { MapIcon, DeliveryIcon, MotorcycleIcon, SubtractionIcon, AdditionIcon, ShieldCheckIcon, BackIcon, MedalIcon, ExclamationCircleIcon, WarningTriangleIcon } from '../../assets/icons/IconsSet';
 import { Card, Container, Row, Col, Button, FormControl, Form, InputGroup, Placeholder } from 'react-bootstrap';
 import FormGroupWithIcon from '../../components/common/FormGroupWithIcon';
 
@@ -15,6 +15,7 @@ import { useGlobalDataProvider } from '../../context/GlobalDataProvider';
 import './batteryPurchasePage.css';
 import FormValidations from '../../components/common/FormValidation';
 import SaleStepsModal from '../sale/SaleStepsModal';
+import ToastComponent from '../../components/common/ToastComponent';
 
 function BatteryPurchasePage() {
     const location = useLocation();
@@ -44,7 +45,7 @@ function BatteryPurchasePage() {
 
     const [showSaleStepsModal, setShowSaleStepsModal] = useState(false);
     const [steps, setSteps] = useState('address')
-
+    const [showToast, setShowToast] = useState(false);
 
     const handleAddBatteryToCart = async () => {
         if (isLoggedIn && batteryCart) {
@@ -58,8 +59,15 @@ function BatteryPurchasePage() {
         const response = await addBattery(batteryCart.cartId, batteryData.batteryId, quantity);
         if (response) {
             setBatteryCart(response);
+        } else {
+            setShowToast(true);
         }
     }
+
+    useEffect(() => {
+        console.log(batteryCartErrorMessages)
+    }, [batteryCartErrorMessages])
+
 
     const addBatteryToLocalCart = () => {
         let batteriesAddCart = [];
@@ -122,16 +130,18 @@ function BatteryPurchasePage() {
                 });
             } catch (e) {
                 if (e.name === 'QuotaExceededError' || e.name === 'NS_ERROR_DOM_QUOTA_REACHED') {
-                    console.error("Não há espaço suficiente no localStorage para adicionar a bateria.");
+                    setBatteryCartErrorMessages({ general: "Não há espaço suficiente no localStorage para adicionar a bateria." });
+                    setShowToast(true);
 
                 } else {
                     console.error("Ocorreu um erro ao tentar adicionar a bateria ao carrinho:", e);
-
+                    setBatteryCartErrorMessages({ general: "Ocorreu um erro ao tentar adicionar a bateria ao carrinho." });
+                    setShowToast(true);
                 }
             }
-
         } else {
-            console.log("A bateria ja esta no carrinho")
+            setBatteryCartErrorMessages({ general: "A bateria selecionada já foi adicionada ao carrinho." });
+            setShowToast(true);
         }
     }
 
@@ -150,7 +160,6 @@ function BatteryPurchasePage() {
                 setPrevFormCEP(formCEP);
                 handleGetFreightByCep(formCEP, response, isRequestModal, quantity);
             } else {
-                console.log('entrou')
                 setAddressErrorMessages({ cep: 'CEP inválido ou não encontrado' })
             }
         }
@@ -173,10 +182,15 @@ function BatteryPurchasePage() {
 
     const handleSaleBattery = async () => {
         if (isLoggedIn) {
-            await addBatteryToServerCart();
+            const batteryExistsInCart = batteryCart.batteries.some(item => item.battery.batteryId === batteryData.batteryId);
+
+            if (!batteryExistsInCart) {
+                await addBatteryToServerCart();
+            }
+
             setShowSaleStepsModal(true);
         }
-    }
+    };
 
     const renderFreightCards = () => {
         return (
@@ -299,6 +313,15 @@ function BatteryPurchasePage() {
                     setBatteryCart={setBatteryCart}
                 />
             )}
+
+            <div className='position-absolute top-0 end-0 mt-2 me-2'>
+                <ToastComponent
+                    icon={<WarningTriangleIcon />}
+                    message={batteryCartErrorMessages.general}
+                    showToast={showToast}
+                    setShowToast={setShowToast}
+                />
+            </div>
         </>
     );
 }
@@ -481,7 +504,7 @@ function RenderInputOrCard({ address, fetchAddress, addressIsLoaded, handleGetAd
                 <Form onSubmit={(e) => handleGetAddressByCep(e, formCEP, false)}>
                     <InputGroup className='flex-nowrap'>
                         <Row className='g-0'>
-                            <Col style={{maxWidth: 247}}>
+                            <Col style={{ maxWidth: 247 }}>
                                 <FormGroupWithIcon
                                     icon={<MapIcon className='position-absolute ms-3' currentColor='#333' />}
                                     type={'text'}

@@ -236,7 +236,7 @@ function AddressForm(props) {
 
             <div className="mt-5">
                 <Button variant="yellow float-end" type="submit" onClick={(e) => handleSubmit(e)} style={{ maxHeight: '35px' }}>
-                    {props.action === 'update' ? 'Editar' : 'Cadastrar'} Endereço
+                    {props.isUpdateId ? 'Editar' : 'Cadastrar'} Endereço
                 </Button>
             </div>
 
